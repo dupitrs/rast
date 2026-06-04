@@ -129,8 +129,17 @@
       </a>
     </section>
 
+    <!-- ============ SCROLL VIDEO — own section; starts scrubbing as you scroll out of the hero ============ -->
+    <section class="scrollvid" id="scrollvid" aria-hidden="true">
+      <div class="scrollvid__sticky">
+        <video class="scrollvid__video" id="scrollVideo" muted playsinline preload="auto" tabindex="-1">
+          <source src="assets/intro.mp4" type="video/mp4" />
+        </video>
+      </div>
+    </section>
+
     <!-- ============ STUDIO / MANIFESTO (word reveal) ============ -->
-    <section class="studio" id="studio">
+    <section class="studio section--orange" id="studio">
       <div class="container">
         <p class="eyebrow" data-reveal><span class="idx">01</span> Studija</p>
         <h2 class="studio__statement" data-split>
@@ -150,7 +159,7 @@
     </section>
 
     <!-- ============ SERVICES ============ -->
-    <section class="svc" id="services">
+    <section class="svc section--orange" id="services">
       <div class="container">
         <header class="section-head">
           <p class="eyebrow" data-reveal><span class="idx">02</span> Pakalpojumi</p>
@@ -240,8 +249,10 @@
 
     <!-- ============ IMPACT (pinned · letter-by-letter on scroll · font-morphing "rast") ============ -->
     <section class="impact" id="impact" aria-label="Kādu iespaidu tu vēlies rast?">
-      <div class="impact__inner">
-        <h2 class="impact__title">Kādu iespaidu<br>tu vēlies <span class="impact__rast" id="rastMorph">rast</span><span class="impact__q">?</span></h2>
+      <div class="impact__sticky">
+        <div class="impact__inner">
+          <h2 class="impact__title">Kādu iespaidu<br>tu vēlies <span class="impact__rast" id="rastMorph">rast</span><span class="impact__q">?</span></h2>
+        </div>
       </div>
     </section>
 

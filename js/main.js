@@ -315,6 +315,36 @@
     });
   }
 
+  /* ---------------- Scroll-scrubbed video section (black → orange) ---------------- */
+  // Its own section after the hero. The video starts going forward the moment the
+  // section begins entering from the hero (start 'top bottom'); the sticky inner holds
+  // it on screen while it finishes, then the page continues into the orange sections.
+  function setupScrollVideo() {
+    var sec = document.getElementById('scrollvid');
+    var video = document.getElementById('scrollVideo');
+    if (!sec || !video || !hasST || reduce) return;   // CSS hides the section when we can't scrub
+    function build() {
+      var dur = video.duration;
+      if (!isFinite(dur) || dur <= 0) dur = 7;
+      // Prime decoding (play→pause) so seeked frames actually paint.
+      try {
+        var pr = video.play();
+        if (pr && pr.then) pr.then(function () { video.pause(); video.currentTime = 0; }).catch(function () {});
+      } catch (e) {}
+      ScrollTrigger.create({
+        trigger: sec, start: 'top bottom', end: 'bottom bottom',
+        scrub: true, invalidateOnRefresh: true,
+        onUpdate: function (self) {
+          var t = self.progress * dur;
+          if (isFinite(t)) { try { video.currentTime = t; } catch (e) {} }
+        }
+      });
+      ScrollTrigger.refresh();
+    }
+    if (video.readyState >= 1) build();
+    else video.addEventListener('loadedmetadata', build, { once: true });
+  }
+
   /* ---------------- Split text into characters (keeps element boundaries) ---------------- */
   function wrapChars(node) {
     var frag = document.createDocumentFragment();
@@ -382,13 +412,14 @@
     var chars = sec.querySelectorAll('.ch');
     if (!hasST || reduce || !chars.length) return;   // no scrub → letters stay visible
 
-    // Pin the section and reveal letters as you scroll through it.
+    // The CSS-sticky inner "holds" the question on screen (the stop); scrolling the
+    // tall section scrubs the letters in slowly, one by one. No pin → no drift.
     gsap.set(chars, { opacity: 0, yPercent: 30 });
     gsap.to(chars, {
-      opacity: 1, yPercent: 0, ease: 'none', stagger: 0.5,
+      opacity: 1, yPercent: 0, ease: 'none', stagger: 0.6,
       scrollTrigger: {
-        trigger: sec, start: 'top top', end: '+=140%',
-        scrub: 0.4, pin: true, anticipatePin: 1
+        trigger: sec, start: 'top top', end: 'bottom bottom',
+        scrub: 0.6, invalidateOnRefresh: true
       }
     });
   }
@@ -411,7 +442,7 @@
   ].join('\n');
 
   var VERT = [
-    'uniform float uTime;uniform vec2 uMouse;uniform float uForce;uniform float uSize;uniform float uDpr;',
+    'uniform float uTime;uniform vec2 uMouse;uniform float uForce;uniform float uSize;uniform float uDpr;uniform float uGather;',
     'attribute float aScale;varying float vH;',
     SNOISE,
     'void main(){',
@@ -421,6 +452,7 @@
     '  float d=distance(p.xy,uMouse);',
     '  e+=smoothstep(3.2,0.0,d)*uForce*1.5;',
     '  p.z+=e;vH=e;',
+    '  p*=1.0-0.96*uGather;',   // scroll pulls every point toward the centre
     '  vec4 mv=modelViewMatrix*vec4(p,1.0);',
     '  gl_PointSize=uSize*aScale*uDpr*(10.0/-mv.z);',
     '  gl_Position=projectionMatrix*mv;}'
@@ -468,6 +500,7 @@
       uForce:  { value: 0 },
       uSize:   { value: small ? 2.1 : 2.7 },
       uDpr:    { value: dpr },
+      uGather: { value: 0 },
       uColorA: { value: new THREE.Color(0xff4a2e) },
       uColorB: { value: new THREE.Color(0xf4f0e9) }
     };
@@ -510,9 +543,11 @@
       targetForce *= 0.95;
       var hh = (heroEl && heroEl.offsetHeight) || window.innerHeight;
       var prog = Math.min(1, Math.max(0, (window.pageYOffset || 0) / hh));
+      var g = Math.min(1, prog * 3.2);    // gather much faster
+      uniforms.uGather.value = g;
       camera.position.z = 9 + prog * 2.6;
       camera.position.y = 4.2 - prog * 1.3;
-      camera.lookAt(0, 0, 0);
+      camera.lookAt(0, g * 8.0, 0);       // sink far lower → points drop toward / into the next section
       renderer.render(scene, camera);
       raf = requestAnimationFrame(frame);
     }
@@ -543,7 +578,14 @@
     if (loader) loader.classList.add('is-done');
     body.style.overflow = '';
     if (lenis) lenis.start();
-    playIntro();
+    // Reveal the hero title only once webfonts are ready, so it can't reflow
+    // (fallback → Bricolage swap) mid slide-in — that swap is the "glitch".
+    if (document.fonts && document.fonts.ready) {
+      var introRan = false;
+      var runIntro = function () { if (!introRan) { introRan = true; playIntro(); } };
+      document.fonts.ready.then(runIntro);
+      setTimeout(runIntro, 800);   // fallback so the title never stays hidden
+    } else { playIntro(); }
     if (hasST) setTimeout(function () { ScrollTrigger.refresh(); }, 100);
   }
 
@@ -576,6 +618,7 @@
     setupParallax();
     setupImpact();
     setupProcess();
+    setupScrollVideo();
     if (hasST) ScrollTrigger.refresh();
   }
 
@@ -601,6 +644,9 @@
 
   // Hard safety: drop loader no matter what
   window.addEventListener('load', finishLoader);
+  // Recompute all pin/scrub positions once everything (video, fonts, images) has
+  // fully loaded — prevents pinned sections (impact) from using stale positions.
+  if (hasST) window.addEventListener('load', function () { setTimeout(function () { ScrollTrigger.refresh(); }, 350); });
   setTimeout(finishLoader, 4500);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
