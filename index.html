@@ -6,17 +6,19 @@
   <meta name="theme-color" content="#0A0A0C" />
 
   <title>rast — tīmekļa dizaina un izstrādes studija</title>
-  <meta name="description" content="Rast ir tīmekļa dizaina un izstrādes studija. Mēs ambicioziem zīmoliem radām ātras, izteiksmīgas un augstas klases mājaslapas. «Rast» nozīmē atrast — mēs rodam īsto ideju un to radām." />
+  <meta name="description" content="Rast ir tīmekļa dizaina un izstrādes studija. Mēs ambicioziem zīmoliem radām ātras, izteiksmīgas un augstas klases mājaslapas. «Rast» nozīmē radīt — un tas ir viss, ko mēs darām." />
 
   <!-- Open Graph / social -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="rast — tīmekļa dizaina un izstrādes studija" />
-  <meta property="og:description" content="Mēs radām mājaslapas, ko atceras. «Rast» — atrast un radīt." />
+  <meta property="og:description" content="Mēs radām mājaslapas, ko atceras. «Rast» nozīmē radīt." />
   <meta property="og:image" content="assets/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Favicon (inline SVG: coral asterisk mark) -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230A0A0C'/%3E%3Cg fill='%23FF4A2E'%3E%3Crect x='14.6' y='6' width='2.8' height='20' rx='1.4'/%3E%3Crect x='14.6' y='6' width='2.8' height='20' rx='1.4' transform='rotate(60 16 16)'/%3E%3Crect x='14.6' y='6' width='2.8' height='20' rx='1.4' transform='rotate(120 16 16)'/%3E%3C/g%3E%3C/svg%3E" />
+  <!-- Favicon: the rast mark — lowercase "r" + orange accent dot, on dark -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/png" href="kvadrats_logo.png" />
+  <link rel="apple-touch-icon" href="kvadrats_logo.png" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -54,7 +56,6 @@
 
   <!-- ============ GRAIN + CURSOR + PROGRESS ============ -->
   <div class="grain" aria-hidden="true"></div>
-  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__label" id="cursorLabel"></span></div>
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="scroll-progress" aria-hidden="true"><span id="scrollBar"></span></div>
 
@@ -63,10 +64,8 @@
   <!-- ============ HEADER ============ -->
   <header class="header" id="header">
     <a href="#top" class="brand" data-cursor="hover" aria-label="rast — sākums">
-      <span class="brand__mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="18" height="18"><g fill="currentColor"><rect x="10.9" y="2" width="2.2" height="20" rx="1.1"/><rect x="10.9" y="2" width="2.2" height="20" rx="1.1" transform="rotate(60 12 12)"/><rect x="10.9" y="2" width="2.2" height="20" rx="1.1" transform="rotate(120 12 12)"/></g></svg>
-      </span>
       <span class="brand__word">rast</span>
+      <span class="brand__dot" aria-hidden="true"></span>
     </a>
 
     <nav class="nav" aria-label="Galvenā navigācija">
@@ -90,7 +89,7 @@
       <a href="#contact"><span class="menu__idx">04</span> Kontakti</a>
     </nav>
     <div class="menu__foot">
-      <a href="mailto:hello@rast.studio">hello@rast.studio</a>
+      <a href="mailto:rast.studija@gmail.com">rast.studija@gmail.com</a>
       <span>Rīga · Visā pasaulē</span>
     </div>
   </div>
@@ -119,7 +118,7 @@
         </p>
 
         <div class="hero__actions" data-reveal>
-          <a href="#contact" class="btn btn--solid magnetic" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+          <a href="mailto:rast.studija@gmail.com" class="btn btn--solid magnetic" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
           <a href="#work" class="btn btn--ghost magnetic" data-cursor="hover"><span>Skatīt darbus</span></a>
         </div>
       </div>
@@ -130,20 +129,12 @@
       </a>
     </section>
 
-    <!-- ============ MARQUEE ============ -->
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee__track" id="marquee">
-        <span>Dizains</span><i>✳</i><span>Izstrāde</span><i>✳</i><span>Kustība</span><i>✳</i><span>Mājaslapas</span><i>✳</i><span>Veiktspēja</span><i>✳</i><span>Mijiedarbība</span><i>✳</i>
-        <span>Dizains</span><i>✳</i><span>Izstrāde</span><i>✳</i><span>Kustība</span><i>✳</i><span>Mājaslapas</span><i>✳</i><span>Veiktspēja</span><i>✳</i><span>Mijiedarbība</span><i>✳</i>
-      </div>
-    </div>
-
     <!-- ============ STUDIO / MANIFESTO (word reveal) ============ -->
     <section class="studio" id="studio">
       <div class="container">
         <p class="eyebrow" data-reveal><span class="idx">01</span> Studija</p>
         <h2 class="studio__statement" data-split>
-          «Rast» nozīmē <em>atrast</em>. Mēs rodam īsto ideju — un tad to <em>radām</em>. Tas nav tikai mūsu vārds; tas ir viss, ko mēs darām.
+          «Rast» nozīmē <em>radīt</em>. Mēs neapstājamies pie idejas — mēs to <em>radām</em>. Tas nav tikai mūsu vārds; tas ir viss, ko mēs darām.
         </h2>
         <div class="studio__cols">
           <p data-reveal>
@@ -158,91 +149,76 @@
       </div>
     </section>
 
-    <!-- ============ CAPABILITIES ============ -->
-    <section class="caps" id="services">
+    <!-- ============ SERVICES ============ -->
+    <section class="svc" id="services">
       <div class="container">
         <header class="section-head">
-          <p class="eyebrow" data-reveal><span class="idx">02</span> Spējas</p>
-          <h2 class="section-title" data-reveal>Viss, kas vajadzīgs tavai vietnei — un nekā lieka.</h2>
+          <p class="eyebrow" data-reveal><span class="idx">02</span> Pakalpojumi</p>
+          <h2 class="section-title" data-reveal>Ko mēs veidojam.</h2>
         </header>
 
-        <ul class="caps__list">
-          <li class="cap" data-reveal data-cursor="hover">
-            <span class="cap__num">01</span>
-            <h3 class="cap__title">Dizains</h3>
-            <p class="cap__desc">Mākslinieciskā vadība, UI/UX un dizaina sistēmas, kas šķiet pašsaprotamas — saskarnes, kuras patīkami lietot.</p>
-            <span class="cap__tags">Mākslas vadība · UI/UX · Dizaina sistēmas</span>
-            <i class="cap__arrow" aria-hidden="true">→</i>
-          </li>
-          <li class="cap" data-reveal data-cursor="hover">
-            <span class="cap__num">02</span>
-            <h3 class="cap__title">Izstrāde</h3>
-            <p class="cap__desc">Front-end inženierija, headless CMS un tā gludā veiktspēja, ko lietotāji sajūt, pirms vēl pamana.</p>
-            <span class="cap__tags">Front-end · Headless CMS · Veiktspēja</span>
-            <i class="cap__arrow" aria-hidden="true">→</i>
-          </li>
-          <li class="cap" data-reveal data-cursor="hover">
-            <span class="cap__num">03</span>
-            <h3 class="cap__title">Kustība un mijiedarbība</h3>
-            <p class="cap__desc">Ritināšanas pieredzes, mikromijiedarbības un kustība, kas tavam zīmolam piešķir pulsu, nevis tikai lapu.</p>
-            <span class="cap__tags">Ritināšana · Mikromijiedarbība · WebGL</span>
-            <i class="cap__arrow" aria-hidden="true">→</i>
-          </li>
-          <li class="cap" data-reveal data-cursor="hover">
-            <span class="cap__num">04</span>
-            <h3 class="cap__title">Palaišana un izaugsme</h3>
-            <p class="cap__desc">SEO, analītika un tehniskie pamati, kas notur tevi ātru, atrodamu un gatavu augt.</p>
-            <span class="cap__tags">SEO · Analītika · Pamati</span>
-            <i class="cap__arrow" aria-hidden="true">→</i>
-          </li>
-        </ul>
+        <div class="svc__list">
+          <div class="svc__item" data-reveal>
+            <h3 class="svc__title">Mājaslapas</h3>
+            <p class="svc__desc">Korporatīvās vietnes, lendinga lapas un mikrovietnes — pielāgotas tavam zīmolam, bez veidnēm un ar ātru veiktspēju.</p>
+          </div>
+          <div class="svc__item" data-reveal>
+            <h3 class="svc__title">Tīmekļa sistēmas un platformas</h3>
+            <p class="svc__desc">Web aplikācijas, klientu portāli un vadības paneļi — sarežģīta loģika, kas lietotājam šķiet vienkārša.</p>
+          </div>
+          <div class="svc__item" data-reveal>
+            <h3 class="svc__title">E-komercija</h3>
+            <p class="svc__desc">Interneta veikali, kas pārdod — gluda pieredze no produkta līdz pasūtījumam, ērti pārvaldāma.</p>
+          </div>
+          <div class="svc__item" data-reveal>
+            <h3 class="svc__title">Izstrāde un integrācijas</h3>
+            <p class="svc__desc">Front-end inženierija, headless CMS un integrācijas ar tavām sistēmām — ātrs un viegli paplašināms kods.</p>
+          </div>
+          <div class="svc__item" data-reveal>
+            <h3 class="svc__title">Dizains un zīmols</h3>
+            <p class="svc__desc">Vizuālā identitāte, UI/UX un dizaina sistēmas, kas tavu zīmolu padara atpazīstamu.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ============ SELECTED WORK ============ -->
-    <!-- PIEZĪME: šīs ir KONCEPTA vietturkartītes. Kad būs reāli projekti, nomaini
-         .work__media mākslu, nosaukumus, tagus un saites. Katra kartīte ir atzīmēta "Koncepts". -->
     <section class="work" id="work">
       <div class="container">
         <header class="section-head section-head--row">
           <div>
             <p class="eyebrow" data-reveal><span class="idx">03</span> Atlasītie darbi</p>
-            <h2 class="section-title" data-reveal>Ieskats mūsu domāšanā.</h2>
+            <h2 class="section-title" data-reveal>Daži no mūsu darbiem.</h2>
           </div>
-          <p class="section-note" data-reveal>Pagaidām koncepti — tavs projekts ieņem nākamo vietu.</p>
+          <p class="section-note" data-reveal>Reāli projekti — un nākamais varētu būt tavs.</p>
         </header>
 
         <div class="work__grid">
-          <a class="work__card" href="#contact" data-reveal data-cursor="view">
-            <div class="work__media work__media--1" aria-hidden="true"></div>
+          <a class="work__card" href="https://www.brivpratigaisdarbs.lv" target="_blank" rel="noopener" data-reveal data-cursor="view">
+            <div class="work__media work__media--shot" style="background-image:url('assets/work-brivpratigais.png')" aria-hidden="true">
+              <span class="work__view">Apskatīt <i>→</i></span>
+            </div>
             <div class="work__meta">
               <span class="work__idx">(01)</span>
-              <h3 class="work__name">Aurora</h3>
-              <span class="work__cat">Fintech platforma · Koncepts</span>
+              <h3 class="work__name">Brīvprātīgais darbs</h3>
+              <span class="work__cat">Platforma · Vietne un izstrāde</span>
             </div>
           </a>
 
-          <a class="work__card" href="#contact" data-reveal data-cursor="view">
-            <div class="work__media work__media--2" aria-hidden="true"></div>
+          <a class="work__card" href="https://www.rundalestour.lv" target="_blank" rel="noopener" data-reveal data-cursor="view">
+            <div class="work__media work__media--shot" style="background-image:url('assets/work-rundale.png')" aria-hidden="true">
+              <span class="work__view">Apskatīt <i>→</i></span>
+            </div>
             <div class="work__meta">
               <span class="work__idx">(02)</span>
-              <h3 class="work__name">Kova</h3>
-              <span class="work__cat">E-komercija · Koncepts</span>
-            </div>
-          </a>
-
-          <a class="work__card" href="#contact" data-reveal data-cursor="view">
-            <div class="work__media work__media--3" aria-hidden="true"></div>
-            <div class="work__meta">
-              <span class="work__idx">(03)</span>
-              <h3 class="work__name">Mežs</h3>
-              <span class="work__cat">Zīmols un vietne · Koncepts</span>
+              <h3 class="work__name">Rundāles tūre</h3>
+              <span class="work__cat">Tūrisms · Mājaslapa</span>
             </div>
           </a>
 
           <a class="work__card work__card--cta" href="#contact" data-reveal data-cursor="hover">
             <div class="work__cta-inner">
-              <span class="work__idx">(04)</span>
+              <span class="work__idx">(03)</span>
               <h3 class="work__name">Tavs projekts<br>šeit<i class="accent">.</i></h3>
               <span class="work__cat">Izveidosim to, ko cilvēki atcerēsies →</span>
             </div>
@@ -256,7 +232,6 @@
       <div class="band__bg" data-parallax="34" aria-hidden="true"></div>
       <div class="band__word" data-parallax="-48" aria-hidden="true">RADĪT</div>
       <div class="container band__content">
-        <p class="eyebrow" data-reveal><span class="dot"></span> Filozofija</p>
         <h2 class="band__title" id="band-title" data-split>
           Mēs neveidojam lapas. Mēs veidojam <em>iespaidu</em>, ko neaizmirst.
         </h2>
@@ -279,36 +254,39 @@
           <p class="process__lead" data-reveal>Kā projekts no pirmās ziņas nonāk līdz palaišanai, ko ir vērts svinēt.</p>
         </div>
 
-        <ol class="process__list">
-          <li class="step" data-reveal>
-            <span class="step__num">01</span>
-            <div>
-              <h3 class="step__title">Izpēte</h3>
-              <p class="step__desc">Iedziļināmies tavā zīmolā, mērķos un auditorijā, līdz problēmu saprotam labāk nekā pats brīfs.</p>
-            </div>
-          </li>
-          <li class="step" data-reveal>
-            <span class="step__num">02</span>
-            <div>
-              <h3 class="step__title">Dizains</h3>
-              <p class="step__desc">Vispirms mākslinieciskā vadība, tad līdz pikselim precīzi ekrāni un dizaina sistēma — pārskatām kopā un slīpējam, līdz ir pareizi.</p>
-            </div>
-          </li>
-          <li class="step" data-reveal>
-            <span class="step__num">03</span>
-            <div>
-              <h3 class="step__title">Izstrāde</h3>
-              <p class="step__desc">Roku darbs kodā, ātrs un responsīvs — ar to kustību un detaļām, kas labu atšķir no neaizmirstama.</p>
-            </div>
-          </li>
-          <li class="step" data-reveal>
-            <span class="step__num">04</span>
-            <div>
-              <h3 class="step__title">Palaišana</h3>
-              <p class="step__desc">Palaižam, mērām un paliekam blakus — lai tava vietne darbojas izcili arī ilgi pēc starta.</p>
-            </div>
-          </li>
-        </ol>
+        <div class="process__steps">
+          <span class="process__line" aria-hidden="true"><i></i></span>
+          <ol class="process__list" id="processList">
+            <li class="step" data-reveal>
+              <span class="step__num">01</span>
+              <div>
+                <h3 class="step__title">Izpēte</h3>
+                <p class="step__desc">Iedziļināmies tavā zīmolā, mērķos un auditorijā, līdz problēmu saprotam labāk nekā pats brīfs.</p>
+              </div>
+            </li>
+            <li class="step" data-reveal>
+              <span class="step__num">02</span>
+              <div>
+                <h3 class="step__title">Dizains</h3>
+                <p class="step__desc">Vispirms mākslinieciskā vadība, tad līdz pikselim precīzi ekrāni un dizaina sistēma — pārskatām kopā un slīpējam, līdz ir pareizi.</p>
+              </div>
+            </li>
+            <li class="step" data-reveal>
+              <span class="step__num">03</span>
+              <div>
+                <h3 class="step__title">Izstrāde</h3>
+                <p class="step__desc">Roku darbs kodā, ātrs un responsīvs — ar to kustību un detaļām, kas labu atšķir no neaizmirstama.</p>
+              </div>
+            </li>
+            <li class="step" data-reveal>
+              <span class="step__num">04</span>
+              <div>
+                <h3 class="step__title">Palaišana</h3>
+                <p class="step__desc">Palaižam, mērām un paliekam blakus — lai tava vietne darbojas izcili arī ilgi pēc starta.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
       </div>
     </section>
 
@@ -342,8 +320,8 @@
           <span class="line"><span>neaizmirstamu<i class="accent">.</i></span></span>
         </h2>
         <div class="cta__actions" data-reveal>
-          <a href="mailto:hello@rast.studio" class="btn btn--solid btn--lg magnetic" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
-          <a href="mailto:hello@rast.studio" class="cta__email" data-cursor="hover">hello@rast.studio</a>
+          <a href="mailto:rast.studija@gmail.com" class="btn btn--solid btn--lg magnetic" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+          <a href="mailto:rast.studija@gmail.com" class="cta__email" data-cursor="hover">rast.studija@gmail.com</a>
         </div>
       </div>
     </section>
@@ -354,7 +332,7 @@
     <div class="container">
       <div class="footer__top">
         <div class="footer__col footer__col--brand">
-          <p class="footer__tag">Tīmekļa dizaina un izstrādes studija.<br>«Rast» — atrast un radīt.</p>
+          <p class="footer__tag">Tīmekļa dizaina un izstrādes studija.</p>
         </div>
         <div class="footer__col">
           <span class="footer__heading">Izvēlne</span>
@@ -372,16 +350,16 @@
         </div>
         <div class="footer__col">
           <span class="footer__heading">Kontakti</span>
-          <a href="mailto:hello@rast.studio" data-cursor="hover">hello@rast.studio</a>
+          <a href="mailto:rast.studija@gmail.com" data-cursor="hover">rast.studija@gmail.com</a>
           <span class="footer__muted">Rīga, Latvija</span>
           <span class="footer__muted">Strādājam visā pasaulē</span>
         </div>
       </div>
 
-      <div class="footer__wordmark" aria-hidden="true">rast<i class="accent">✳</i></div>
+      <div class="footer__wordmark" aria-hidden="true">rast<i class="accent brand__dot--xl"></i></div>
 
       <div class="footer__bottom">
-        <span>© <span id="year">2026</span> rast — atrast un radīt.</span>
+        <span>© <span id="year">2026</span> rast — radīt.</span>
         <a href="#top" class="footer__totop" data-cursor="hover">Atpakaļ augšā ↑</a>
       </div>
     </div>

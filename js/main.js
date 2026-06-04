@@ -99,36 +99,23 @@
     });
   });
 
-  /* ---------------- Custom cursor ---------------- */
+  /* ---------------- Follower dot (native cursor stays visible) ---------------- */
   if (fine) {
-    var cursor = document.getElementById('cursor');
-    var dot    = document.getElementById('cursorDot');
-    var label  = document.getElementById('cursorLabel');
-    var mx = window.innerWidth / 2, my = window.innerHeight / 2, cx = mx, cy = my;
-
-    window.addEventListener('mousemove', function (e) {
-      mx = e.clientX; my = e.clientY;
-      if (dot) dot.style.transform = 'translate(' + mx + 'px,' + my + 'px)';
-    });
-    (function loop() {
-      cx += (mx - cx) * 0.2; cy += (my - cy) * 0.2;
-      if (cursor) cursor.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
-      requestAnimationFrame(loop);
-    })();
-
-    Array.prototype.forEach.call(document.querySelectorAll('[data-cursor]'), function (el) {
-      var type = el.getAttribute('data-cursor');
-      el.addEventListener('mouseenter', function () {
-        if (!cursor) return;
-        cursor.classList.add(type === 'view' ? 'is-view' : 'is-hover');
-        if (type === 'view' && label) label.textContent = 'View';
+    var dot = document.getElementById('cursorDot');
+    if (dot) {
+      var mx = window.innerWidth / 2, my = window.innerHeight / 2, dx = mx, dy = my;
+      window.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; });
+      (function loop() {
+        dx += (mx - dx) * 0.18; dy += (my - dy) * 0.18;     // trails the real pointer
+        dot.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        requestAnimationFrame(loop);
+      })();
+      // React (grow) over interactive elements
+      Array.prototype.forEach.call(document.querySelectorAll('[data-cursor]'), function (el) {
+        el.addEventListener('mouseenter', function () { dot.classList.add('is-active'); });
+        el.addEventListener('mouseleave', function () { dot.classList.remove('is-active'); });
       });
-      el.addEventListener('mouseleave', function () {
-        if (!cursor) return;
-        cursor.classList.remove('is-view', 'is-hover');
-        if (label) label.textContent = '';
-      });
-    });
+    }
   }
 
   /* ---------------- Magnetic buttons ---------------- */
@@ -179,10 +166,10 @@
       el.appendChild(frag);
       if (!hasST || reduce) return;                 // no animation → stays fully visible
       var words = el.querySelectorAll('.word .w');
-      gsap.set(words, { opacity: 0.18 });
+      gsap.set(words, { opacity: 0, yPercent: 24 });
       gsap.to(words, {
-        opacity: 1, ease: 'power1.out', stagger: 0.045, duration: 0.5,
-        scrollTrigger: { trigger: el, start: 'top 78%', once: true }   // cascade in once, stay lit
+        opacity: 1, yPercent: 0, ease: 'power3.out', stagger: 0.05, duration: 0.7,
+        scrollTrigger: { trigger: el, start: 'top 80%', once: true }   // appear word by word (not pre-dimmed)
       });
     });
   }
@@ -219,24 +206,9 @@
     if (ctaLines.length) {
       gsap.fromTo(ctaLines, { yPercent: 110 }, {
         yPercent: 0, duration: 1, stagger: 0.1, ease: 'power4.out',
-        scrollTrigger: { trigger: '.cta__title', start: 'top 82%', once: true }
+        immediateRender: false,   // stay visible until the trigger actually fires (no permanently-hidden headline)
+        scrollTrigger: { trigger: '.cta__title', start: 'top 90%', once: true }
       });
-    }
-  }
-
-  /* ---------------- Marquee ---------------- */
-  function setupMarquee() {
-    var track = document.getElementById('marquee');
-    if (!track || reduce) return;
-    if (hasGSAP) {
-      gsap.to(track, { xPercent: -50, repeat: -1, duration: 26, ease: 'none' });
-    } else {
-      var x = 0, half = track.scrollWidth / 2;
-      (function loop() {
-        x -= 0.5; if (x <= -half) x = 0;
-        track.style.transform = 'translateX(' + x + 'px)';
-        requestAnimationFrame(loop);
-      })();
     }
   }
 
@@ -331,6 +303,18 @@
     });
   }
 
+  /* ---------------- Process: scroll-filling timeline spine ---------------- */
+  function setupProcess() {
+    if (!hasST || reduce) return;
+    var fill = document.querySelector('.process__line i');
+    var listEl = document.getElementById('processList');
+    if (!fill || !listEl) return;
+    gsap.fromTo(fill, { scaleY: 0 }, {
+      scaleY: 1, ease: 'none',
+      scrollTrigger: { trigger: listEl, start: 'top 72%', end: 'bottom 78%', scrub: 0.5 }
+    });
+  }
+
   /* ---------------- Split text into characters (keeps element boundaries) ---------------- */
   function wrapChars(node) {
     var frag = document.createDocumentFragment();
@@ -399,7 +383,7 @@
     if (!hasST || reduce || !chars.length) return;   // no scrub → letters stay visible
 
     // Pin the section and reveal letters as you scroll through it.
-    gsap.set(chars, { opacity: 0.1, yPercent: 30 });
+    gsap.set(chars, { opacity: 0, yPercent: 30 });
     gsap.to(chars, {
       opacity: 1, yPercent: 0, ease: 'none', stagger: 0.5,
       scrollTrigger: {
@@ -591,12 +575,12 @@
     setupReveals();
     setupParallax();
     setupImpact();
+    setupProcess();
     if (hasST) ScrollTrigger.refresh();
   }
 
   function init() {
     try {
-      setupMarquee();
       if (window.THREE && !reduce) setupHero3D();
       else setupCanvas();
       runLoader();
