@@ -324,24 +324,18 @@ ul, ol { list-style: none; }
 /* ============================================================
    SCROLL VIDEO — own section; sticky video, scrubbed by scroll
    ============================================================ */
-.scrollvid { position: relative; height: 240vh; background: #0A0A0C; }
+.scrollvid { position: relative; height: 240vh; height: 240svh; background: #0A0A0C; }
 .scrollvid__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 .scrollvid__video { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Portrait phones: rotate the 16:9 clip 90° and size it to the swapped viewport so
-   it COVERS the whole screen (object-fit:contain only letterboxed it small).
-   Per user: "pa visu ekrānu - apgriez to sāniski". */
+/* Portrait phones: fill the screen UPRIGHT (object-fit:cover crops the sides) instead of
+   rotating the clip — rotation made the centred reveal read sideways. */
 @media (max-aspect-ratio: 3/4) {
-  .scrollvid__video {
-    position: absolute; top: 50%; left: 50%;
-    width: 100svh; height: 100vw;
-    transform: translate(-50%, -50%) rotate(90deg);
-    object-fit: cover;
-  }
+  .scrollvid__video { width: 100%; height: 100%; object-fit: cover; }
 }
 /* Touch devices play the clip natively instead of scrubbing (see main.js),
    so the sticky hold can be shorter — less black to scroll through on a phone. */
 @media (hover: none), (pointer: coarse) {
-  .scrollvid { height: 150vh; }
+  .scrollvid { height: 150vh; height: 150svh; }
 }
 .no-anim .scrollvid { display: none; }
 @media (prefers-reduced-motion: reduce) { .scrollvid { display: none; } }
@@ -349,17 +343,34 @@ ul, ol { list-style: none; }
 /* ============================================================
    STUDIO
    ============================================================ */
-.studio { padding: clamp(90px, 13vw, 200px) 0; position: relative; overflow: hidden; }
-/* Desktop: Studio overlaps the video's last viewport and FADES IN over the held
-   end-frame, in place — it rises invisibly (opacity 0) into position, then
-   setupStudioHandoff() briefly pins it and fades it in (no slide-over). Touch keeps
-   Studio as a normal section after the video. */
-/* Studio overlaps the video's last viewport and fades in over the held end-frame
-   (desktop AND mobile). setupStudioHandoff() drives the opacity; the resets keep it
-   visible when JS or animation is unavailable. */
-.js .studio { margin-top: -100vh; z-index: 2; opacity: 0; }
-.no-anim .studio { margin-top: 0; opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .js .studio { margin-top: 0; opacity: 1; } }
+.studio { padding: clamp(90px, 13vw, 200px) 0; position: relative; overflow: hidden;
+  /* Top stays transparent so the held video end-frame shows through and the blurred
+     ::after strip melts it into the section — no hard seam. Solid bg below the blend. */
+  background: linear-gradient(to bottom, transparent 0, transparent clamp(110px, 18vh, 230px), var(--bg) clamp(230px, 34vh, 430px)); }
+/* Blurred handoff strip: blurs whatever shows through the transparent top (the video's
+   end-frame) and fades out downward, so the video dissolves softly into the section. */
+.studio::after {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; z-index: 0;
+  height: clamp(170px, 28vh, 320px); pointer-events: none;
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  -webkit-mask: linear-gradient(to bottom, #000 0%, #000 52%, transparent 100%);
+          mask: linear-gradient(to bottom, #000 0%, #000 52%, transparent 100%);
+}
+/* During the handoff the content is held vertically centred in the viewport so it blooms
+   in over the held end-frame from the middle of the screen, not the top. */
+.js .studio { min-height: 100vh; min-height: 100svh; display: flex; align-items: center; }
+.js .studio > .container { width: 100%; transform: translateY(-9vh); }
+/* Studio overlaps the video's last viewport (margin-top:-100svh) and rises invisibly
+   (opacity 0) into position; setupStudioHandoff() then plays a simple one-shot, time-based
+   fade (no scroll-scrub, no pin) so it blooms in centred over the held end-frame. The
+   resets below keep it visible when JS or animation is unavailable. */
+.js .studio { margin-top: -100vh; margin-top: -100svh; z-index: 2; opacity: 0; }
+.no-anim .studio { margin-top: 0; opacity: 1; min-height: 0; display: block; }
+.no-anim .studio > .container { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .js .studio { margin-top: 0; opacity: 1; min-height: 0; display: block; }
+  .js .studio > .container { transform: none; }
+}
 /* Atmosphere — a faint vermilion bloom so the section reads as designed space, not a void */
 .studio::before {
   content: ""; position: absolute; top: -12%; right: -4%; z-index: 0;
@@ -402,10 +413,8 @@ ul, ol { list-style: none; }
 [data-split] .word .w { display: inline-block; }
 
 /* ============================================================
-   SERVICES — sticky "stacking cards". Each card pins a little lower
-   than the previous one (staggered `top`), so every card keeps its
-   title bar peeking above the next: a cascade, not a cover-up. Once the
-   whole deck is stacked, the section scrolls on past it.
+   SERVICES — a plain vertical list of cards: all four always fully
+   visible, normal scroll. (No sticky stacking.)
    ============================================================ */
 .svc { padding: clamp(70px, 9vw, 150px) 0; }
 
@@ -414,8 +423,7 @@ ul, ol { list-style: none; }
   --peek: clamp(64px, 8vh, 96px);         /* title-bar strip each covered card keeps visible */
   display: flex; flex-direction: column;
   gap: clamp(16px, 2.2vh, 26px);
-  /* trailing room so the LAST card travels all the way to its pin (uniform peeks),
-     the full deck holds for a beat, then scrolls away */
+  /* trailing room so the last card travels to its pin, then the whole deck scrolls on */
   padding-bottom: clamp(130px, 20vh, 240px);
 }
 .svc__card {
@@ -429,7 +437,7 @@ ul, ol { list-style: none; }
   box-shadow: 0 -20px 50px -28px rgba(0, 0, 0, 0.75);   /* stacked cards cast depth on the bar above */
   will-change: transform;
 }
-/* Staggered pins → the settled deck fans out, every title bar visible */
+/* Staggered pins → every card keeps its title bar peeking above the next */
 .svc__card:nth-child(1) { top: var(--deck-top); }
 .svc__card:nth-child(2) { top: calc(var(--deck-top) + var(--peek)); }
 .svc__card:nth-child(3) { top: calc(var(--deck-top) + var(--peek) * 2); }
@@ -488,7 +496,7 @@ ul, ol { list-style: none; }
 .svc__mini-desc { color: var(--ink-dim); font-size: 15px; line-height: 1.6; margin-top: 10px; }
 
 @media (max-width: 760px) {
-  .svc__deck { --peek: clamp(46px, 10vh, 64px); padding-bottom: clamp(280px, 55vh, 480px); }   /* keep the cascade on mobile; extra trailing room so all 4 stagger cleanly */
+  .svc__deck { --peek: clamp(46px, 10vh, 64px); padding-bottom: clamp(280px, 55vh, 480px); }   /* keep the cascade on mobile; trailing room so all 4 stagger cleanly */
   .svc__card { min-height: clamp(300px, 54vh, 430px); }
   .svc__title { font-size: clamp(20px, 5.6vw, 30px); }
   .svc__card-bar { padding: 0 20px; }
@@ -498,6 +506,7 @@ ul, ol { list-style: none; }
 /* Reduced motion: no pinning theatre — cards just flow normally */
 @media (prefers-reduced-motion: reduce) {
   .svc__card { position: static; }
+  .svc__pin .section-head { position: static; }
 }
 
 /* ============================================================
@@ -664,7 +673,7 @@ ul, ol { list-style: none; }
    STATS
    ============================================================ */
 .stats { padding: clamp(50px, 7vw, 90px) 0; border-block: 1px solid var(--line); }
-.stats__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(24px, 4vw, 60px); }
+.stats__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 4vw, 60px); }
 .stat { display: flex; flex-direction: column; gap: 8px; }
 .stat__num { font-family: var(--font-display); font-weight: 600; font-size: clamp(34px, 4.4vw, 64px); letter-spacing: -0.03em; line-height: 1; }
 .stat__label { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--ink-dim); }
@@ -690,9 +699,9 @@ ul, ol { list-style: none; }
 .no-anim .impact__sticky { position: static; height: auto; min-height: 60vh; }
 .impact__title {
   font-family: var(--font-display); font-weight: 700;
-  /* 32px floor: the morphing "rast" swaps into wide cursive fonts, so the
-     line needs slack on narrow phones to avoid overflow. */
-  font-size: clamp(32px, 8.4vw, 132px); line-height: 1.28; letter-spacing: -0.035em;
+  /* Floor raised for a bolder presence on phones; the morphing "rast" still has the
+     line-height slack + visible overflow below so wide cursive fonts don't clip. */
+  font-size: clamp(44px, 11.5vw, 132px); line-height: 1.28; letter-spacing: -0.035em;
   max-width: 15ch;
 }
 .impact .ch { display: inline-block; will-change: transform, opacity; }
@@ -726,7 +735,7 @@ ul, ol { list-style: none; }
    FOOTER
    ============================================================ */
 .footer { padding-top: clamp(50px, 7vw, 90px); border-top: 1px solid var(--line); overflow: hidden; }
-.footer__top { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: clamp(28px, 4vw, 60px); padding-bottom: clamp(50px, 7vw, 90px); }
+.footer__top { display: grid; grid-template-columns: 1.6fr repeat(2, 1fr); gap: clamp(28px, 4vw, 60px); padding-bottom: clamp(50px, 7vw, 90px); }
 .footer__tag { font-family: var(--font-display); font-size: clamp(20px, 2vw, 28px); line-height: 1.25; letter-spacing: -0.01em; max-width: 22ch; }
 .footer__col { display: flex; flex-direction: column; gap: 12px; }
 .footer__heading { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
@@ -792,3 +801,107 @@ ul, ol { list-style: none; }
   .js .hero__title .line > span, .js .cta__title .line > span { transform: none; }
   .hero__canvas { display: none; }
 }
+
+/* ============================================================
+   PROJECT FORM MODAL (Web3Forms)
+   ============================================================ */
+button.btn { font-family: inherit; cursor: pointer; }
+
+.form-modal {
+  position: fixed; inset: 0; z-index: 1500;
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--gutter);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .4s var(--ease), visibility .4s;
+}
+.form-modal.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+.form-modal__backdrop {
+  position: absolute; inset: 0; cursor: pointer;
+  background: rgba(5, 5, 7, 0.72);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.form {
+  position: relative; z-index: 1; width: min(560px, 100%);
+  max-height: 90vh; max-height: 90svh; overflow-y: auto;
+  background: var(--bg-2); border: 1px solid var(--line-2);
+  border-radius: calc(var(--radius) + 6px);
+  padding: clamp(26px, 4vw, 46px);
+  box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.85);
+  transform: translateY(18px) scale(0.985);
+  transition: transform .5s var(--ease);
+}
+.form-modal.is-open .form { transform: none; }
+.form__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: clamp(18px, 3vw, 28px); }
+.form__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(23px, 3vw, 32px); letter-spacing: -0.02em; line-height: 1.06; }
+.form__sub { color: var(--ink-dim); font-size: 14px; line-height: 1.55; margin-top: 8px; max-width: 42ch; }
+.form__close {
+  flex: none; width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--line-2); background: transparent; color: var(--ink);
+  font-size: 22px; line-height: 1; cursor: pointer; display: grid; place-items: center;
+  transition: background .3s var(--ease), border-color .3s, color .3s, transform .3s var(--ease);
+}
+.form__close:hover { background: var(--accent); border-color: var(--accent); color: #fff; transform: rotate(90deg); }
+.form__el { display: flex; flex-direction: column; gap: 15px; }
+.form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form__field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.form__label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); }
+.form__input, .form__select, .form__textarea {
+  width: 100%; background: var(--bg); color: var(--ink);
+  border: 1px solid var(--line-2); border-radius: 12px;
+  padding: 13px 15px; font-family: inherit; font-size: 15px;
+  transition: border-color .3s var(--ease), background .3s;
+}
+.form__input::placeholder, .form__textarea::placeholder { color: var(--ink-faint); }
+.form__input:focus, .form__select:focus, .form__textarea:focus { outline: none; border-color: var(--accent); background: #0C0C10; }
+.form__textarea { resize: vertical; min-height: 108px; line-height: 1.55; }
+.form__select {
+  appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 42px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23A7A2AE' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+}
+.form__select option { background: var(--bg-2); color: var(--ink); }
+.form__submit { margin-top: 6px; align-self: flex-start; }
+.form__submit:disabled { opacity: .55; pointer-events: none; }
+.form__status { font-size: 14px; line-height: 1.5; min-height: 1.2em; margin-top: 2px; }
+.form__status.is-sending { color: var(--ink-dim); }
+.form__status.is-ok { color: #57D08A; }
+.form__status.is-err { color: var(--accent); }
+.form__hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+body.modal-open { overflow: hidden; }
+@media (max-width: 480px) {
+  .form__row { grid-template-columns: 1fr; }
+  .form__submit { width: 100%; justify-content: center; align-self: stretch; }
+}
+
+/* Custom service dropdown (replaces the native <select>) */
+.cselect { position: relative; }
+.cselect__btn {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--line-2); border-radius: 12px;
+  padding: 13px 15px; font-family: inherit; font-size: 15px; cursor: pointer; text-align: left;
+  transition: border-color .3s var(--ease), background .3s;
+}
+.cselect__btn:hover { border-color: var(--ink-faint); }
+.cselect.is-open .cselect__btn { border-color: var(--accent); background: #0C0C10; }
+.cselect__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cselect__value.is-placeholder { color: var(--ink-faint); }
+.cselect__chevron { flex: none; color: var(--ink-dim); transition: transform .35s var(--ease), color .3s; }
+.cselect.is-open .cselect__chevron { transform: rotate(180deg); color: var(--accent); }
+.cselect__list {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 5;
+  list-style: none; margin: 0; padding: 6px;
+  background: #121217; border: 1px solid var(--line-2); border-radius: 12px;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.85);
+  max-height: 230px; overflow-y: auto;
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .22s var(--ease), transform .22s var(--ease), visibility .22s;
+}
+.cselect.is-open .cselect__list { opacity: 1; visibility: visible; transform: none; }
+.cselect__opt {
+  padding: 11px 12px; border-radius: 8px; font-size: 14.5px; color: var(--ink-dim); cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  transition: background .2s var(--ease), color .2s;
+}
+.cselect__opt:hover { background: rgba(var(--ink-rgb), 0.06); color: var(--ink); }
+.cselect__opt[aria-selected="true"] { color: var(--accent); }
+.cselect__opt[aria-selected="true"]::after { content: "\2713"; font-size: 13px; }

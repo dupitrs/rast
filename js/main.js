@@ -17,7 +17,14 @@
   var hasLenis = typeof window.Lenis !== 'undefined';
 
   if (!hasGSAP) html.classList.add('no-anim');           // CSS fallback: reveal everything
-  if (hasST) gsap.registerPlugin(ScrollTrigger);
+  if (hasST) {
+    gsap.registerPlugin(ScrollTrigger);
+    // Mobile browsers show/hide their address bar on scroll, which resizes the visual
+    // viewport (100vh changes). Without this, ScrollTrigger re-measures mid-scroll and the
+    // page snaps/jumps. ignoreMobileResize tells it to NOT refresh on those height-only
+    // resizes, so scrolling up/down on a phone stays smooth.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+  }
 
   // Footer year
   var yearEl = document.getElementById('year');
@@ -85,9 +92,116 @@
     menu.classList.contains('is-open') ? closeMenu() : openMenu();
   });
 
+  /* ---------------- Project form modal (Web3Forms — no backend) ---------------- */
+  (function setupContactForm() {
+    var modal = document.getElementById('formModal');
+    var form  = document.getElementById('projectForm');
+    if (!modal || !form) return;
+    var serviceInput = document.getElementById('fService');
+    var statusEl   = form.querySelector('.form__status');
+    var submitBtn  = form.querySelector('[type="submit"]');
+    var lastFocus  = null;
+
+    /* ---- Custom service dropdown ---- */
+    var cs = document.getElementById('fServiceSelect');
+    var csBtn = cs && cs.querySelector('.cselect__btn');
+    var csValue = cs && cs.querySelector('.cselect__value');
+    var csList = cs && cs.querySelector('.cselect__list');
+    var csOpts = cs ? cs.querySelectorAll('.cselect__opt') : [];
+    var csPlaceholder = csValue ? csValue.textContent : 'Izvēlies pakalpojumu';
+    function csOpen()  { if (cs) { cs.classList.add('is-open'); csBtn.setAttribute('aria-expanded', 'true'); } }
+    function csClose() { if (cs) { cs.classList.remove('is-open'); csBtn.setAttribute('aria-expanded', 'false'); } }
+    function csSet(value) {
+      if (!cs) return;
+      var label = csPlaceholder, found = false;
+      Array.prototype.forEach.call(csOpts, function (o) {
+        var on = o.getAttribute('data-value') === value && value;
+        o.setAttribute('aria-selected', on ? 'true' : 'false');
+        if (on) { label = o.textContent.trim(); found = true; }
+      });
+      serviceInput.value = found ? value : '';
+      csValue.textContent = label;
+      csValue.classList.toggle('is-placeholder', !found);
+    }
+    if (cs) {
+      csBtn.addEventListener('click', function (e) { e.stopPropagation(); cs.classList.contains('is-open') ? csClose() : csOpen(); });
+      Array.prototype.forEach.call(csOpts, function (o) {
+        o.addEventListener('click', function () { csSet(o.getAttribute('data-value')); csClose(); csBtn.focus(); });
+      });
+      document.addEventListener('click', function (e) { if (!cs.contains(e.target)) csClose(); });
+    }
+
+    function openForm(service) {
+      lastFocus = document.activeElement;
+      if (service) csSet(service);
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      closeMenu();
+      if (lenis) lenis.stop();
+      var first = form.querySelector('input:not([type=hidden]):not(.form__hp), select, textarea');
+      setTimeout(function () { if (first) try { first.focus(); } catch (e) {} }, 90);
+    }
+    function closeForm() {
+      csClose();
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      if (lenis) lenis.start();
+      if (lastFocus) try { lastFocus.focus(); } catch (e) {}
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('.js-open-form'), function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        var service = el.getAttribute('data-service');
+        if (!service) {                                   // service-card link → use that card's title
+          var card = el.closest && el.closest('.svc__card');
+          var t = card && card.querySelector('.svc__title');
+          if (t) service = t.textContent.trim();
+        }
+        openForm(service);
+      });
+    });
+
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal || (e.target.hasAttribute && e.target.hasAttribute('data-close'))) closeForm();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) closeForm();
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!serviceInput.value) {                       // custom dropdown isn't a native field → validate manually
+        if (statusEl) { statusEl.textContent = 'Lūdzu izvēlies pakalpojumu.'; statusEl.className = 'form__status is-err'; }
+        csOpen();
+        return;
+      }
+      if (statusEl) { statusEl.textContent = 'Sūta…'; statusEl.className = 'form__status is-sending'; }
+      if (submitBtn) submitBtn.disabled = true;
+      fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
+        .then(function (r) { return r.json(); })
+        .then(function (json) {
+          if (json && json.success) {
+            if (statusEl) { statusEl.textContent = 'Paldies! Pieteikums nosūtīts — atbildēsim drīz.'; statusEl.className = 'form__status is-ok'; }
+            form.reset();
+            csSet('');
+          } else {
+            throw new Error((json && json.message) || 'error');
+          }
+        })
+        .catch(function () {
+          if (statusEl) { statusEl.textContent = 'Neizdevās nosūtīt. Mēģini vēlreiz vai raksti rast.studija@gmail.com'; statusEl.className = 'form__status is-err'; }
+        })
+        .finally(function () { if (submitBtn) submitBtn.disabled = false; });
+    });
+  })();
+
   /* ---------------- Anchor smooth scroll ---------------- */
   Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function (a) {
     a.addEventListener('click', function (e) {
+      if (a.classList.contains('js-open-form')) return;        // handled by the project-form modal
       var id = a.getAttribute('href');
       if (id === '#') { e.preventDefault(); return; }          // placeholder links
       var target = document.querySelector(id);
@@ -308,19 +422,22 @@
   }
 
   /* ---------------- Studio handoff: fade in over the video's end-frame ---------------- */
-  // Desktop only. Studio overlaps the video's last viewport (CSS margin-top:-100vh) and
-  // starts at opacity 0, so it rises into place INVISIBLY; once its top hits the top (the
-  // clip's end) it pins briefly and fades in — content appears in place over the held
-  // end-frame instead of a section sliding over the video.
+  // Studio overlaps the video's last viewport (CSS margin-top:-100vh) and starts at
+  // opacity 0, so it rises into place INVISIBLY. Its content is vertically centred in
+  // that viewport (CSS min-height:100vh + flex). When it reaches the top (the clip's
+  // end frame) the fade plays as a simple, one-shot, time-based tween — NOT scrubbed to
+  // scroll — so the section just blooms in centred over the held end-frame.
   function setupStudioHandoff() {
     if (!hasST || reduce) return;
     var studio = document.getElementById('studio');
     if (!studio) return;
-    // Start ~0.3s of clip before the end ('top 12%' ≈ 0.3s of the scrub) and fade a bit
-    // quicker (shorter range) so the content begins blooming in just before the last frame.
-    gsap.fromTo(studio, { opacity: 0 }, {
-      opacity: 1, ease: 'none',
-      scrollTrigger: { trigger: studio, start: 'top 12%', end: '+=30%', pin: true, scrub: true }
+    // Simple time-based fade, reversible: fades IN over 0.9s on enter, and fades OUT
+    // ~3× faster (timeScale on reverse) when scrolling back up.
+    var fade = gsap.to(studio, { opacity: 1, duration: 0.9, ease: 'power2.out', paused: true });
+    ScrollTrigger.create({
+      trigger: studio, start: 'top 30%',
+      onEnter:     function () { fade.timeScale(1).play(); },
+      onLeaveBack: function () { fade.timeScale(3).reverse(); }
     });
   }
 
@@ -346,7 +463,7 @@
       for (var i = 0; i < N; i++) {
         var delta = pos - i;                       // >0 already revolved past, <0 waiting to swing in
         var ad = Math.abs(delta);
-        steps[i].style.transform = 'rotateY(' + (delta * 90) + 'deg) translateZ(' + radius + 'px)';
+        steps[i].style.transform = 'rotateY(' + (-delta * 90) + 'deg) translateZ(' + radius + 'px)';
         steps[i].style.opacity = ad < 1 ? String(1 - ad * ad) : '0';   // quadratic fade = rounder reveal
         steps[i].style.zIndex = ad < 0.5 ? '2' : '1';
         steps[i].classList.toggle('is-active', i === active);
@@ -417,10 +534,63 @@
   }
 
   /* ---------------- Services: sticky "stacking cards" ---------------- */
-  // The cascade is pure CSS now (position:sticky with staggered `top` offsets so
-  // every card's title bar keeps peeking — see .svc__card in the stylesheet).
-  // No JS needed; kept as a no-op so the buildScenes() call site stays stable.
+  // The card cascade is pure CSS (position:sticky with staggered `top` offsets).
   function setupServices() { /* CSS-only cascade */ }
+
+  /* ---------------- Services header: hold during cascade, release when last card lands -----
+  // CSS sticky would cling to the very bottom of the deck (header drags to the end). Instead
+  // we drive the header ourselves: it "sticks" at the top while the cards cascade in, then
+  // RELEASES the instant the last card reaches its pinned spot, so it scrolls away while the
+  // final card sits mid-screen — instead of clinging until the deck ends. */
+  function setupServicesHeader() {
+    if (!hasST || reduce) return;
+    var svc  = document.querySelector('.svc');
+    var head = document.querySelector('.svc__pin .section-head');
+    var deck = document.querySelector('.svc__deck');
+    if (!svc || !head || !deck) return;
+    var cards = deck.querySelectorAll('.svc__card');
+    if (!cards.length) return;
+    var last = cards[cards.length - 1];
+
+    function docTop(el) { var y = 0; while (el) { y += el.offsetTop; el = el.offsetParent; } return y; }
+
+    var sEnter = 0, sRelease = 0, deckPinned = false;
+    function measure() {
+      // read the resolved sticky offset while CSS sticky is still in effect, then take over
+      head.style.position = '';
+      head.style.transform = 'none';
+      var offset = parseFloat(getComputedStyle(head).top) || 80;        // --svc-head-top, resolved
+      // Pin the first card just BELOW the held header so the header never covers it.
+      deck.style.setProperty('--deck-top', (offset + head.offsetHeight + 16) + 'px');
+      var offsetLast = parseFloat(getComputedStyle(last).top) || offset; // last card's pinned top, resolved
+      sEnter   = docTop(head) - offset;          // scroll where the header reaches the top
+      sRelease = docTop(last) - offsetLast;      // scroll where the LAST card finishes pinning
+      if (sRelease < sEnter) sRelease = sEnter;
+      head.style.position = 'relative';
+      head.style.top = 'auto';        // cancel the CSS sticky `top:72px`, else relative pos shifts it onto card 1
+      head.style.zIndex = '6';
+      head.style.willChange = 'transform';
+      deckPinned = false;
+    }
+    function apply() {
+      var y = window.scrollY || window.pageYOffset;
+      var t = y <= sEnter ? 0 : (y >= sRelease ? sRelease - sEnter : y - sEnter);
+      head.style.transform = t ? 'translateY(' + t + 'px)' : 'none';
+      // Once the header is actually held, pin the first card to its REAL rendered bottom
+      // (bulletproof against any measurement drift) so it never sits under the header.
+      if (!deckPinned && t > 0) {
+        var b = head.getBoundingClientRect().bottom;
+        if (b > 0) { deck.style.setProperty('--deck-top', Math.round(b + 16) + 'px'); deckPinned = true; }
+      }
+    }
+
+    measure(); apply();
+    window.addEventListener('scroll', apply, { passive: true });   // fires for native + Lenis scroll
+    ScrollTrigger.create({
+      trigger: svc, start: 'top bottom', end: 'bottom top',
+      onUpdate: apply, onRefresh: function () { measure(); apply(); }
+    });
+  }
 
   /* ---------------- Split text into characters (keeps element boundaries) ---------------- */
   function wrapChars(node) {
@@ -725,7 +895,12 @@
   window.addEventListener('load', finishLoader);
   // Recompute all pin/scrub positions once everything (video, fonts, images) has
   // fully loaded — prevents pinned sections (impact) from using stale positions.
-  if (hasST) window.addEventListener('load', function () { setTimeout(function () { ScrollTrigger.refresh(); }, 350); });
+  // Force the top first (a reload must never start mid-page, or the pins miscalculate).
+  if (hasST) window.addEventListener('load', function () {
+    window.scrollTo(0, 0);
+    if (lenis) lenis.scrollTo(0, { immediate: true });
+    setTimeout(function () { ScrollTrigger.refresh(); }, 350);
+  });
   setTimeout(finishLoader, 4500);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

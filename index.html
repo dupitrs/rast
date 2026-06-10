@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0A0A0C" />
 
   <title>rast - tīmekļa dizaina un izstrādes studija</title>
-  <meta name="description" content="Rast ir tīmekļa dizaina un izstrādes studija Rīgā. Pie mums rodas ātras, izteiksmīgas un augstas klases mājaslapas - zīmoliem, kas grib vairāk." />
+  <meta name="description" content="Rast ir tīmekļa dizaina un izstrādes studija. Pie mums rodas ātras, izteiksmīgas un augstas klases mājaslapas - zīmoliem, kas grib vairāk." />
 
   <!-- Open Graph / social -->
   <meta property="og:type" content="website" />
@@ -33,6 +33,10 @@
     (function () {
       var d = document.documentElement;
       d.classList.add('js');
+      // Always boot from the top: restoring a mid-page scroll on reload made the pinned/
+      // scrubbed sections (video, impact) initialise at the wrong offset and break the layout.
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
       setTimeout(function () {
         if (!window.__rastBooted) {
           d.classList.add('no-anim');
@@ -90,7 +94,7 @@
     </nav>
     <div class="menu__foot">
       <a href="mailto:rast.studija@gmail.com">rast.studija@gmail.com</a>
-      <span>Rīga · Visā pasaulē</span>
+      <span>Visā pasaulē</span>
     </div>
   </div>
 
@@ -104,7 +108,7 @@
 
       <div class="hero__inner">
         <p class="eyebrow hero__eyebrow" data-reveal>
-          <span class="dot"></span> Tīmekļa dizaina un izstrādes studija - Rīga, visā pasaulē
+          <span class="dot"></span> Tīmekļa dizaina un izstrādes studija
         </p>
 
         <h1 class="hero__title">
@@ -113,12 +117,12 @@
         </h1>
 
         <p class="hero__sub" data-reveal>
-          Rast ir tīmekļa dizaina un izstrādes studija Rīgā. Pie mums rodas ātras,
+          Rast ir tīmekļa dizaina un izstrādes studija. Pie mums rodas ātras,
           izteiksmīgas un augstas klases mājaslapas - zīmoliem, kas grib vairāk.
         </p>
 
         <div class="hero__actions" data-reveal>
-          <a href="mailto:rast.studija@gmail.com" class="btn btn--solid magnetic" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+          <button type="button" class="btn btn--solid magnetic js-open-form" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></button>
           <a href="#work" class="btn btn--ghost magnetic" data-cursor="hover"><span>Skatīt darbus</span></a>
         </div>
       </div>
@@ -169,9 +173,10 @@
     <!-- ============ SERVICES ============ -->
     <section class="svc section--panel" id="services">
       <div class="container">
+        <div class="svc__pin">
         <header class="section-head">
           <p class="eyebrow" data-reveal><span class="idx">02</span> Pakalpojumi</p>
-          <h2 class="section-title" data-reveal>Ko mēs veidojam.</h2>
+          <h2 class="section-title" data-reveal>Ko tu iegūsi.</h2>
         </header>
 
         <div class="svc__deck">
@@ -187,7 +192,7 @@
               </div>
               <div class="svc__card-aside">
                 <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> vajag pirmo mājaslapu · esošā novecojusi · lapa konkrētai kampaņai vai pakalpojumam</p>
-                <a class="svc__card-link" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
+                <a class="svc__card-link js-open-form" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
               </div>
             </div>
           </article>
@@ -204,7 +209,7 @@
               </div>
               <div class="svc__card-aside">
                 <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> lapa veidota pirms gadiem · lēni ielādējas · telefonā to grūti lietot</p>
-                <a class="svc__card-link" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
+                <a class="svc__card-link js-open-form" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
               </div>
             </div>
           </article>
@@ -221,7 +226,7 @@
               </div>
               <div class="svc__card-aside">
                 <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> vēlaties sākt pārdot internetā · esošais veikals kļuvis lēns un neērts</p>
-                <a class="svc__card-link" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
+                <a class="svc__card-link js-open-form" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
               </div>
             </div>
           </article>
@@ -238,10 +243,11 @@
               </div>
               <div class="svc__card-aside">
                 <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> rutīnas darbi prasa daudz laika · procesi neiekļaujas standarta programmās</p>
-                <a class="svc__card-link" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
+                <a class="svc__card-link js-open-form" href="#contact" data-cursor="hover">Apspriest projektu <i>→</i></a>
               </div>
             </div>
           </article>
+        </div>
         </div>
 
         <div class="svc__extra">
@@ -389,9 +395,8 @@
     <section class="stats">
       <div class="container stats__grid">
         <div class="stat" data-reveal><span class="stat__num">2026</span><span class="stat__label">Dibināts</span></div>
-        <div class="stat" data-reveal><span class="stat__num">Rīga</span><span class="stat__label">Bāze Latvijā</span></div>
+        <div class="stat" data-reveal><span class="stat__num">Latvija</span><span class="stat__label">Mūsu bāze</span></div>
         <div class="stat" data-reveal><span class="stat__num">100%</span><span class="stat__label">Pielāgots, bez veidnēm</span></div>
-        <div class="stat" data-reveal><span class="stat__num">∞</span><span class="stat__label">Pieejami visā pasaulē</span></div>
       </div>
     </section>
 
@@ -405,7 +410,7 @@
           <span class="line"><span>neaizmirstamu<i class="accent">.</i></span></span>
         </h2>
         <div class="cta__actions" data-reveal>
-          <a href="mailto:rast.studija@gmail.com" class="btn btn--solid btn--lg magnetic" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+          <button type="button" class="btn btn--solid btn--lg magnetic js-open-form" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></button>
           <a href="mailto:rast.studija@gmail.com" class="cta__email" data-cursor="hover">rast.studija@gmail.com</a>
         </div>
       </div>
@@ -427,16 +432,9 @@
           <a href="#contact" data-cursor="hover">Kontakti</a>
         </div>
         <div class="footer__col">
-          <span class="footer__heading">Sociālie tīkli</span>
-          <a href="#" data-cursor="hover">Instagram</a>
-          <a href="#" data-cursor="hover">Dribbble</a>
-          <a href="#" data-cursor="hover">Behance</a>
-          <a href="#" data-cursor="hover">LinkedIn</a>
-        </div>
-        <div class="footer__col">
           <span class="footer__heading">Kontakti</span>
           <a href="mailto:rast.studija@gmail.com" data-cursor="hover">rast.studija@gmail.com</a>
-          <span class="footer__muted">Rīga, Latvija</span>
+          <span class="footer__muted">Latvija</span>
           <span class="footer__muted">Strādājam visā pasaulē</span>
         </div>
       </div>
@@ -449,6 +447,67 @@
       </div>
     </div>
   </footer>
+
+  <!-- ============ PROJECT FORM (Web3Forms — no backend) ============ -->
+  <div class="form-modal" id="formModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+    <div class="form-modal__backdrop" data-close></div>
+    <div class="form" role="document">
+      <div class="form__head">
+        <div>
+          <h2 class="form__title" id="formTitle">Sāksim projektu</h2>
+          <p class="form__sub">Pastāsti īsumā, ko vajag — atbildēsim 1 darba dienas laikā.</p>
+        </div>
+        <button type="button" class="form__close" data-close aria-label="Aizvērt formu">×</button>
+      </div>
+
+      <form class="form__el" id="projectForm">
+        <!-- Web3Forms config -->
+        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
+        <input type="hidden" name="subject" value="Jauns projekta pieteikums — rast.lv" />
+        <input type="hidden" name="from_name" value="rast.lv forma" />
+        <input type="checkbox" name="botcheck" class="form__hp" tabindex="-1" autocomplete="off" />
+
+        <div class="form__row">
+          <div class="form__field">
+            <label class="form__label" for="fName">Vārds</label>
+            <input class="form__input" id="fName" name="Vārds" type="text" required autocomplete="name" placeholder="Tavs vārds" />
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="fEmail">E-pasts</label>
+            <input class="form__input" id="fEmail" name="E-pasts" type="email" required autocomplete="email" placeholder="tavs@epasts.lv" />
+          </div>
+        </div>
+
+        <div class="form__field">
+          <span class="form__label" id="fServiceLabel">Pakalpojums</span>
+          <div class="cselect" id="fServiceSelect">
+            <button type="button" class="cselect__btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="fServiceLabel">
+              <span class="cselect__value is-placeholder">Izvēlies pakalpojumu</span>
+              <svg class="cselect__chevron" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <ul class="cselect__list" role="listbox" aria-label="Pakalpojums" tabindex="-1">
+              <li class="cselect__opt" role="option" data-value="Mājaslapas">Mājaslapa (jauna)</li>
+              <li class="cselect__opt" role="option" data-value="Lapas atjaunošana">Lapas atjaunošana</li>
+              <li class="cselect__opt" role="option" data-value="Interneta veikali">Interneta veikals</li>
+              <li class="cselect__opt" role="option" data-value="Sistēmas un rīki uzņēmumam">Sistēmas un rīki uzņēmumam</li>
+              <li class="cselect__opt" role="option" data-value="SEO / Google atrodamība">SEO / Google atrodamība</li>
+              <li class="cselect__opt" role="option" data-value="Logo un vizuālā identitāte">Logo un vizuālā identitāte</li>
+              <li class="cselect__opt" role="option" data-value="Cits / vēl nezinu">Cits / vēl nezinu</li>
+            </ul>
+            <input type="hidden" name="Pakalpojums" id="fService" value="" />
+          </div>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="fMsg">Par projektu</label>
+          <textarea class="form__textarea" id="fMsg" name="Ziņa" required placeholder="Daži teikumi par to, ko vēlies — mērķis, termiņš, budžets, ja zināms."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn--solid form__submit"><span>Nosūtīt pieteikumu</span> <i class="btn__arrow">→</i></button>
+        <p class="form__status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
 
   <!-- ============ SCRIPTS (CDN, all guarded in main.js) ============ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
