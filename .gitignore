@@ -8,3 +8,4 @@ package-lock.json
 # Verification artifacts
 assets/_verify_*.png
 *_verify*.png
+.playwright-mcp/

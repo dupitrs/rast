@@ -181,7 +181,11 @@
     if (!hasGSAP || reduce) return;
     var heroReveals = heroEl ? heroEl.querySelectorAll('[data-reveal]') : [];
     var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-    tl.fromTo('.hero__title .line > span', { yPercent: 110 }, { yPercent: 0, duration: 1.1, stagger: 0.12 })
+    // NB: y:0 in the from-state is load-bearing. The CSS pre-hide is
+    // translateY(110%), which GSAP imports as PIXELS (percentages are already
+    // resolved in computed style); animating only yPercent would leave that
+    // pixel offset behind and the title would stay clipped forever.
+    tl.fromTo('.hero__title .line > span', { y: 0, yPercent: 110 }, { y: 0, yPercent: 0, duration: 1.1, stagger: 0.12 })
       .fromTo(heroReveals, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.12 }, '-=0.7');
   }
 
@@ -201,13 +205,13 @@
       }
     });
 
-    // CTA headline lines
+    // CTA headline lines — pre-hidden via CSS (clipped by .line), slide up smoothly
+    // on enter. immediateRender stays default(true) so they start hidden, not snapped.
     var ctaLines = document.querySelectorAll('.cta__title .line > span');
     if (ctaLines.length) {
-      gsap.fromTo(ctaLines, { yPercent: 110 }, {
-        yPercent: 0, duration: 1, stagger: 0.1, ease: 'power4.out',
-        immediateRender: false,   // stay visible until the trigger actually fires (no permanently-hidden headline)
-        scrollTrigger: { trigger: '.cta__title', start: 'top 90%', once: true }
+      gsap.fromTo(ctaLines, { y: 0, yPercent: 110 }, {
+        y: 0, yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'power3.out',
+        scrollTrigger: { trigger: '.cta__title', start: 'top 85%', once: true }
       });
     }
   }
@@ -303,26 +307,92 @@
     });
   }
 
-  /* ---------------- Process: scroll-filling timeline spine ---------------- */
-  function setupProcess() {
+  /* ---------------- Studio handoff: fade in over the video's end-frame ---------------- */
+  // Desktop only. Studio overlaps the video's last viewport (CSS margin-top:-100vh) and
+  // starts at opacity 0, so it rises into place INVISIBLY; once its top hits the top (the
+  // clip's end) it pins briefly and fades in — content appears in place over the held
+  // end-frame instead of a section sliding over the video.
+  function setupStudioHandoff() {
     if (!hasST || reduce) return;
-    var fill = document.querySelector('.process__line i');
-    var listEl = document.getElementById('processList');
-    if (!fill || !listEl) return;
-    gsap.fromTo(fill, { scaleY: 0 }, {
-      scaleY: 1, ease: 'none',
-      scrollTrigger: { trigger: listEl, start: 'top 72%', end: 'bottom 78%', scrub: 0.5 }
+    var studio = document.getElementById('studio');
+    if (!studio) return;
+    // Start ~0.3s of clip before the end ('top 12%' ≈ 0.3s of the scrub) and fade a bit
+    // quicker (shorter range) so the content begins blooming in just before the last frame.
+    gsap.fromTo(studio, { opacity: 0 }, {
+      opacity: 1, ease: 'none',
+      scrollTrigger: { trigger: studio, start: 'top 12%', end: '+=30%', pin: true, scrub: true }
     });
   }
 
-  /* ---------------- Scroll-scrubbed video section (black → orange) ---------------- */
-  // Its own section after the hero. The video starts going forward the moment the
-  // section begins entering from the hero (start 'top bottom'); the sticky inner holds
-  // it on screen while it finishes, then the page continues into the orange sections.
+  /* ---------------- Process: sticky 3D "revolver" ---------------- */
+  // Desktop: the section is tall and .process__container is CSS-sticky (held centred);
+  // this scrub (NO ScrollTrigger pin — its spacer was desyncing later sections)
+  // revolves the chapters through one shared stage like a revolver cylinder (each swings
+  // in to face you, flat & lit, number filled vermilion). Mobile/reduced: plain list.
+  function setupProcess() {
+    if (!hasST || reduce) return;
+    var section = document.getElementById('process');
+    var listEl = document.getElementById('processList');
+    var counter = document.getElementById('procCount');
+    var steps = gsap.utils.toArray('.step');
+    if (!section || !listEl || !steps.length) return;
+
+    listEl.classList.add('is-drum');
+    var N = steps.length;
+
+    function render(pos) {
+      var active = Math.round(Math.max(0, Math.min(N - 1, pos)));
+      var radius = window.innerWidth <= 860 ? 90 : 240;   // smaller cylinder on phones so content doesn't overflow the edge
+      for (var i = 0; i < N; i++) {
+        var delta = pos - i;                       // >0 already revolved past, <0 waiting to swing in
+        var ad = Math.abs(delta);
+        steps[i].style.transform = 'rotateY(' + (delta * 90) + 'deg) translateZ(' + radius + 'px)';
+        steps[i].style.opacity = ad < 1 ? String(1 - ad * ad) : '0';   // quadratic fade = rounder reveal
+        steps[i].style.zIndex = ad < 0.5 ? '2' : '1';
+        steps[i].classList.toggle('is-active', i === active);
+      }
+      if (counter) counter.textContent = steps[active].getAttribute('data-step');
+    }
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1.1,
+      onUpdate: function (self) { render(self.progress * (N - 1)); },
+      onRefresh: function (self) { render(self.progress * (N - 1)); }
+    });
+    render(0);
+  }
+
+  /* ---------------- Scroll-scrubbed video section ---------------- */
+  // Its own section after the hero. The clip scrubs as the section scrolls and STARTS the
+  // moment the section enters from the hero ('top bottom'), so the hero particles hand off
+  // straight into it; the sticky inner holds it on screen while it finishes, and #studio
+  // (pulled up in CSS) scrolls UP OVER it. Touch plays it natively (see branch below).
   function setupScrollVideo() {
     var sec = document.getElementById('scrollvid');
     var video = document.getElementById('scrollVideo');
     if (!sec || !video || !hasST || reduce) return;   // CSS hides the section when we can't scrub
+
+    // Touch devices: driving currentTime from scroll is keyframe-bound and
+    // visibly choppy on phones, so there the clip simply plays itself while
+    // the section is on screen — same look, native smoothness, less battery.
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) {
+      var playVid = function () {
+        if (video.ended) { try { video.currentTime = 0; } catch (e) {} }
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {});
+      };
+      var pauseVid = function () { video.pause(); };
+      ScrollTrigger.create({
+        trigger: sec, start: 'top 80%', end: 'bottom top',
+        onEnter: playVid, onEnterBack: playVid,
+        onLeave: pauseVid, onLeaveBack: pauseVid
+      });
+      return;
+    }
+
     function build() {
       var dur = video.duration;
       if (!isFinite(dur) || dur <= 0) dur = 7;
@@ -331,6 +401,7 @@
         var pr = video.play();
         if (pr && pr.then) pr.then(function () { video.pause(); video.currentTime = 0; }).catch(function () {});
       } catch (e) {}
+      // Scrub the clip across the whole section, starting as it enters from the hero.
       ScrollTrigger.create({
         trigger: sec, start: 'top bottom', end: 'bottom bottom',
         scrub: true, invalidateOnRefresh: true,
@@ -344,6 +415,12 @@
     if (video.readyState >= 1) build();
     else video.addEventListener('loadedmetadata', build, { once: true });
   }
+
+  /* ---------------- Services: sticky "stacking cards" ---------------- */
+  // The cascade is pure CSS now (position:sticky with staggered `top` offsets so
+  // every card's title bar keeps peeking — see .svc__card in the stylesheet).
+  // No JS needed; kept as a no-op so the buildScenes() call site stays stable.
+  function setupServices() { /* CSS-only cascade */ }
 
   /* ---------------- Split text into characters (keeps element boundaries) ---------------- */
   function wrapChars(node) {
@@ -616,8 +693,10 @@
     setupSplit();
     setupReveals();
     setupParallax();
+    setupStudioHandoff();
     setupImpact();
     setupProcess();
+    setupServices();
     setupScrollVideo();
     if (hasST) ScrollTrigger.refresh();
   }
