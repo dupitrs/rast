@@ -192,7 +192,7 @@
         .then(function (r) { return r.json(); })
         .then(function (json) {
           if (json && json.success) {
-            if (statusEl) { statusEl.textContent = 'Paldies! Pieteikums nosūtīts — atbildēsim drīz.'; statusEl.className = 'form__status is-ok'; }
+            if (statusEl) { statusEl.textContent = 'Paldies! Pieteikums nosūtīts, atbildēsim drīz.'; statusEl.className = 'form__status is-ok'; }
             form.reset();
             csSet('');
           } else {
