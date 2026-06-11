@@ -200,7 +200,7 @@
           }
         })
         .catch(function () {
-          if (statusEl) { statusEl.textContent = 'Neizdevās nosūtīt. Mēģini vēlreiz vai raksti rast.studija@gmail.com'; statusEl.className = 'form__status is-err'; }
+          if (statusEl) { statusEl.textContent = 'Neizdevās nosūtīt. Mēģini vēlreiz vai raksti hello@raststudio.lv'; statusEl.className = 'form__status is-err'; }
         })
         .finally(function () { if (submitBtn) submitBtn.disabled = false; });
     });
