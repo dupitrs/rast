@@ -47,6 +47,12 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* The whole site is dark — without this, Windows browsers paint scrollable areas
+     (e.g. the service dropdown) with the default WHITE scrollbar. */
+  color-scheme: dark;
+  /* Page scrollbar: same slim, quiet treatment as the dropdown/modal ones. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
 }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -249,7 +255,9 @@ ul, ol { list-style: none; }
    HERO
    ============================================================ */
 .hero {
-  position: relative; min-height: 100svh; min-height: 100dvh;
+  /* svh, NOT dvh: dvh re-resolves every time the mobile browser bar slides in/out,
+     which resized the hero mid-scroll and made the whole page jump. */
+  position: relative; min-height: 100vh; min-height: 100svh;
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: 0 var(--gutter) clamp(40px, 6vh, 70px);
   overflow: hidden;
@@ -331,11 +339,6 @@ ul, ol { list-style: none; }
    rotating the clip — rotation made the centred reveal read sideways. */
 @media (max-aspect-ratio: 3/4) {
   .scrollvid__video { width: 100%; height: 100%; object-fit: cover; }
-}
-/* Touch devices play the clip natively instead of scrubbing (see main.js),
-   so the sticky hold can be shorter — less black to scroll through on a phone. */
-@media (hover: none), (pointer: coarse) {
-  .scrollvid { height: 150vh; height: 150svh; }
 }
 .no-anim .scrollvid { display: none; }
 @media (prefers-reduced-motion: reduce) { .scrollvid { display: none; } }
@@ -823,6 +826,8 @@ button.btn { font-family: inherit; cursor: pointer; }
 .form {
   position: relative; z-index: 1; width: min(560px, 100%);
   max-height: 90vh; max-height: 90svh; overflow-y: auto;
+  overscroll-behavior: contain;   /* don't chain modal scrolling to the page behind it */
+  scrollbar-width: thin; scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
   background: var(--bg-2); border: 1px solid var(--line-2);
   border-radius: calc(var(--radius) + 6px);
   padding: clamp(26px, 4vw, 46px);
@@ -893,6 +898,8 @@ body.modal-open { overflow: hidden; }
   background: #121217; border: 1px solid var(--line-2); border-radius: 12px;
   box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.85);
   max-height: 230px; overflow-y: auto;
+  overscroll-behavior: contain;   /* wheel/touch at the list edge mustn't scroll the form */
+  scrollbar-width: thin; scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
   opacity: 0; visibility: hidden; transform: translateY(-6px);
   transition: opacity .22s var(--ease), transform .22s var(--ease), visibility .22s;
 }

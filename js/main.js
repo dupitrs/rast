@@ -109,7 +109,15 @@
     var csList = cs && cs.querySelector('.cselect__list');
     var csOpts = cs ? cs.querySelectorAll('.cselect__opt') : [];
     var csPlaceholder = csValue ? csValue.textContent : 'Izvēlies pakalpojumu';
-    function csOpen()  { if (cs) { cs.classList.add('is-open'); csBtn.setAttribute('aria-expanded', 'true'); } }
+    function csOpen()  {
+      if (!cs) return;
+      cs.classList.add('is-open'); csBtn.setAttribute('aria-expanded', 'true');
+      // The modal body scrolls (max-height 90svh); on phones the opened list can sit
+      // below that scroll box's fold — bring it into view once it has expanded.
+      setTimeout(function () {
+        if (csList && csList.scrollIntoView) csList.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }, 230);
+    }
     function csClose() { if (cs) { cs.classList.remove('is-open'); csBtn.setAttribute('aria-expanded', 'false'); } }
     function csSet(value) {
       if (!cs) return;
@@ -486,46 +494,40 @@
   // Its own section after the hero. The clip scrubs as the section scrolls and STARTS the
   // moment the section enters from the hero ('top bottom'), so the hero particles hand off
   // straight into it; the sticky inner holds it on screen while it finishes, and #studio
-  // (pulled up in CSS) scrolls UP OVER it. Touch plays it natively (see branch below).
+  // (pulled up in CSS) scrolls UP OVER it. Scrubs on touch too: the clip is all-keyframe
+  // encoded, so seeks are frame-accurate, and the eased ticker below hides seek latency.
   function setupScrollVideo() {
     var sec = document.getElementById('scrollvid');
     var video = document.getElementById('scrollVideo');
     if (!sec || !video || !hasST || reduce) return;   // CSS hides the section when we can't scrub
 
-    // Touch devices: driving currentTime from scroll is keyframe-bound and
-    // visibly choppy on phones, so there the clip simply plays itself while
-    // the section is on screen — same look, native smoothness, less battery.
-    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) {
-      var playVid = function () {
-        if (video.ended) { try { video.currentTime = 0; } catch (e) {} }
-        var p = video.play();
-        if (p && p.catch) p.catch(function () {});
-      };
-      var pauseVid = function () { video.pause(); };
-      ScrollTrigger.create({
-        trigger: sec, start: 'top 80%', end: 'bottom top',
-        onEnter: playVid, onEnterBack: playVid,
-        onLeave: pauseVid, onLeaveBack: pauseVid
-      });
-      return;
-    }
-
     function build() {
       var dur = video.duration;
       if (!isFinite(dur) || dur <= 0) dur = 7;
-      // Prime decoding (play→pause) so seeked frames actually paint.
+      var target = 0;
+      // Prime decoding (play→pause) so seeked frames actually paint — on phones a
+      // never-started video can stay black when only ever seeked.
       try {
         var pr = video.play();
-        if (pr && pr.then) pr.then(function () { video.pause(); video.currentTime = 0; }).catch(function () {});
+        if (pr && pr.then) pr.then(function () { video.pause(); }).catch(function () {});
       } catch (e) {}
       // Scrub the clip across the whole section, starting as it enters from the hero.
       ScrollTrigger.create({
         trigger: sec, start: 'top bottom', end: 'bottom bottom',
         scrub: true, invalidateOnRefresh: true,
-        onUpdate: function (self) {
-          var t = self.progress * dur;
-          if (isFinite(t)) { try { video.currentTime = t; } catch (e) {} }
-        }
+        onUpdate: function (self) { target = self.progress * dur; }
+      });
+      // Don't write currentTime straight from scroll events: on phones each seek is
+      // comparatively slow and one-per-event reads as stutter. Instead ease the time
+      // toward the scroll target every frame and never start a new seek while the
+      // previous one is still in flight — smooth on touch, identical on desktop.
+      gsap.ticker.add(function () {
+        if (video.seeking) return;
+        var cur = video.currentTime || 0;
+        var diff = target - cur;
+        if (!isFinite(diff) || Math.abs(diff) < 1 / 60) return;   // already on the right frame
+        var next = Math.abs(diff) < 0.12 ? target : cur + diff * 0.22;
+        try { video.currentTime = next; } catch (e) {}
       });
       ScrollTrigger.refresh();
     }
