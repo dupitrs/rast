@@ -1010,8 +1010,15 @@ button:focus-visible {
   color: var(--ink); padding: 7px 12px; border-radius: 999px;
   background: rgba(var(--bg-rgb), .58); border: 1px solid rgba(var(--ink-rgb), .22);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  transition: background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease);
+  transition: background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease);
+  /* Looping pulse (scale + accent glow) draws the eye to “click me”. Stops on hover; off for reduced-motion. */
+  animation: workBadgePulse 2.2s var(--ease-in-out) infinite;
+}
+@keyframes workBadgePulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
+  50%      { transform: scale(1.06); box-shadow: 0 0 0 5px rgba(var(--accent-rgb), 0.14), 0 8px 22px -4px rgba(var(--accent-rgb), 0.55); }
 }
 .work__badge i { color: var(--accent); font-style: normal; transition: transform .35s var(--ease); }
-.work__card:hover .work__badge { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.work__card:hover .work__badge { background: var(--accent); color: var(--bg); border-color: var(--accent); animation: none; transform: scale(1.06); }
 .work__card:hover .work__badge i { color: var(--bg); transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) { .work__badge { animation: none; } }
