@@ -923,3 +923,28 @@ body.modal-open { overflow: hidden; }
 .cselect__opt:hover { background: rgba(var(--ink-rgb), 0.06); color: var(--ink); }
 .cselect__opt[aria-selected="true"] { color: var(--accent); }
 .cselect__opt[aria-selected="true"]::after { content: "\2713"; font-size: 13px; }
+
+/* ============================================================
+   AGENCY POLISH  (additive + isolated — this whole block can be
+   deleted to fully revert the polish layer)
+   ============================================================ */
+
+/* 1) Keyboard accessibility: a visible focus ring on every interactive
+   element. :focus-visible keeps mouse clicks clean (ring only on keyboard). */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* 2) Mini service cards were 3 static identical blocks. Give them a quiet,
+   intentional hover: the top rule lights up in the accent and the card lifts. */
+.svc__mini { transition: transform .4s var(--ease), border-top-color .4s var(--ease); }
+.svc__mini:hover { transform: translateY(-4px); border-top-color: var(--accent); }
+.svc__mini-title { transition: color .3s var(--ease); }
+.svc__mini:hover .svc__mini-title { color: var(--accent); }
+
+/* 3) Work "your project here" CTA card: match the subtle lift used elsewhere. */
+.work__card--cta { transition: background .4s var(--ease), transform .4s var(--ease); }
+.work__card--cta:hover { transform: translateY(-4px); }
