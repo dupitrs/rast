@@ -602,7 +602,7 @@ ul, ol { list-style: none; }
      the gradient fills the glyphs via background-clip:text, the stroke stays as the outline. */
   --fill: 0%;
   color: transparent;
-  background-image: linear-gradient(90deg, var(--accent) var(--fill), transparent var(--fill));
+  background-image: linear-gradient(90deg, rgba(var(--accent-rgb), 0.22) var(--fill), transparent var(--fill));
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   -webkit-text-stroke: 1.5px rgba(var(--ink-rgb), 0.16);
