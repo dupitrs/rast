@@ -420,6 +420,11 @@ ul, ol { list-style: none; }
    visible, normal scroll. (No sticky stacking.)
    ============================================================ */
 .svc { padding: clamp(70px, 9vw, 150px) 0; }
+.svc__pin { position: relative; }
+/* The section header stays pinned while the cards cascade beneath it, then scrolls
+   away with the whole section. Cards clear it via --deck-top (kept in sync by JS). */
+.svc__pin .section-head { position: sticky; top: clamp(80px, 11vh, 116px); z-index: 6; margin-bottom: clamp(28px, 4vw, 56px); }
+.no-anim .svc__pin .section-head, .no-anim .svc__card { position: static; }
 
 .svc__deck {
   --deck-top: clamp(78px, 10vh, 112px);   /* where the first card pins, below the fixed header */

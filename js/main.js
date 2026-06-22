@@ -439,7 +439,7 @@
     if (!word) return;
     ScrollTrigger.create({
       trigger: word.closest('section') || word,
-      start: 'top 40%', end: 'bottom center', scrub: true,
+      start: 'top 50%', end: 'bottom 60%', scrub: true,
       onUpdate: function (self) { word.style.setProperty('--fill', (self.progress * 100).toFixed(1) + '%'); }
     });
   }
@@ -564,59 +564,23 @@
   // The card cascade is pure CSS (position:sticky with staggered `top` offsets).
   function setupServices() { /* CSS-only cascade */ }
 
-  /* ---------------- Services header: hold during cascade, release when last card lands -----
-  // CSS sticky would cling to the very bottom of the deck (header drags to the end). Instead
-  // we drive the header ourselves: it "sticks" at the top while the cards cascade in, then
-  // RELEASES the instant the last card reaches its pinned spot, so it scrolls away while the
-  // final card sits mid-screen — instead of clinging until the deck ends. */
+  /* ---------------- Services header: CSS-sticky, stays pinned through the cascade -----
+  // The header is now CSS position:sticky (see .svc__pin .section-head), so it stays pinned
+  // while all four cards cascade beneath it and releases naturally when the whole .svc__pin
+  // block scrolls past. JS only keeps --deck-top in sync so the first card pins just BELOW
+  // the pinned header instead of behind it. */
   function setupServicesHeader() {
-    if (!hasST || reduce) return;
-    var svc  = document.querySelector('.svc');
+    if (reduce) return;
     var head = document.querySelector('.svc__pin .section-head');
     var deck = document.querySelector('.svc__deck');
-    if (!svc || !head || !deck) return;
-    var cards = deck.querySelectorAll('.svc__card');
-    if (!cards.length) return;
-    var last = cards[cards.length - 1];
-
-    function docTop(el) { var y = 0; while (el) { y += el.offsetTop; el = el.offsetParent; } return y; }
-
-    var sEnter = 0, sRelease = 0, deckPinned = false;
+    if (!head || !deck) return;
     function measure() {
-      // read the resolved sticky offset while CSS sticky is still in effect, then take over
-      head.style.position = '';
-      head.style.transform = 'none';
-      var offset = parseFloat(getComputedStyle(head).top) || 80;        // --svc-head-top, resolved
-      // Pin the first card just BELOW the held header so the header never covers it.
-      deck.style.setProperty('--deck-top', (offset + head.offsetHeight + 16) + 'px');
-      var offsetLast = parseFloat(getComputedStyle(last).top) || offset; // last card's pinned top, resolved
-      sEnter   = docTop(head) - offset;          // scroll where the header reaches the top
-      sRelease = docTop(last) - offsetLast;      // scroll where the LAST card finishes pinning
-      if (sRelease < sEnter) sRelease = sEnter;
-      head.style.position = 'relative';
-      head.style.top = 'auto';        // cancel the CSS sticky `top:72px`, else relative pos shifts it onto card 1
-      head.style.zIndex = '6';
-      head.style.willChange = 'transform';
-      deckPinned = false;
+      var offset = parseFloat(getComputedStyle(head).top) || 96;   // resolved sticky top
+      deck.style.setProperty('--deck-top', Math.round(offset + head.offsetHeight + 18) + 'px');
     }
-    function apply() {
-      var y = window.scrollY || window.pageYOffset;
-      var t = y <= sEnter ? 0 : (y >= sRelease ? sRelease - sEnter : y - sEnter);
-      head.style.transform = t ? 'translateY(' + t + 'px)' : 'none';
-      // Once the header is actually held, pin the first card to its REAL rendered bottom
-      // (bulletproof against any measurement drift) so it never sits under the header.
-      if (!deckPinned && t > 0) {
-        var b = head.getBoundingClientRect().bottom;
-        if (b > 0) { deck.style.setProperty('--deck-top', Math.round(b + 16) + 'px'); deckPinned = true; }
-      }
-    }
-
-    measure(); apply();
-    window.addEventListener('scroll', apply, { passive: true });   // fires for native + Lenis scroll
-    ScrollTrigger.create({
-      trigger: svc, start: 'top bottom', end: 'bottom top',
-      onUpdate: apply, onRefresh: function () { measure(); apply(); }
-    });
+    measure();
+    window.addEventListener('resize', measure);
+    if (hasST) ScrollTrigger.addEventListener('refreshInit', measure);
   }
 
   /* ---------------- Split text into characters (keeps element boundaries) ---------------- */
@@ -895,6 +859,7 @@
     setupImpact();
     setupProcess();
     setupServices();
+    setupServicesHeader();
     setupScrollVideo();
     if (hasST) ScrollTrigger.refresh();
   }
