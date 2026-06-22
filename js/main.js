@@ -439,7 +439,7 @@
     if (!word) return;
     ScrollTrigger.create({
       trigger: word.closest('section') || word,
-      start: 'top 60%', end: 'bottom 70%', scrub: true,
+      start: 'top 70%', end: 'bottom 80%', scrub: true,
       onUpdate: function (self) { word.style.setProperty('--fill', (self.progress * 100).toFixed(1) + '%'); }
     });
   }

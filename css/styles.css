@@ -433,8 +433,9 @@ ul, ol { list-style: none; }
   --peek: clamp(64px, 8vh, 96px);         /* title-bar strip each covered card keeps visible */
   display: flex; flex-direction: column;
   gap: clamp(16px, 2.2vh, 26px);
-  /* trailing room so the last card travels to its pin, then the whole deck scrolls on */
-  padding-bottom: clamp(130px, 20vh, 240px);
+  /* Small trailing room only: keep it short so the sticky header releases together with
+     the last card instead of floating alone after it. */
+  padding-bottom: clamp(24px, 4vh, 60px);
 }
 .svc__card {
   position: sticky;
@@ -510,7 +511,7 @@ ul, ol { list-style: none; }
 .svc__mini:hover .svc__mini-ico { transform: translateY(-2px) scale(1.06); }
 
 @media (max-width: 760px) {
-  .svc__deck { --peek: clamp(46px, 10vh, 64px); padding-bottom: clamp(70px, 12vh, 130px); }   /* keep the cascade on mobile, but trim trailing room so the gap before "Papildu pakalpojumi" isn't huge */
+  .svc__deck { --peek: clamp(46px, 10vh, 64px); padding-bottom: clamp(16px, 3vh, 40px); }   /* small trailing room so the header releases with the last card and the gap before "Papildu pakalpojumi" stays tight */
   .svc__card { min-height: clamp(300px, 54vh, 430px); }
   .svc__title { font-size: clamp(20px, 5.6vw, 30px); }
   .svc__card-bar { padding: 0 20px; }
