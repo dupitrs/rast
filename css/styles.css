@@ -564,6 +564,17 @@ ul, ol { list-style: none; }
   display: grid; place-items: center; overflow: hidden;
   margin-block: clamp(40px, 7vw, 100px);
 }
+/* Feather the top + bottom edges into the page background (--bg) so the band
+   blends into the previous (work) and next (impact) sections instead of showing
+   a hard rectangular line. Overlays sit on the static .band (not the parallax
+   layer), above the bg + giant word, below the centred title. */
+.band::before,
+.band::after {
+  content: ""; position: absolute; left: 0; right: 0;
+  height: clamp(90px, 18vh, 220px); z-index: 2; pointer-events: none;
+}
+.band::before { top: 0;    background: linear-gradient(to bottom, var(--bg) 0%, rgba(var(--bg-rgb), 0) 100%); }
+.band::after  { bottom: 0; background: linear-gradient(to top,    var(--bg) 0%, rgba(var(--bg-rgb), 0) 100%); }
 .band__bg {
   position: absolute; inset: -38% 0; z-index: 0; will-change: transform;
   background:
@@ -599,7 +610,7 @@ ul, ol { list-style: none; }
    PROCESS
    ============================================================ */
 .process { height: 360vh; }   /* desktop: tall section; .process__container is CSS-sticky and the revolver SCRUBS over it (no ScrollTrigger pin → no spacer to desync later sections) */
-.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: center; align-content: center; position: sticky; top: 0; min-height: 100vh; }
+.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: center; align-content: center; position: sticky; top: 0; min-height: 100vh; min-height: 100svh; }
 .process__head { position: relative; z-index: 2; }
 .process__lead { color: var(--ink-dim); margin-top: 20px; max-width: 32ch; }
 /* Live chapter counter — the reader's position in the story; updated by JS */
@@ -635,7 +646,7 @@ ul, ol { list-style: none; }
 .process__list.is-drum {
   display: block; position: relative; border: 0;
   height: clamp(300px, 46vh, 440px);
-  perspective: 2400px; perspective-origin: 50% 50%;   /* deeper perspective: bigger round arc, less front-scale */
+  perspective: 1700px; perspective-origin: 50% 50%;   /* stronger 3D cube feel (smaller perspective = more depth) */
 }
 .process__list.is-drum .step {
   position: absolute; left: 0; top: 0; width: 100%; height: 100%;

@@ -449,11 +449,12 @@
     });
   }
 
-  /* ---------------- Process: sticky 3D "revolver" ---------------- */
+  /* ---------------- Process: sticky 3D cube (revolves left→right) ---------------- */
   // Desktop: the section is tall and .process__container is CSS-sticky (held centred);
-  // this scrub (NO ScrollTrigger pin — its spacer was desyncing later sections)
-  // revolves the chapters through one shared stage like a revolver cylinder (each swings
-  // in to face you, flat & lit, number filled vermilion). Mobile/reduced: plain list.
+  // this scrub (NO ScrollTrigger pin — its spacer was desyncing later sections) revolves
+  // the four chapters as faces of a 3D cube around the Y axis, left→right like a storyline.
+  // An ease-in-out scrub makes each face DWELL flat-on (text readable) and turn quickly
+  // between faces, so you never have to read a card mid-rotation. Mobile/reduced: plain list.
   function setupProcess() {
     if (!hasST || reduce) return;
     var section = document.getElementById('process');
@@ -467,25 +468,34 @@
 
     function render(pos) {
       var active = Math.round(Math.max(0, Math.min(N - 1, pos)));
-      var radius = window.innerWidth <= 860 ? 90 : 240;   // smaller cylinder on phones so content doesn't overflow the edge
+      var radius = window.innerWidth <= 860 ? 90 : 240;   // cube half-depth (px) — same geometry as before
       for (var i = 0; i < N; i++) {
-        var delta = pos - i;                       // >0 already revolved past, <0 waiting to swing in
+        var delta = pos - i;                       // >0 already turned past (to the left), <0 upcoming (from the right)
         var ad = Math.abs(delta);
+        // Each chapter is a face of a 3D cube 90° apart, revolving left→right around Y.
+        // The active face sits flat-on (rotateY 0deg) so its text reads perfectly straight.
         steps[i].style.transform = 'rotateY(' + (-delta * 90) + 'deg) translateZ(' + radius + 'px)';
-        steps[i].style.opacity = ad < 1 ? String(1 - ad * ad) : '0';   // quadratic fade = rounder reveal
+        steps[i].style.opacity = ad < 1 ? String(1 - ad * ad) : '0';   // only the front chapter is lit; side faces fade out
         steps[i].style.zIndex = ad < 0.5 ? '2' : '1';
         steps[i].classList.toggle('is-active', i === active);
       }
       if (counter) counter.textContent = steps[active].getAttribute('data-step');
     }
 
+    // Ease-in-out within each step: the cube DWELLS flat-on (readable) and turns
+    // quickly between faces, so you never have to read a card mid-rotation.
+    function easePos(raw) {
+      var base = Math.floor(raw), f = raw - base;
+      var fs = f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2;
+      return base + fs;
+    }
     ScrollTrigger.create({
       trigger: section,
       start: 'top top',
       end: 'bottom bottom',
       scrub: 1.1,
-      onUpdate: function (self) { render(self.progress * (N - 1)); },
-      onRefresh: function (self) { render(self.progress * (N - 1)); }
+      onUpdate: function (self) { render(easePos(self.progress * (N - 1))); },
+      onRefresh: function (self) { render(easePos(self.progress * (N - 1))); }
     });
     render(0);
   }
