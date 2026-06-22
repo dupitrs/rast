@@ -423,7 +423,9 @@ ul, ol { list-style: none; }
 .svc__pin { position: relative; }
 /* The section header stays pinned while the cards cascade beneath it, then scrolls
    away with the whole section. Cards clear it via --deck-top (kept in sync by JS). */
-.svc__pin .section-head { position: sticky; top: clamp(80px, 11vh, 116px); z-index: 6; margin-bottom: clamp(28px, 4vw, 56px); }
+/* z-index below the cards: the header stays visible above the cards' pin zone during the
+   cascade, but the last card slides cleanly OVER it at the end (no text overlap). */
+.svc__pin .section-head { position: sticky; top: clamp(80px, 11vh, 116px); z-index: 1; margin-bottom: clamp(28px, 4vw, 56px); }
 .no-anim .svc__pin .section-head, .no-anim .svc__card { position: static; }
 
 .svc__deck {
@@ -436,6 +438,7 @@ ul, ol { list-style: none; }
 }
 .svc__card {
   position: sticky;
+  z-index: 2;   /* above the sticky section header, so cards slide over it at the cascade's end */
   display: flex; flex-direction: column;
   min-height: clamp(380px, 54vh, 540px);
   background: linear-gradient(150deg, #16161C 0%, #0E0E12 72%);
