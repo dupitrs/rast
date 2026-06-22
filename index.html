@@ -54,6 +54,22 @@
   }
   </script>
 
+  <!-- Structured data: FAQ (mirrors the on-page FAQ section) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Cik maksā mājaslapa?", "acceptedAnswer": { "@type": "Answer", "text": "Katrs projekts ir pielāgots, tāpēc cena atkarīga no apjoma un funkcijām. Pēc īsas sarunas un izpētes sagatavojam konkrētu piedāvājumu bez saistībām." } },
+      { "@type": "Question", "name": "Cik ilgi aizņem izstrāde?", "acceptedAnswer": { "@type": "Answer", "text": "Vienkāršāku lapu varam pabeigt dažās nedēļās, apjomīgāku projektu ilgāk. Precīzu termiņu nosakām pēc izpētes un saskaņojam to ar tevi jau pašā sākumā." } },
+      { "@type": "Question", "name": "Kas man jāsagatavo?", "acceptedAnswer": { "@type": "Answer", "text": "Pietiek ar pamatinformāciju par uzņēmumu un mērķiem. Ar tekstiem un attēliem varam palīdzēt, ja tādu vēl nav." } },
+      { "@type": "Question", "name": "Vai varat atjaunot manu esošo lapu?", "acceptedAnswer": { "@type": "Answer", "text": "Jā. Pārceļam saturu uz mūsdienīgu, ātru un telefonā ērtu dizainu, saglabājot tavu adresi un Google pozīcijas." } },
+      { "@type": "Question", "name": "Kas notiek pēc lapas palaišanas?", "acceptedAnswer": { "@type": "Answer", "text": "Esam blakus ar atbalstu, atjauninājumiem un uzlabojumiem, un piedāvājam uzturēšanu, lai lapa ilgtermiņā paliek ātra un droša." } },
+      { "@type": "Question", "name": "Vai veidojat arī interneta veikalus?", "acceptedAnswer": { "@type": "Answer", "text": "Jā. Izveidojam interneta veikalus ar ērtu preču pārvaldību, drošiem maksājumiem un piegādes risinājumiem." } }
+    ]
+  }
+  </script>
+
   <!-- Favicon: the rast mark - lowercase "r" + orange accent dot, on dark -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="icon" type="image/png" href="kvadrats_logo.png" />
@@ -156,8 +172,8 @@
         </h1>
 
         <p class="hero__sub" data-reveal>
-          Rast ir mājaslapu izstrādes un dizaina studija. Pie mums rodas ātras,
-          izteiksmīgas un augstas klases mājaslapas - zīmoliem, kas grib vairāk.
+          Veidojam ātras, izteiksmīgas mājaslapas, kas ne tikai izskatās augstā
+          līmenī, bet arī atnes vairāk pieteikumu, zvanu un pārdošanu.
         </p>
 
         <div class="hero__actions" data-reveal>
@@ -287,14 +303,17 @@
           <p class="svc__extra-label" data-reveal>+ Papildu pakalpojumi</p>
           <div class="svc__extra-grid">
             <div class="svc__mini" data-reveal>
+              <span class="svc__mini-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke-linecap="round"/></svg></span>
               <h3 class="svc__mini-title">Google atrodamība (SEO)</h3>
               <p class="svc__mini-desc">Palīdzam, lai klienti tevi atrod Google, kad meklē tavus pakalpojumus - ne tikai pēc uzņēmuma nosaukuma.</p>
             </div>
             <div class="svc__mini" data-reveal>
+              <span class="svc__mini-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.1 5.9L20 11l-5.9 2.1L12 19l-2.1-5.9L4 11l5.9-2.1z"/></svg></span>
               <h3 class="svc__mini-title">Logo un vizuālā identitāte</h3>
               <p class="svc__mini-desc">Logo, krāsas un stils, kas padara uzņēmumu atpazīstamu - ērti nokārtojams vienuviet kopā ar jauno mājaslapu.</p>
             </div>
             <div class="svc__mini" data-reveal>
+              <span class="svc__mini-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/><path d="M9 12l2 2 4-4" stroke-linecap="round"/></svg></span>
               <h3 class="svc__mini-title">Uzturēšana un atbalsts</h3>
               <p class="svc__mini-desc">Atjauninājumi, drošība, rezerves kopijas un sīkas izmaiņas - viss vienā mēneša maksā. Ja kaut kas notiek, tev ir viens numurs, kam zvanīt.</p>
             </div>
@@ -423,12 +442,39 @@
       </div>
     </section>
 
-    <!-- ============ STATS ============ -->
-    <section class="stats">
-      <div class="container stats__grid">
-        <div class="stat" data-reveal><span class="stat__num">1 diena</span><span class="stat__label">Līdz atbildei uz tavu pieteikumu</span></div>
-        <div class="stat" data-reveal><span class="stat__num">Latvija</span><span class="stat__label">Mūsu bāze</span></div>
-        <div class="stat" data-reveal><span class="stat__num">100%</span><span class="stat__label">Pielāgots, bez veidnēm</span></div>
+    <!-- ============ FAQ ============ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow" data-reveal>Biežākie jautājumi</p>
+          <h2 class="section-title" data-reveal>Atbildes uz to, ko parasti vaicā.</h2>
+        </header>
+        <div class="faq__list">
+          <details class="faq__item" data-reveal>
+            <summary class="faq__q"><span>Cik maksā mājaslapa?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Katrs projekts ir pielāgots, tāpēc cena atkarīga no apjoma un funkcijām. Pēc īsas sarunas un izpētes sagatavojam konkrētu piedāvājumu bez saistībām, lai tu zini, ko un par cik saņem.</p>
+          </details>
+          <details class="faq__item" data-reveal>
+            <summary class="faq__q"><span>Cik ilgi aizņem izstrāde?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Vienkāršāku lapu varam pabeigt dažās nedēļās, apjomīgāku projektu - ilgāk. Precīzu termiņu nosakām pēc izpētes un saskaņojam to ar tevi jau pašā sākumā.</p>
+          </details>
+          <details class="faq__item" data-reveal>
+            <summary class="faq__q"><span>Kas man jāsagatavo?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Pietiek ar pamatinformāciju par uzņēmumu un mērķiem. Ar tekstiem un attēliem varam palīdzēt - ja tādu vēl nav, sakārtojam tos kopā.</p>
+          </details>
+          <details class="faq__item" data-reveal>
+            <summary class="faq__q"><span>Vai varat atjaunot manu esošo lapu?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Jā. Pārceļam saturu uz mūsdienīgu, ātru un telefonā ērtu dizainu, saglabājot tavu adresi un Google pozīcijas, kas jau strādā.</p>
+          </details>
+          <details class="faq__item" data-reveal>
+            <summary class="faq__q"><span>Kas notiek pēc lapas palaišanas?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Nepazūdam. Esam blakus ar atbalstu, atjauninājumiem un uzlabojumiem, un piedāvājam uzturēšanu, lai lapa ilgtermiņā paliek ātra un droša.</p>
+          </details>
+          <details class="faq__item" data-reveal>
+            <summary class="faq__q"><span>Vai veidojat arī interneta veikalus?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Jā. Izveidojam interneta veikalus ar ērtu preču pārvaldību, drošiem maksājumiem un piegādes risinājumiem - tu pievieno preces, pārējais jau strādā.</p>
+          </details>
+        </div>
       </div>
     </section>
 
