@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0C" />
+  <title>Brīvprātīgais darbs — projekts | rast studija</title>
+  <meta name="description" content="Kā tapa Brīvprātīgais darbs - platforma, kas savieno cilvēkus ar brīvprātīgā darba iespējām. Projekta gaita: izaicinājums, risinājums, rezultāts." />
+  <link rel="canonical" href="https://www.raststudio.lv/darbi/brivpratigais-darbs.html" />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    /* Case-study page — reuses the site's tokens, buttons and type from styles.css */
+    .cs-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
+      padding: 18px var(--gutter); background: rgba(var(--bg-rgb), .72); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .cs-nav .brand { display: inline-flex; align-items: flex-start; gap: 5px; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; }
+    .cs-back { font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); letter-spacing: .04em; }
+    .cs-back:hover { color: var(--accent); }
+    .cs-hero { padding: clamp(56px, 9vw, 120px) 0 clamp(28px, 4vw, 50px); }
+    .cs-title { font-family: var(--font-display); font-weight: 700; letter-spacing: -.03em; line-height: 1.02;
+      font-size: clamp(40px, 8vw, 104px); margin: 14px 0 22px; }
+    .cs-meta { display: flex; flex-wrap: wrap; gap: 12px 28px; font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); letter-spacing: .03em; }
+    .cs-meta b { color: var(--ink); font-weight: 400; }
+    .cs-cover { margin: clamp(28px,4vw,52px) 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line);
+      aspect-ratio: 16/9; background: #fff center/cover no-repeat; }
+    .cs-body { display: grid; grid-template-columns: 1fr; gap: clamp(40px,6vw,80px); padding-bottom: clamp(60px,9vw,120px); }
+    .cs-block { display: grid; grid-template-columns: 0.5fr 1fr; gap: clamp(18px,4vw,60px); align-items: start; }
+    .cs-block h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,3vw,40px); letter-spacing: -.02em; }
+    .cs-block .k { font-family: var(--font-mono); font-size: 12px; color: var(--accent); letter-spacing: .14em; text-transform: uppercase; display: block; margin-bottom: 10px; }
+    .cs-block p { color: var(--ink-dim); font-size: clamp(16px,1.3vw,18px); line-height: 1.75; max-width: 62ch; }
+    .cs-block p + p { margin-top: 16px; }
+    .cs-list { list-style: none; margin: 10px 0 0; padding: 0; }
+    .cs-list li { color: var(--ink-dim); padding: 10px 0 10px 26px; position: relative; border-top: 1px solid var(--line); }
+    .cs-list li:first-child { border-top: 0; }
+    .cs-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+    .cs-result { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px,3vw,40px); margin-top: 8px; }
+    .cs-stat .n { font-family: var(--font-display); font-weight: 600; font-size: clamp(30px,4vw,56px); letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+    .cs-stat .l { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); margin-top: 8px; display: block; }
+    .cs-todo { color: var(--accent) !important; font-style: italic; }
+    .cs-cta { border-top: 1px solid var(--line); padding: clamp(50px,8vw,100px) 0; text-align: center; }
+    .cs-cta h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px,5vw,64px); letter-spacing: -.03em; line-height: 1.05; }
+    .cs-cta .row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+    @media (max-width: 760px) { .cs-block { grid-template-columns: 1fr; gap: 12px; } .cs-result { grid-template-columns: 1fr; gap: 22px; } }
+  </style>
+</head>
+<body>
+  <nav class="cs-nav">
+    <a href="../index.html" class="brand">rast<span class="accent" style="font-weight:800">.</span></a>
+    <a href="../index.html#work" class="cs-back">← Visi darbi</a>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="container">
+        <p class="eyebrow"><span class="dot"></span> Projekts</p>
+        <h1 class="cs-title">Brīvprātīgais darbs</h1>
+        <div class="cs-meta">
+          <span>Joma: <b>Platforma</b></span>
+          <span>Darbs: <b>Vietne un izstrāde</b></span>
+          <span>Gads: <b>2025</b></span>
+          <span><a class="accent" href="https://www.brivpratigaisdarbs.lv" target="_blank" rel="noopener">Skatīt dzīvajā ↗</a></span>
+        </div>
+        <div class="cs-cover" style="background-image:url('../assets/work-brivpratigais.png')" role="img" aria-label="Brīvprātīgais darbs mājaslapas ekrānuzņēmums"></div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="cs-body">
+
+        <section class="cs-block">
+          <h2><span class="k">01 — Izaicinājums</span>Ko vajadzēja atrisināt</h2>
+          <div>
+            <p>Brīvprātīgā darba iniciatīvai bija nepieciešama vieta, kur cilvēki var atrast iespējas iesaistīties un viegli pieteikties - bez liekas birokrātijas un sarežģītības.</p>
+            <p>Galvenais izaicinājums: padarīt platformu skaidru un uzticamu, lai jauns apmeklētājs dažu sekunžu laikā saprot, ko tā piedāvā un kā sākt.</p>
+          </div>
+        </section>
+
+        <section class="cs-block">
+          <h2><span class="k">02 — Risinājums</span>Ko izveidojām</h2>
+          <div>
+            <p>Izstrādājām ātru, telefonā ērtu platformu ar skaidru struktūru: iespēju atrašana, pieteikšanās un kopienas sajūta vienuviet.</p>
+            <ul class="cs-list">
+              <li>Pārdomāta informācijas arhitektūra - viegli atrast un pieteikties</li>
+              <li>Telefonam pielāgots dizains ar ātru ielādi</li>
+              <li>Skaidri aicinājumi uz darbību visā lapā</li>
+              <li>Viegli papildināms saturs nākotnē</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="cs-block">
+          <h2><span class="k">03 — Rezultāts</span>Kā tas strādā</h2>
+          <div>
+            <p>Platforma ir ātra, telefonā ērta un sniedz apmeklētājam skaidru ceļu uz iesaistīšanos.</p>
+            <!-- TODO (rast): aizvieto zemāk esošās vietas ar reāliem skaitļiem, kad tie ir zināmi
+                 (piem. reģistrāciju skaits, pieteikumu pieaugums, ielādes ātrums). NESKAITĪT izdomātus skaitļus. -->
+            <div class="cs-result">
+              <div class="cs-stat"><span class="n cs-todo">— ⟵</span><span class="l">Reģistrācijas (aizpildi)</span></div>
+              <div class="cs-stat"><span class="n cs-todo">— ⟵</span><span class="l">Pieteikumu pieaugums (aizpildi)</span></div>
+              <div class="cs-stat"><span class="n cs-todo">— ⟵</span><span class="l">Ielādes ātrums (aizpildi)</span></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="cs-cta">
+      <div class="container">
+        <h2>Gribi līdzīgu rezultātu?<span class="accent">.</span></h2>
+        <div class="row">
+          <a href="../index.html#contact" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+          <a href="../index.html#work" class="btn btn--ghost"><span>Citi darbi</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
