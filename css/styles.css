@@ -725,6 +725,28 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
 }
 
 /* ============================================================
+   INSIGHTS / IESKATI  (blog teaser — SEO)
+   ============================================================ */
+.insights { padding: clamp(70px, 10vw, 130px) 0; }
+.insights__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2vw, 28px); }
+.insight {
+  display: flex; flex-direction: column; gap: 12px; min-height: 230px;
+  padding: clamp(24px, 2.4vw, 32px);
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+  transition: transform .4s var(--ease), border-color .4s var(--ease);
+}
+.insight:not(.insight--soon):hover { transform: translateY(-5px); border-color: var(--line-2); }
+.insight__tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+.insight__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(19px, 1.7vw, 24px); letter-spacing: -.015em; line-height: 1.2; }
+.insight__desc { color: var(--ink-dim); font-size: 15px; line-height: 1.6; }
+.insight__more { margin-top: auto; font-family: var(--font-mono); font-size: 13px; color: var(--ink); letter-spacing: .03em; }
+.insight__more i { color: var(--accent); font-style: normal; display: inline-block; transition: transform .4s var(--ease); }
+.insight:not(.insight--soon):hover .insight__more i { transform: translateX(5px); }
+.insight--soon { opacity: .5; }
+.insight--soon .insight__tag, .insight--soon .insight__more { color: var(--ink-faint); }
+@media (max-width: 860px) { .insights__grid { grid-template-columns: 1fr; } }
+
+/* ============================================================
    IMPACT  (pinned — letters appear on scroll, "rast" morphs fonts)
    ============================================================ */
 /* Tall section + sticky inner "holds" the question while you scroll (the stop),
