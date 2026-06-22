@@ -439,7 +439,7 @@
     if (!word) return;
     ScrollTrigger.create({
       trigger: word.closest('section') || word,
-      start: 'top bottom', end: 'center center', scrub: true,
+      start: 'top 65%', end: 'center center', scrub: true,
       onUpdate: function (self) { word.style.setProperty('--fill', (self.progress * 100).toFixed(1) + '%'); }
     });
   }
@@ -925,9 +925,19 @@
   // fully loaded — prevents pinned sections (impact) from using stale positions.
   // Force the top first (a reload must never start mid-page, or the pins miscalculate).
   if (hasST) window.addEventListener('load', function () {
-    window.scrollTo(0, 0);
-    if (lenis) lenis.scrollTo(0, { immediate: true });
-    setTimeout(function () { ScrollTrigger.refresh(); }, 350);
+    // If we arrived with a hash (e.g. from a case-study/article via "Citi darbi"/"Citi ieskati"),
+    // honour it: refresh first, THEN jump to that section. Otherwise start at the top
+    // (a plain reload must not start mid-page, or the pinned sections miscalculate).
+    var hash = location.hash;
+    var target = (hash && hash.length > 1) ? document.querySelector(hash) : null;
+    if (!target) { window.scrollTo(0, 0); if (lenis) lenis.scrollTo(0, { immediate: true }); }
+    setTimeout(function () {
+      ScrollTrigger.refresh();
+      if (target) {
+        if (lenis) lenis.scrollTo(target, { immediate: true, offset: 0 });
+        else target.scrollIntoView();
+      }
+    }, 350);
   });
   setTimeout(finishLoader, 4500);
 
