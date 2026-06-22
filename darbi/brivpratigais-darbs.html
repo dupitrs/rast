@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0A0A0C" />
   <title>Brīvprātīgais darbs — projekts | rast studija</title>
-  <meta name="description" content="Kā tapa Brīvprātīgais darbs - platforma, kas savieno cilvēkus ar brīvprātīgā darba iespējām. Projekta gaita: izaicinājums, risinājums, rezultāts." />
+  <meta name="description" content="Brīvprātīgā darba uzskaites un motivācijas sistēma biedrībai Mums pieder pasaule: pieteikumi, nostrādāto stundu uzskaite, PDF apliecinājumi, punkti, līmeņi un balvas." />
   <link rel="canonical" href="https://www.raststudio.lv/darbi/brivpratigais-darbs.html" />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,10 +36,12 @@
     .cs-list li { color: var(--ink-dim); padding: 10px 0 10px 26px; position: relative; border-top: 1px solid var(--line); }
     .cs-list li:first-child { border-top: 0; }
     .cs-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+    .cs-stack { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .cs-stack span { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); letter-spacing: .02em;
+      padding: 7px 13px; border: 1px solid var(--line-2); border-radius: 999px; }
     .cs-result { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px,3vw,40px); margin-top: 8px; }
-    .cs-stat .n { font-family: var(--font-display); font-weight: 600; font-size: clamp(30px,4vw,56px); letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+    .cs-stat .n { font-family: var(--font-display); font-weight: 600; font-size: clamp(20px,2vw,27px); letter-spacing: -.02em; line-height: 1.15; color: var(--ink); display: block; }
     .cs-stat .l { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); margin-top: 8px; display: block; }
-    .cs-todo { color: var(--accent) !important; font-style: italic; }
     .cs-cta { border-top: 1px solid var(--line); padding: clamp(50px,8vw,100px) 0; text-align: center; }
     .cs-cta h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px,5vw,64px); letter-spacing: -.03em; line-height: 1.05; }
     .cs-cta .row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
@@ -58,12 +60,12 @@
         <p class="eyebrow"><span class="dot"></span> Projekts</p>
         <h1 class="cs-title">Brīvprātīgais darbs</h1>
         <div class="cs-meta">
-          <span>Joma: <b>Platforma</b></span>
-          <span>Darbs: <b>Vietne un izstrāde</b></span>
-          <span>Gads: <b>2025</b></span>
+          <span>Joma: <b>Brīvprātīgā darba platforma</b></span>
+          <span>Darbs: <b>Sistēma, vietne un izstrāde</b></span>
+          <span>Gads: <b>2026</b></span>
           <span><a class="accent" href="https://www.brivpratigaisdarbs.lv" target="_blank" rel="noopener">Skatīt dzīvajā ↗</a></span>
         </div>
-        <div class="cs-cover" style="background-image:url('../assets/work-brivpratigais.png')" role="img" aria-label="Brīvprātīgais darbs mājaslapas ekrānuzņēmums"></div>
+        <div class="cs-cover" style="background-image:url('../assets/work-brivpratigais.png')" role="img" aria-label="Brīvprātīgais darbs platformas ekrānuzņēmums"></div>
       </div>
     </header>
 
@@ -71,36 +73,46 @@
       <div class="cs-body">
 
         <section class="cs-block">
-          <h2><span class="k">01 — Izaicinājums</span>Ko vajadzēja atrisināt</h2>
+          <h2><span class="k">01 — Izaicinājums</span>Uzskaite, kas prasīja par daudz laika</h2>
           <div>
-            <p>Brīvprātīgā darba iniciatīvai bija nepieciešama vieta, kur cilvēki var atrast iespējas iesaistīties un viegli pieteikties - bez liekas birokrātijas un sarežģītības.</p>
-            <p>Galvenais izaicinājums: padarīt platformu skaidru un uzticamu, lai jauns apmeklētājs dažu sekunžu laikā saprot, ko tā piedāvā un kā sākt.</p>
+            <p>Biedrība “Mums pieder pasaule” iesaista jauniešus brīvprātīgajā darbā - bet pašu darba uzskaite bija sāpīgākā daļa. Nostrādātās stundas, paveiktie darbi un katra ieguldījums tika pierakstīti ar roku, Excel tabulās vai pat WhatsApp sarakstēs.</p>
+            <p>Tas radīja kļūdas, datu zuduma risku un prasīja daudz laika. Trūka arī motivācijas - jauniešiem nebija skaidra veida, kā redzēt savu progresu un saņemt atzinību par paveikto.</p>
           </div>
         </section>
 
         <section class="cs-block">
-          <h2><span class="k">02 — Risinājums</span>Ko izveidojām</h2>
+          <h2><span class="k">02 — Risinājums</span>Viena sistēma uzskaitei un motivācijai</h2>
           <div>
-            <p>Izstrādājām ātru, telefonā ērtu platformu ar skaidru struktūru: iespēju atrašana, pieteikšanās un kopienas sajūta vienuviet.</p>
+            <p>Izveidojām centralizētu brīvprātīgā darba uzskaites un motivācijas sistēmu. Brīvprātīgie reģistrējas, piesakās pasākumiem un darbiem, ievada nostrādātās stundas un seko savam progresam. Organizācijas vadītājs pārskata un apstiprina datus, un ar vienu klikšķi ģenerē PDF apliecinājumus par nostrādātajām stundām.</p>
             <ul class="cs-list">
-              <li>Pārdomāta informācijas arhitektūra - viegli atrast un pieteikties</li>
-              <li>Telefonam pielāgots dizains ar ātru ielādi</li>
-              <li>Skaidri aicinājumi uz darbību visā lapā</li>
-              <li>Viegli papildināms saturs nākotnē</li>
+              <li>Sludinājumi un darbu pieteikumi ar statusu izsekošanu</li>
+              <li>Nostrādāto stundu ievade un administratora apstiprināšana</li>
+              <li>PDF apliecinājumi par nostrādātajām stundām</li>
+              <li>Motivācija: punkti, līmeņi, misijas un balvas</li>
+              <li>Profils ar adrešu meklēšanu kartē un drošu pieteikšanos</li>
             </ul>
           </div>
         </section>
 
         <section class="cs-block">
-          <h2><span class="k">03 — Rezultāts</span>Kā tas strādā</h2>
+          <h2><span class="k">03 — Tehnoloģijas</span>Kā tas uzbūvēts</h2>
           <div>
-            <p>Platforma ir ātra, telefonā ērta un sniedz apmeklētājam skaidru ceļu uz iesaistīšanos.</p>
-            <!-- TODO (rast): aizvieto zemāk esošās vietas ar reāliem skaitļiem, kad tie ir zināmi
-                 (piem. reģistrāciju skaits, pieteikumu pieaugums, ielādes ātrums). NESKAITĪT izdomātus skaitļus. -->
+            <p>Priekšgals veidots ar Vue.js 3 un Tailwind CSS, aizmugure - ar Laravel 12 (PHP 8.2) un MySQL. Sistēma mitināta Microsoft Azure mākonī, ar drošu autentifikāciju un ārējiem servisiem failu glabāšanai, e-pastiem un adrešu meklēšanai.</p>
+            <div class="cs-stack">
+              <span>Vue.js 3</span><span>Tailwind CSS</span><span>Vite</span><span>Laravel 12</span><span>MySQL</span>
+              <span>Sanctum</span><span>Microsoft Azure</span><span>reCAPTCHA</span><span>Brevo</span><span>Nominatim</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="cs-block">
+          <h2><span class="k">04 — Rezultāts</span>Mazāk roku darba, vairāk motivācijas</h2>
+          <div>
+            <p>Sistēma būtiski samazina manuālo darbu, paātrina apliecinājumu sagatavošanu un nodrošina drošu, pārskatāmu datu bāzi. Motivācijas mehānisms palīdz jauniešiem justies iesaistītiem un novērtētiem - turklāt risinājumu var pielāgot arī citām jauniešu organizācijām.</p>
             <div class="cs-result">
-              <div class="cs-stat"><span class="n cs-todo">— ⟵</span><span class="l">Reģistrācijas (aizpildi)</span></div>
-              <div class="cs-stat"><span class="n cs-todo">— ⟵</span><span class="l">Pieteikumu pieaugums (aizpildi)</span></div>
-              <div class="cs-stat"><span class="n cs-todo">— ⟵</span><span class="l">Ielādes ātrums (aizpildi)</span></div>
+              <div class="cs-stat"><span class="n">Excel un WhatsApp → viena sistēma</span><span class="l">Sakārtota datu bāze</span></div>
+              <div class="cs-stat"><span class="n">PDF ar vienu klikšķi</span><span class="l">Apliecinājumi par stundām</span></div>
+              <div class="cs-stat"><span class="n">Punkti · līmeņi · misijas</span><span class="l">Iebūvēta motivācija</span></div>
             </div>
           </div>
         </section>
@@ -110,7 +122,7 @@
 
     <section class="cs-cta">
       <div class="container">
-        <h2>Gribi līdzīgu rezultātu?<span class="accent">.</span></h2>
+        <h2>Gribi līdzīgu sistēmu?<span class="accent">.</span></h2>
         <div class="row">
           <a href="../index.html#contact" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
           <a href="../index.html#work" class="btn btn--ghost"><span>Citi darbi</span></a>
