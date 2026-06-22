@@ -429,6 +429,21 @@
     });
   }
 
+  /* ---------------- Band word: scroll-driven left→right colour fill ---------------- */
+  // The giant "RODAS" outline word colours in from left to right as the band scrolls
+  // through. JS drives the --fill CSS variable 0%→100%; CSS clips an accent gradient
+  // to the glyphs (see .band__word). Reduced-motion: stays as a plain outline.
+  function setupBandFill() {
+    if (!hasST || reduce) return;
+    var word = document.querySelector('.band__word');
+    if (!word) return;
+    ScrollTrigger.create({
+      trigger: word.closest('section') || word,
+      start: 'top bottom', end: 'center center', scrub: true,
+      onUpdate: function (self) { word.style.setProperty('--fill', (self.progress * 100).toFixed(1) + '%'); }
+    });
+  }
+
   /* ---------------- Studio handoff: fade in over the video's end-frame ---------------- */
   // Studio overlaps the video's last viewport (CSS margin-top:-100vh) and starts at
   // opacity 0, so it rises into place INVISIBLY. Its content is vertically centred in
@@ -875,6 +890,7 @@
     setupSplit();
     setupReveals();
     setupParallax();
+    setupBandFill();
     setupStudioHandoff();
     setupImpact();
     setupProcess();
