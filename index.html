@@ -29,7 +29,7 @@
     "@type": "ProfessionalService",
     "name": "rast studija",
     "url": "https://www.raststudio.lv/",
-    "logo": "https://www.raststudio.lv/kvadrats_logo.png",
+    "logo": "https://www.raststudio.lv/assets/logo-512.png",
     "image": "https://www.raststudio.lv/assets/og.png",
     "email": "hello@raststudio.lv",
     "telephone": "+37128744598",
@@ -83,13 +83,17 @@
 
   <!-- Favicon: the rast mark - lowercase "r" + orange accent dot, on dark -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-  <link rel="icon" type="image/png" href="kvadrats_logo.png" />
-  <link rel="apple-touch-icon" href="kvadrats_logo.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Pacifico&family=Bebas+Neue&family=Archivo+Black&family=Caveat:wght@700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <!-- Pamata fonti (lietoti uzreiz, redzamajā daļā) - bloķē attēlošanu apzināti -->
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Dekoratīvie fonti (tikai 'rast' morph-animācijai zemāk) - ielādē asinhroni, lai nebremzē FCP/LCP -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Pacifico&family=Bebas+Neue&family=Archivo+Black&family=Caveat:wght@700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Pacifico&family=Bebas+Neue&family=Archivo+Black&family=Caveat:wght@700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" /></noscript>
 
   <link rel="stylesheet" href="css/styles.css" />
 
