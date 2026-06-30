@@ -814,6 +814,35 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
 .cta__email { font-family: var(--font-mono); font-size: clamp(14px, 1.6vw, 18px); color: var(--ink-dim); border-bottom: 1px solid var(--line-2); padding-bottom: 4px; transition: color .3s, border-color .3s; }
 .cta__email:hover { color: var(--accent); border-color: var(--accent); }
 
+/* Lead line + reassurance under the CTA headline */
+.cta__lead { max-width: 540px; margin: clamp(24px, 3vw, 34px) auto 0; color: var(--ink-dim);
+  font-size: clamp(16px, 1.5vw, 19px); line-height: 1.6; }
+.cta__reply { display: inline-flex; align-items: center; gap: 9px; margin-top: 22px;
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: .02em; color: var(--ink-faint); }
+.cta__reply .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 14px var(--accent); flex: none; }
+
+/* Direct contact channels — fills the section + makes us easy to reach */
+.cta__channels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  max-width: 920px; margin: clamp(46px, 6vw, 72px) auto 0; }
+.cta__channel { display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 22px 22px 24px; text-align: left; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  transition: border-color .3s var(--ease), transform .3s var(--ease), background-color .3s var(--ease); }
+.cta__channel:hover { border-color: var(--accent); transform: translateY(-4px); background: var(--surface-2); }
+.cta__channel-label { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint); }
+.cta__channel-value { font-family: var(--font-display); font-weight: 600; font-size: clamp(16px, 1.5vw, 19px);
+  letter-spacing: -.01em; color: var(--ink); }
+.cta__channel-sub { font-size: 13px; color: var(--ink-dim); }
+.cta__channel:hover .cta__channel-value { color: var(--accent); }
+@media (max-width: 760px) {
+  .cta__channels { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+@media (max-width: 420px) {
+  .cta__channels { grid-template-columns: 1fr; }
+}
+
 /* ============================================================
    FOOTER
    ============================================================ */
