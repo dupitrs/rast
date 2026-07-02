@@ -464,6 +464,46 @@
     });
   }
 
+  /* ---------------- Studio principles: line fills orange + subtext types on scroll ---- */
+  // Each principle's top border fills orange left→right (scrubbed to scroll), and its
+  // subtext reveals letter by letter over the same range. The fill is a pseudo-element
+  // driven by the --fill custom property (0→1); letters are wrapped in .ch spans.
+  function setupPrinciples() {
+    var items = gsap.utils.toArray('.studio__principle');
+    if (!items.length) return;
+
+    // Wrap subtext into per-letter spans (keep an accessible label on the paragraph).
+    items.forEach(function (item) {
+      var p = item.querySelector('p');
+      if (!p || p.querySelector('.ch')) return;
+      var text = p.textContent;
+      p.setAttribute('aria-label', text);
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < text.length; i++) {
+        var span = document.createElement('span');
+        span.className = 'ch';
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = text.charAt(i);
+        frag.appendChild(span);
+      }
+      p.textContent = '';
+      p.appendChild(frag);
+    });
+
+    if (!hasST || reduce) return;   // no scroll animation → line + text stay fully visible
+
+    items.forEach(function (item) {
+      var chars = item.querySelectorAll('.ch');
+      gsap.set(item, { '--fill': 0 });
+      gsap.set(chars, { opacity: 0 });
+      var tl = gsap.timeline({
+        scrollTrigger: { trigger: item, start: 'top 85%', end: 'top 45%', scrub: 0.6 }
+      });
+      tl.to(item, { '--fill': 1, ease: 'none', duration: 1 })
+        .to(chars, { opacity: 1, ease: 'none', stagger: { each: 0.02 }, duration: 1 }, 0.1);
+    });
+  }
+
   /* ---------------- Process: sticky 3D cube (revolves left→right) ---------------- */
   // Desktop: the section is tall and .process__container is CSS-sticky (held centred);
   // this scrub (NO ScrollTrigger pin — its spacer was desyncing later sections) revolves
@@ -856,6 +896,7 @@
     setupParallax();
     setupBandFill();
     setupStudioHandoff();
+    setupPrinciples();
     setupImpact();
     setupProcess();
     setupServices();
