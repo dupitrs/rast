@@ -413,6 +413,8 @@ ul, ol { list-style: none; }
   color: var(--ink-dim); font-size: clamp(14px, 1.05vw, 16px); line-height: 1.6;
 }
 .studio__principle p .ch { display: inline-block; white-space: pre; }
+/* Keep each word's letters together so lines wrap by words, not mid-word. */
+.studio__principle p .chw { display: inline-block; white-space: nowrap; }
 @media (max-width: 860px) {
   .studio__grid { grid-template-columns: 1fr; align-items: start; gap: 26px; }
   .studio__principles { grid-template-columns: repeat(2, 1fr); gap: 24px 22px; }

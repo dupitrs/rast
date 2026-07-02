@@ -479,13 +479,30 @@
       var text = p.textContent;
       p.setAttribute('aria-label', text);
       var frag = document.createDocumentFragment();
-      for (var i = 0; i < text.length; i++) {
-        var span = document.createElement('span');
-        span.className = 'ch';
-        span.setAttribute('aria-hidden', 'true');
-        span.textContent = text.charAt(i);
-        frag.appendChild(span);
-      }
+      // Split into words + whitespace so lines break BETWEEN words, not mid-word.
+      // Each word's letters go in a non-breaking .chw wrapper; spaces stay their
+      // own .ch (the only allowed break points). Letters still animate via .ch.
+      text.split(/(\s+)/).forEach(function (token) {
+        if (token === '') return;
+        if (/^\s+$/.test(token)) {
+          var sp = document.createElement('span');
+          sp.className = 'ch';
+          sp.setAttribute('aria-hidden', 'true');
+          sp.textContent = token;
+          frag.appendChild(sp);
+          return;
+        }
+        var word = document.createElement('span');
+        word.className = 'chw';
+        word.setAttribute('aria-hidden', 'true');
+        for (var i = 0; i < token.length; i++) {
+          var span = document.createElement('span');
+          span.className = 'ch';
+          span.textContent = token.charAt(i);
+          word.appendChild(span);
+        }
+        frag.appendChild(word);
+      });
       p.textContent = '';
       p.appendChild(frag);
     });
