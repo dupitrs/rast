@@ -2,12 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.raststudio.lv/</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.raststudio.lv/majaslapu-izstrade.html</loc>
+    <lastmod>2026-07-06</lastmod>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.raststudio.lv/raksti/cik-maksa-majaslapa.html</loc>
     <lastmod>2026-06-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.raststudio.lv/raksti/ka-sagatavoties-izstradei.html</loc>
+    <lastmod>2026-07-06</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
