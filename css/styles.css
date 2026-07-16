@@ -844,6 +844,19 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
 .footer__col a:hover { color: var(--accent); }
 .footer__muted { color: var(--ink-faint); font-size: 14px; }
 
+.footer__social { display: flex; gap: 12px; margin-top: 2px; }
+.footer__col .footer__social-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--line-2); color: var(--ink-dim);
+  transition: color .3s var(--ease), background .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
+}
+.footer__col .footer__social-link svg { width: 20px; height: 20px; display: block; }
+.footer__col .footer__social-link:hover, .footer__col .footer__social-link:focus-visible {
+  color: var(--bg); background: var(--accent); border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
 .footer__wordmark {
   font-family: var(--font-display); font-weight: 700;
   font-size: clamp(90px, 26vw, 420px); line-height: 0.8; letter-spacing: -0.04em;
