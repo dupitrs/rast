@@ -54,13 +54,6 @@ html {
   /* Page scrollbar: same slim, quiet treatment as the dropdown/modal ones. */
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
-  /* No sideways scroll, ever — on a phone even a couple of stray pixels turn every
-     downward swipe into a horizontal drag. `clip` instead of `hidden` on purpose:
-     hidden would make the root a scroll container and break `position: sticky`
-     plus the GSAP pinned sections. Set on the root as well as body, because body's
-     overflow only propagates to the viewport while the root's is `visible`. */
-  overflow-x: clip;
-  overscroll-behavior-x: none;
 }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -74,12 +67,7 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: clip;
-  overscroll-behavior-x: none;
-  /* Touch: only vertical panning (and pinch-zoom, so zooming stays available).
-     Kills the diagonal-swipe wobble on the pinned sections. If a horizontally
-     scrollable child is ever added, give it `touch-action: pan-x pan-y`. */
-  touch-action: pan-y pinch-zoom;
+  overflow-x: hidden;
 }
 
 img, svg, canvas { display: block; max-width: 100%; }
