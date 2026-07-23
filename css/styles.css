@@ -53,6 +53,13 @@ html {
   /* Page scrollbar: same slim, quiet treatment as the dropdown/modal ones. */
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
+  /* No sideways scroll, ever — on a phone even a couple of stray pixels turn every
+     downward swipe into a horizontal drag. `clip` instead of `hidden` on purpose:
+     hidden would make the root a scroll container and break `position: sticky`
+     plus the GSAP pinned sections. Set on the root as well as body, because body's
+     overflow only propagates to the viewport while the root's is `visible`. */
+  overflow-x: clip;
+  overscroll-behavior-x: none;
 }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -66,7 +73,12 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  /* Touch: only vertical panning (and pinch-zoom, so zooming stays available).
+     Kills the diagonal-swipe wobble on the pinned sections. If a horizontally
+     scrollable child is ever added, give it `touch-action: pan-x pan-y`. */
+  touch-action: pan-y pinch-zoom;
 }
 
 img, svg, canvas { display: block; max-width: 100%; }
@@ -982,7 +994,9 @@ button.btn { font-family: inherit; cursor: pointer; }
 .form__status.is-sending { color: var(--ink-dim); }
 .form__status.is-ok { color: #57D08A; }
 .form__status.is-err { color: var(--accent); }
-.form__hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+/* Honeypot: clipped in place rather than parked at left:-9999px, so it can never
+   drag the layout sideways if a browser decides to scroll it into view. */
+.form__hp { position: absolute !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; clip-path: inset(50%); }
 body.modal-open { overflow: hidden; }
 @media (max-width: 480px) {
   .form__row { grid-template-columns: 1fr; }
