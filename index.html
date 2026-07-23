@@ -90,11 +90,9 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Pamata fonti (lietoti uzreiz, redzamajā daļā) - bloķē attēlošanu apzināti -->
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <!-- Dekoratīvie fonti (tikai 'rast' morph-animācijai zemāk) - ielādē asinhroni, lai nebremzē FCP/LCP -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Pacifico&family=Bebas+Neue&family=Archivo+Black&family=Caveat:wght@700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Pacifico&family=Bebas+Neue&family=Archivo+Black&family=Caveat:wght@700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" /></noscript>
+  <!-- v3: tikai divas saimes — Bricolage Grotesque (display) + Inter (teksts/UI/etiķetes).
+       Space Mono un dekoratīvie morph-fonti izņemti (nav fontu morphing). -->
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
 
@@ -120,19 +118,18 @@
 </head>
 
 <body>
-  <!-- ============ PRELOADER ============ -->
-  <div class="loader" id="loader" aria-hidden="true">
-    <div class="loader__inner">
-      <span class="loader__mark">rast</span>
-      <span class="loader__count" id="loaderCount">0</span>
-    </div>
-    <div class="loader__bar"><span id="loaderFill"></span></div>
-  </div>
-
   <!-- ============ GRAIN + CURSOR + PROGRESS ============ -->
   <div class="grain" aria-hidden="true"></div>
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="scroll-progress" aria-hidden="true"><span id="scrollBar"></span></div>
+
+  <!-- Fixed full-screen particle canvas: hero wave at rest, morphs to "rast" then the dot on scroll -->
+  <canvas class="fx-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+  <!-- Orange circle that the particles fall into and that grows out of the dot (JS-driven).
+       Two stacked layers: the ink layer inverts whatever is underneath (white text → black),
+       the orb layer multiplies the brand gradient on top → black text on an orange sphere. -->
+  <div class="fx-orb-ink" id="fxOrbInk" aria-hidden="true"></div>
+  <div class="fx-orb" id="fxOrb" aria-hidden="true"></div>
 
   <a class="skip-link" href="#main">Pāriet uz saturu</a>
 
@@ -174,7 +171,6 @@
 
     <!-- ============ HERO ============ -->
     <section class="hero" id="hero">
-      <canvas class="hero__canvas" id="heroCanvas" aria-hidden="true"></canvas>
       <div class="hero__glow" aria-hidden="true"></div>
 
       <div class="hero__inner">
@@ -201,14 +197,8 @@
 
     </section>
 
-    <!-- ============ SCROLL VIDEO - own section; starts scrubbing as you scroll out of the hero ============ -->
-    <section class="scrollvid" id="scrollvid" aria-hidden="true">
-      <div class="scrollvid__sticky">
-        <video class="scrollvid__video" id="scrollVideo" muted playsinline preload="metadata" tabindex="-1">
-          <source src="assets/intro.mp4" type="video/mp4" />
-        </video>
-      </div>
-    </section>
+    <!-- ============ PLACEHOLDER - empty for now; the intro video used to live here ============ -->
+    <section class="assembly" id="assembly" aria-hidden="true"></section>
 
     <!-- ============ STUDIO / MANIFESTO (word reveal) ============ -->
     <section class="studio section--panel" id="studio">
@@ -245,7 +235,6 @@
       <div class="container">
         <div class="svc__pin">
         <header class="section-head">
-          <p class="eyebrow" data-reveal>Pakalpojumi</p>
           <h2 class="section-title" data-reveal>Ko tu iegūsi.</h2>
         </header>
 
@@ -261,7 +250,14 @@
                 <p class="svc__desc">Izveidojam vietni, kas ne tikai labi izskatās, bet arī palīdz sasniegt mērķi - vairāk zvanu, pieteikumu vai pārdošanu. Ātra, ērti lietojama telefonā un viegli atrodama Google.</p>
               </div>
               <div class="svc__card-aside">
-                <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> nepieciešama pirmā mājaslapa · esošā mājaslapa novecojusi · nepieciešama lapa konkrētai kampaņai vai pakalpojumam</p>
+                <div class="svc__fit">
+                  <span class="svc__fit-tag">Der, ja:</span>
+                  <ul class="svc__fit-list">
+                    <li>nepieciešama pirmā mājaslapa</li>
+                    <li>esošā mājaslapa novecojusi</li>
+                    <li>nepieciešama lapa konkrētai kampaņai vai pakalpojumam</li>
+                  </ul>
+                </div>
                 <a class="svc__card-link" href="majaslapu-izstrade.html" data-cursor="hover">Vairāk par mājaslapu izstrādi <i>→</i></a>
               </div>
             </div>
@@ -278,7 +274,14 @@
                 <p class="svc__desc">Pārceļam saturu uz mūsdienīgu, ātru un telefonā ērti lietojamu dizainu, saglabājot adresi, saturu un Google pozīcijas, kas jau strādā.</p>
               </div>
               <div class="svc__card-aside">
-                <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> lapa veidota pirms vairākiem gadiem · lapa lēni ielādējas · lapu telefonā grūti lietot</p>
+                <div class="svc__fit">
+                  <span class="svc__fit-tag">Der, ja:</span>
+                  <ul class="svc__fit-list">
+                    <li>lapa veidota pirms vairākiem gadiem</li>
+                    <li>lapa lēni ielādējas</li>
+                    <li>lapu telefonā grūti lietot</li>
+                  </ul>
+                </div>
                 <a class="svc__card-link js-open-form" href="#contact" data-cursor="hover">Sākt projektu <i>→</i></a>
               </div>
             </div>
@@ -295,7 +298,13 @@
                 <p class="svc__desc">Izveidojam interneta veikalu ar ērtu preču pārvaldību, drošiem maksājumiem un piegādes risinājumiem. tev atliek pievienot preces, jo pārējais jau strādā.</p>
               </div>
               <div class="svc__card-aside">
-                <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> vēlies sākt pārdot internetā · esošais veikals kļuvis lēns un neērts</p>
+                <div class="svc__fit">
+                  <span class="svc__fit-tag">Der, ja:</span>
+                  <ul class="svc__fit-list">
+                    <li>vēlies sākt pārdot internetā</li>
+                    <li>esošais veikals kļuvis lēns un neērts</li>
+                  </ul>
+                </div>
                 <a class="svc__card-link js-open-form" href="#contact" data-cursor="hover">Sākt projektu <i>→</i></a>
               </div>
             </div>
@@ -312,7 +321,13 @@
                 <p class="svc__desc">Izstrādājam pielāgotus rīkus tieši tavām vajadzībām - rezervāciju sistēmas, klientu portālus, pasūtījumu pārvaldību un iekšējos rīkus, kas aizstāj Excel tabulas un manuālu darbu.</p>
               </div>
               <div class="svc__card-aside">
-                <p class="svc__fit"><span class="svc__fit-tag">Der, ja:</span> rutīnas darbi prasa daudz laika · procesi neiekļaujas standarta programmās</p>
+                <div class="svc__fit">
+                  <span class="svc__fit-tag">Der, ja:</span>
+                  <ul class="svc__fit-list">
+                    <li>rutīnas darbi prasa daudz laika</li>
+                    <li>procesi neiekļaujas standarta programmās</li>
+                  </ul>
+                </div>
                 <a class="svc__card-link js-open-form" href="#contact" data-cursor="hover">Sākt projektu <i>→</i></a>
               </div>
             </div>
@@ -346,11 +361,8 @@
     <!-- ============ SELECTED WORK ============ -->
     <section class="work" id="work">
       <div class="container">
-        <header class="section-head section-head--row">
-          <div>
-            <h2 class="section-title" data-reveal>Daži no mūsu darbiem.</h2>
-          </div>
-          <p class="section-note" data-reveal>Reāli projekti - un nākamais varētu būt tavs.</p>
+        <header class="section-head">
+          <h2 class="section-title" data-reveal>Daži no mūsu darbiem.</h2>
         </header>
 
         <div class="work__grid">
@@ -360,7 +372,6 @@
               <span class="work__view">Apskatīt <i>→</i></span>
             </div>
             <div class="work__meta">
-              <span class="work__idx">(01)</span>
               <h3 class="work__name">Brīvprātīgais darbs</h3>
               <span class="work__cat">Platforma · Vietne un izstrāde</span>
             </div>
@@ -371,7 +382,6 @@
               <span class="work__view">Apskatīt <i>→</i></span>
             </div>
             <div class="work__meta">
-              <span class="work__idx">(02)</span>
               <h3 class="work__name">Rundāles tūre</h3>
               <span class="work__cat">Tūrisms · Mājaslapa</span>
             </div>
@@ -379,7 +389,6 @@
 
           <a class="work__card work__card--cta" href="#contact" data-reveal data-cursor="hover">
             <div class="work__cta-inner">
-              <span class="work__idx">(03)</span>
               <h3 class="work__name">Tavs projekts<br>šeit<i class="accent">.</i></h3>
               <span class="work__cat">Izveidosim to, ko cilvēki atcerēsies →</span>
             </div>
@@ -388,22 +397,37 @@
       </div>
     </section>
 
-    <!-- ============ PARALLAX BAND (background + scroll effect) ============ -->
-    <section class="band" aria-labelledby="band-title">
-      <div class="band__bg" data-parallax="34" aria-hidden="true"></div>
-      <div class="band__word" data-parallax="-48" aria-hidden="true">RODAS</div>
-      <div class="container band__content">
-        <h2 class="band__title" id="band-title" data-split>
-          Mēs neveidojam tikai lapas. Pie mums <em>rodas</em> iespaids, ko neaizmirst.
-        </h2>
-      </div>
-    </section>
-
-    <!-- ============ IMPACT (pinned · letter-by-letter on scroll · font-morphing "rast") ============ -->
-    <section class="impact" id="impact" aria-label="Kādu iespaidu tu vēlies rast?">
-      <div class="impact__sticky">
-        <div class="impact__inner">
-          <h2 class="impact__title">Kādu iespaidu<br>tu vēlies <span class="impact__rast" id="rastMorph">rast</span><span class="impact__q">?</span></h2>
+    <!-- ============ FAQ ============ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <header class="section-head">
+          <h2 class="section-title" data-reveal>Atbildes uz to, ko parasti vaicā.</h2>
+        </header>
+        <div class="faq__list">
+          <details class="faq__item" name="faq" data-reveal>
+            <summary class="faq__q"><span>Cik maksā mājaslapa?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Katrs projekts ir pielāgots, tāpēc cena atkarīga no apjoma un funkcijām. Visvienkāršākās lapas sākas no 300 €. Pēc iepazīšanās sarunas un izpētes sagatavojam konkrētu piedāvājumu bez saistībām, lai tu zini, ko un par cik saņem.</p>
+          </details>
+          <details class="faq__item" name="faq" data-reveal>
+            <summary class="faq__q"><span>Cik ilgi aizņem izstrāde?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Vienkāršāku lapu varam izstrādāt dažās dienās, apjomīgāku projektu, ilgāk. Precīzu termiņu nosakām pēc izpētes un saskaņojam to ar tevi jau pašā sākumā.</p>
+          </details>
+          <details class="faq__item" name="faq" data-reveal>
+            <summary class="faq__q"><span>Kas man jāsagatavo?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Pietiek ar pamatinformāciju par uzņēmumu un mērķiem. Ar tekstiem un attēliem varam palīdzēt, ja tādu vēl nav.</p>
+          </details>
+          <details class="faq__item" name="faq" data-reveal>
+            <summary class="faq__q"><span>Vai varat atjaunot manu esošo lapu?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Jā. Pārceļam saturu uz mūsdienīgu, ātru un telefonā ērtu dizainu, saglabājot tavu adresi un Google pozīcijas, kas jau strādā.</p>
+          </details>
+          <details class="faq__item" name="faq" data-reveal>
+            <summary class="faq__q"><span>Kas notiek pēc lapas palaišanas?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Mūsu sadarbība neapstājas ar mājaslapas palaišanu. Pirmais mēnesis ir iekļauts - uzraugām, ka viss darbojas, izlabojam neprecizitātes un atbildam uz jūsu jautājumiem. Pēc tam piedāvājam ikmēneša uzturēšanas plānu: atjauninājumi, drošība, rezerves kopijas un sīkas izmaiņas, lai lapa ilgtermiņā paliktu ātra un droša.</p>
+          </details>
+          <details class="faq__item" name="faq" data-reveal>
+            <summary class="faq__q"><span>Vai veidojat arī interneta veikalus?</span><i class="faq__mark" aria-hidden="true"></i></summary>
+            <p class="faq__a">Jā. Izveidojam interneta veikalus ar ērtu preču pārvaldību, drošiem maksājumiem un piegādes risinājumiem. Tu pievieno preces, pārējais jau strādā.</p>
+          </details>
         </div>
       </div>
     </section>
@@ -412,7 +436,6 @@
     <section class="process" id="process">
       <div class="container process__container">
         <div class="process__head">
-          <p class="eyebrow" data-reveal>Process</p>
           <h2 class="section-title" data-reveal>Četri soļi.</h2>
           <p class="process__lead" data-reveal>Kā projekts no pirmās ziņas nonāk līdz gatavai lapai - soli pa solim, bez stresa.</p>
           <div class="process__meter" aria-hidden="true">
@@ -454,6 +477,55 @@
       </div>
     </section>
 
+    <!-- ============ PARALLAX BAND (background + scroll effect) ============ -->
+    <section class="band" aria-labelledby="band-title">
+      <div class="band__bg" data-parallax="34" aria-hidden="true"></div>
+      <div class="band__word" data-parallax="-48" aria-hidden="true">RODAS</div>
+      <div class="container band__content">
+        <h2 class="band__title" id="band-title" data-split>
+          Mēs neveidojam tikai lapas. Pie mums <em>rodas</em> iespaids, ko neaizmirst.
+        </h2>
+      </div>
+    </section>
+
+    <!-- ============ IMPACT (pinned · letter-by-letter on scroll · statisks "rast" akcentā) ============ -->
+    <section class="impact" id="impact" aria-label="Kādu iespaidu tu vēlies rast?">
+      <div class="impact__sticky">
+        <div class="impact__inner">
+          <h2 class="impact__title">Kādu iespaidu<br>tu vēlies <span class="impact__nb"><span class="impact__rast" id="rastMorph">rast</span><span class="impact__q">?</span></span></h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INSIGHTS / IESKATI ============ -->
+    <section class="insights" id="insights">
+      <div class="container">
+        <header class="section-head">
+          <h2 class="section-title">Noderīgi, pirms sāc.</h2>
+        </header>
+        <div class="insights__grid">
+          <a class="insight" href="raksti/cik-maksa-majaslapa.html" data-cursor="hover">
+            <span class="insight__tag">Ceļvedis</span>
+            <h3 class="insight__title">Cik maksā mājaslapa Latvijā?</h3>
+            <p class="insight__desc">Kas nosaka cenu, kāpēc diapazoni ir tik plaši un uz ko skatīties, salīdzinot piedāvājumus.</p>
+            <span class="insight__more">Lasīt <i>→</i></span>
+          </a>
+          <a class="insight" href="raksti/wordpress-vai-pielagots.html" data-cursor="hover">
+            <span class="insight__tag">Ceļvedis</span>
+            <h3 class="insight__title">WordPress vai pielāgots risinājums?</h3>
+            <p class="insight__desc">Kuram gadījumam kas der un kur slēpjas patiesās izmaksas ilgtermiņā.</p>
+            <span class="insight__more">Lasīt <i>→</i></span>
+          </a>
+          <a class="insight" href="raksti/ka-sagatavoties-izstradei.html" data-cursor="hover">
+            <span class="insight__tag">Ceļvedis</span>
+            <h3 class="insight__title">Kā sagatavoties izstrādei</h3>
+            <p class="insight__desc">Ko sagatavot iepriekš, lai projekts norit ātri un bez pārpratumiem.</p>
+            <span class="insight__more">Lasīt <i>→</i></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ MANIFESTO QUOTE ============ -->
     <section class="manifesto">
       <div class="container">
@@ -464,85 +536,15 @@
       </div>
     </section>
 
-    <!-- ============ FAQ ============ -->
-    <section class="faq" id="faq">
-      <div class="container">
-        <header class="section-head">
-          <p class="eyebrow" data-reveal>Biežākie jautājumi</p>
-          <h2 class="section-title" data-reveal>Atbildes uz to, ko parasti vaicā.</h2>
-        </header>
-        <div class="faq__list">
-          <details class="faq__item" data-reveal>
-            <summary class="faq__q"><span>Cik maksā mājaslapa?</span><i class="faq__mark" aria-hidden="true"></i></summary>
-            <p class="faq__a">Katrs projekts ir pielāgots, tāpēc cena atkarīga no apjoma un funkcijām. Visvienkāršākās lapas sākas no 300 €. Pēc iepazīšanās sarunas un izpētes sagatavojam konkrētu piedāvājumu bez saistībām, lai tu zini, ko un par cik saņem.</p>
-          </details>
-          <details class="faq__item" data-reveal>
-            <summary class="faq__q"><span>Cik ilgi aizņem izstrāde?</span><i class="faq__mark" aria-hidden="true"></i></summary>
-            <p class="faq__a">Vienkāršāku lapu varam izstrādāt dažās dienās, apjomīgāku projektu, ilgāk. Precīzu termiņu nosakām pēc izpētes un saskaņojam to ar tevi jau pašā sākumā.</p>
-          </details>
-          <details class="faq__item" data-reveal>
-            <summary class="faq__q"><span>Kas man jāsagatavo?</span><i class="faq__mark" aria-hidden="true"></i></summary>
-            <p class="faq__a">Pietiek ar pamatinformāciju par uzņēmumu un mērķiem. Ar tekstiem un attēliem varam palīdzēt, ja tādu vēl nav.</p>
-          </details>
-          <details class="faq__item" data-reveal>
-            <summary class="faq__q"><span>Vai varat atjaunot manu esošo lapu?</span><i class="faq__mark" aria-hidden="true"></i></summary>
-            <p class="faq__a">Jā. Pārceļam saturu uz mūsdienīgu, ātru un telefonā ērtu dizainu, saglabājot tavu adresi un Google pozīcijas, kas jau strādā.</p>
-          </details>
-          <details class="faq__item" data-reveal>
-            <summary class="faq__q"><span>Kas notiek pēc lapas palaišanas?</span><i class="faq__mark" aria-hidden="true"></i></summary>
-            <p class="faq__a">Mūsu sadarbība neapstājas ar mājaslapas palaišanu. Pirmais mēnesis ir iekļauts - uzraugām, ka viss darbojas, izlabojam neprecizitātes un atbildam uz jūsu jautājumiem. Pēc tam piedāvājam ikmēneša uzturēšanas plānu: atjauninājumi, drošība, rezerves kopijas un sīkas izmaiņas, lai lapa ilgtermiņā paliktu ātra un droša.</p>
-          </details>
-          <details class="faq__item" data-reveal>
-            <summary class="faq__q"><span>Vai veidojat arī interneta veikalus?</span><i class="faq__mark" aria-hidden="true"></i></summary>
-            <p class="faq__a">Jā. Izveidojam interneta veikalus ar ērtu preču pārvaldību, drošiem maksājumiem un piegādes risinājumiem. Tu pievieno preces, pārējais jau strādā.</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ INSIGHTS / IESKATI ============ -->
-    <section class="insights" id="insights">
-      <div class="container">
-        <header class="section-head section-head--row">
-          <div>
-            <p class="eyebrow" data-reveal>Raksti</p>
-            <h2 class="section-title" data-reveal>Noderīgi, pirms sāc.</h2>
-          </div>
-          <p class="section-note" data-reveal>Īsi raksti par to, kas visbiežāk interesē.</p>
-        </header>
-        <div class="insights__grid">
-          <a class="insight" href="raksti/cik-maksa-majaslapa.html" data-reveal data-cursor="hover">
-            <span class="insight__tag">Ceļvedis</span>
-            <h3 class="insight__title">Cik maksā mājaslapa Latvijā?</h3>
-            <p class="insight__desc">Kas nosaka cenu, kāpēc diapazoni ir tik plaši un uz ko skatīties, salīdzinot piedāvājumus.</p>
-            <span class="insight__more">Lasīt <i>→</i></span>
-          </a>
-          <div class="insight insight--soon" data-reveal aria-disabled="true">
-            <span class="insight__tag">Drīzumā</span>
-            <h3 class="insight__title">WordPress vai pielāgots risinājums?</h3>
-            <p class="insight__desc">Kuram gadījumam kas der un kur slēpjas patiesās izmaksas ilgtermiņā.</p>
-            <span class="insight__more">Drīzumā</span>
-          </div>
-          <a class="insight" href="raksti/ka-sagatavoties-izstradei.html" data-reveal data-cursor="hover">
-            <span class="insight__tag">Ceļvedis</span>
-            <h3 class="insight__title">Kā sagatavoties izstrādei</h3>
-            <p class="insight__desc">Ko sagatavot iepriekš, lai projekts norit ātri un bez pārpratumiem.</p>
-            <span class="insight__more">Lasīt <i>→</i></span>
-          </a>
-        </div>
-      </div>
-    </section>
-
     <!-- ============ CTA ============ -->
     <section class="cta" id="contact">
       <div class="container">
-        <p class="eyebrow" data-reveal><span class="dot"></span> Parunāsim</p>
         <h2 class="cta__title">
           <span class="line"><span>Radīsim</span></span>
           <span class="line"><span>kaut ko</span></span>
           <span class="line"><span>neaizmirstamu<i class="accent">.</i></span></span>
         </h2>
-        <p class="cta__lead" data-reveal>Pastāsti par savu ideju vai uzdod jautājumu. Bez saistībām un bez maksas.</p>
+        <p class="cta__lead" data-reveal>Pastāsti par savu ideju vai uzdod jautājumu.</p>
         <div class="cta__actions" data-reveal>
           <button type="button" class="btn btn--solid btn--lg magnetic js-open-form" data-cursor="hover"><span>Sākt projektu</span> <i class="btn__arrow">→</i></button>
           <a href="mailto:hello@raststudio.lv" class="cta__email" data-cursor="hover">hello@raststudio.lv</a>
@@ -569,7 +571,6 @@
         <div class="footer__col">
           <span class="footer__heading">Kontakti</span>
           <a href="mailto:hello@raststudio.lv" data-cursor="hover">hello@raststudio.lv</a>
-          <a href="https://wa.me/37128744598" target="_blank" rel="noopener" data-cursor="hover">+371 28 744 598</a>
           <span class="footer__muted">Latvija · strādājam attālināti</span>
         </div>
         <div class="footer__col">
