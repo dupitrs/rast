@@ -90,8 +90,9 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- v3: tikai divas saimes — Bricolage Grotesque (display) + Inter (teksts/UI/etiķetes).
-       Space Mono un dekoratīvie morph-fonti izņemti (nav fontu morphing). -->
+  <!-- v3: lapa ielādējas ar divām saimēm — Bricolage Grotesque (display) + Inter (teksts/UI/etiķetes).
+       Dekoratīvos fontus vārda "rast" morphingam main.js pieprasa atsevišķi un tikai tad,
+       kad "iespaida" sadaļa tuvojas ekrānam, tāpēc sākotnējā ielāde paliek viegla. -->
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
@@ -105,6 +106,34 @@
       // Always boot from the top: restoring a mid-page scroll on reload made the pinned/
       // scrubbed sections (video, impact) initialise at the wrong offset and break the layout.
       if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      // A hash (#insights, #work, ...) can only arrive from another page — the in-page nav
+      // links scroll without ever touching the URL. So honour it when we arrive that way,
+      // but drop it on a manual refresh: F5 on index.html#insights must reload the homepage
+      // from the top, not jump back to the section again.
+      // main.js reloads the page itself when it is restored by back/forward (a bfcache
+      // restore leaves the GSAP ticker dead); it marks that internal reload in history.state
+      // so it still counts as "arriving" and keeps the hash. history.state rather than
+      // sessionStorage: it survives the reload without needing storage permission (visitors
+      // who block all site data would otherwise be dumped at the top of the page), and it
+      // belongs to this one history entry instead of the whole tab.
+      var isReload = false;
+      try {
+        var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        isReload = nav ? nav.type === 'reload'
+                       : !!(performance.navigation && performance.navigation.type === 1);
+      } catch (err) { }
+      var internal = false;
+      try {
+        internal = !!(history.state && history.state.rastBfReload);
+        // Consume it, or the next refresh would look internal too and keep the hash.
+        if (internal) history.replaceState(null, '');
+      } catch (err) { }
+      if (isReload && !internal && location.hash.length > 1) {
+        // Flag as well as strip: on file:// (local preview) replaceState can throw, and
+        // main.js reads the flag too so the behaviour stays the same either way.
+        window.__rastDropHash = true;
+        try { history.replaceState(null, '', location.pathname + location.search); } catch (err) { }
+      }
       window.scrollTo(0, 0);
       setTimeout(function () {
         if (!window.__rastBooted) {
@@ -258,7 +287,7 @@
                     <li>nepieciešama lapa konkrētai kampaņai vai pakalpojumam</li>
                   </ul>
                 </div>
-                <a class="svc__card-link" href="majaslapu-izstrade.html" data-cursor="hover">Vairāk par mājaslapu izstrādi <i>→</i></a>
+                <a class="svc__card-link" href="/majaslapu-izstrade" data-cursor="hover">Vairāk par mājaslapu izstrādi <i>→</i></a>
               </div>
             </div>
           </article>
@@ -366,7 +395,7 @@
         </header>
 
         <div class="work__grid">
-          <a class="work__card" href="darbi/brivpratigais-darbs.html" data-reveal data-cursor="view">
+          <a class="work__card" href="/darbi/brivpratigais-darbs" data-reveal data-cursor="view">
             <div class="work__media work__media--shot" style="background-image:url('assets/work-brivpratigais.webp')" aria-hidden="true">
               <span class="work__badge">Projekta apraksts <i>→</i></span>
               <span class="work__view">Apskatīt <i>→</i></span>
@@ -504,19 +533,19 @@
           <h2 class="section-title">Noderīgi, pirms sāc.</h2>
         </header>
         <div class="insights__grid">
-          <a class="insight" href="raksti/cik-maksa-majaslapa.html" data-cursor="hover">
+          <a class="insight" href="/raksti/cik-maksa-majaslapa" data-cursor="hover">
             <span class="insight__tag">Ceļvedis</span>
             <h3 class="insight__title">Cik maksā mājaslapa Latvijā?</h3>
             <p class="insight__desc">Kas nosaka cenu, kāpēc diapazoni ir tik plaši un uz ko skatīties, salīdzinot piedāvājumus.</p>
             <span class="insight__more">Lasīt <i>→</i></span>
           </a>
-          <a class="insight" href="raksti/wordpress-vai-pielagots.html" data-cursor="hover">
+          <a class="insight" href="/raksti/wordpress-vai-pielagots" data-cursor="hover">
             <span class="insight__tag">Ceļvedis</span>
             <h3 class="insight__title">WordPress vai pielāgots risinājums?</h3>
             <p class="insight__desc">Kuram gadījumam kas der un kur slēpjas patiesās izmaksas ilgtermiņā.</p>
             <span class="insight__more">Lasīt <i>→</i></span>
           </a>
-          <a class="insight" href="raksti/ka-sagatavoties-izstradei.html" data-cursor="hover">
+          <a class="insight" href="/raksti/ka-sagatavoties-izstradei" data-cursor="hover">
             <span class="insight__tag">Ceļvedis</span>
             <h3 class="insight__title">Kā sagatavoties izstrādei</h3>
             <p class="insight__desc">Ko sagatavot iepriekš, lai projekts norit ātri un bez pārpratumiem.</p>
@@ -562,7 +591,7 @@
         </div>
         <div class="footer__col">
           <span class="footer__heading">Izvēlne</span>
-          <a href="majaslapu-izstrade.html" data-cursor="hover">Mājaslapu izstrāde</a>
+          <a href="/majaslapu-izstrade" data-cursor="hover">Mājaslapu izstrāde</a>
           <a href="#work" data-cursor="hover">Darbi</a>
           <a href="#studio" data-cursor="hover">Studija</a>
           <a href="#process" data-cursor="hover">Process</a>
@@ -611,7 +640,7 @@
       <div class="form__head">
         <div>
           <h2 class="form__title" id="formTitle">Sāksim projektu</h2>
-          <p class="form__sub">Pastāsti īsumā, ko vajag, un atbildēsim 1 darba dienas laikā.</p>
+          <p class="form__sub">Pastāsti īsumā, ko vēlies, un atbildēsim 1 darba dienas laikā.</p>
         </div>
         <button type="button" class="form__close" data-close aria-label="Aizvērt formu">×</button>
       </div>
@@ -671,5 +700,6 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/tab-title.js"></script>
 </body>
 </html>

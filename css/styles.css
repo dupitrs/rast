@@ -281,12 +281,14 @@ ul, ol { list-style: none; }
   will-change: transform, opacity;
 }
 .fx-orb-ink { background: #fff; mix-blend-mode: difference; }
-/* Collect/grow phase: rendered FLAT (no blending) so the circle melts into the particle-made
-   white cluster with zero inversion artifacts; blending returns for the travel phase, where
-   the sphere passes over text. The toggle happens over the empty black section — invisible. */
-.fx-orb-ink.is-flat, .fx-orb.is-flat { mix-blend-mode: normal; }
-/* The collection dot starts WHITE; the orange circle forms out of it — ::after carries the
-   brand gradient and fades in via --oj (0 = tiny white dot, 1 = orange circle; JS-driven). */
+/* Collect/grow phase: rendered FLAT (no blending) so the circle sits opaquely over the
+   particle-made white cluster with zero inversion artifacts; blending returns before the travel
+   phase, where the sphere passes over text. The toggle happens over the empty black section.
+   Over that near-black bg the blend pair renders the gradient ~4% darker than flat does, so the
+   flat phase is dimmed by the same 4% — the switch is then a true no-op on screen. */
+.fx-orb-ink.is-flat, .fx-orb.is-flat { mix-blend-mode: normal; filter: brightness(0.96); }
+/* ::after carries the brand gradient at --oj opacity. The sphere is fully orange (--oj = 1)
+   from its very first pixel and never changes tone while it grows — see updateOrb in main.js. */
 .fx-orb {
   background: #fff;
   mix-blend-mode: multiply;
@@ -392,10 +394,15 @@ ul, ol { list-style: none; }
    STUDIO
    ============================================================ */
 /* Normal flowing section — no overlap / opacity handoff (the intro video that needed it
-   is gone), so it just scrolls in like any other section. overflow stays visible so the
-   vermilion bloom (::before) bleeds softly past the edges instead of being clipped into
-   a hard line between sections. */
-.studio { padding: clamp(90px, 13vw, 200px) 0; position: relative; background: var(--bg); }
+   is gone), so it just scrolls in like any other section. overflow-y stays visible so the
+   vermilion bloom (::before) still bleeds softly past the TOP edge instead of being clipped
+   into a hard line between sections; only the horizontal axis is clipped, because the bloom
+   sits at right: -4% and that overhang was widening the page on phones (the whole document
+   could be dragged sideways ~4% of the screen, which turned every downward swipe into a
+   diagonal one). `clip` not `hidden`: hidden would make this a scroll container and cut the
+   vertical bleed too. Nothing visible is lost — the gradient is fully transparent well
+   before that edge (transparent at 64% of the circle's radius). */
+.studio { padding: clamp(90px, 13vw, 200px) 0; position: relative; background: var(--bg); overflow-x: clip; }
 /* Atmosphere — a faint vermilion bloom so the section reads as designed space, not a void */
 .studio::before {
   content: ""; position: absolute; top: -12%; right: -4%; z-index: 0;
@@ -458,6 +465,9 @@ ul, ol { list-style: none; }
 /* z-index below the cards: the header stays visible above the cards' pin zone during the
    cascade, but the last card slides cleanly OVER it at the end (no text overlap). */
 .svc__pin .section-head { position: sticky; top: clamp(80px, 11vh, 116px); z-index: 1; margin-bottom: clamp(28px, 4vw, 56px); }
+/* Kārts noapaļotie stūri ir caurspīdīgi, tāpēc sadaļas beigās, kad pēdējā kārts aizslīd
+   virsrakstam pāri, stūrī pavīdēja virsraksta burts. JS (setupServicesHeader) virsrakstu
+   izdzēš tieši tajā brīdī — caurspīdība tiek likta inline. */
 .no-anim .svc__pin .section-head, .no-anim .svc__card { position: static; }
 
 .svc__deck {
@@ -555,7 +565,15 @@ ul, ol { list-style: none; }
 
 @media (max-width: 760px) {
   .svc__deck { --peek: clamp(46px, 10vh, 64px); padding-bottom: clamp(16px, 3vh, 40px); }   /* small trailing room so the header releases with the last card and the gap before "Papildu pakalpojumi" stays tight */
-  .svc__card { min-height: clamp(300px, 54vh, 430px); }
+  /* --card-h: JS izlīdzina visas kārtis uz garākās augstumu, lai garākās apakša neizlīstu
+     zem nākamās (visas pinojas vienā augstumā). Bez JS paliek parastais minimums. */
+  .svc__card { min-height: var(--card-h, clamp(300px, 54vh, 430px)); }
+  /* Telefonā kārtis pilnībā pārklāj viena otru: visas piestiprinās vienā augstumā, tāpēc
+     iepriekšējās kārts virsraksta josla nepaliek redzama augšā un saturam atliek visa ekrāna daļa. */
+  .svc__card:nth-child(1),
+  .svc__card:nth-child(2),
+  .svc__card:nth-child(3),
+  .svc__card:nth-child(4) { top: var(--deck-top); }
   .svc__title { font-size: clamp(20px, 5.6vw, 30px); }
   .svc__card-bar { padding: 0 20px; }
   .svc__card-main { grid-template-columns: 1fr; gap: 18px; padding: 20px 20px 26px; }
@@ -644,7 +662,7 @@ ul, ol { list-style: none; }
     radial-gradient(52% 60% at 82% 72%, rgba(201,52,28,0.42), transparent 62%),
     radial-gradient(42% 50% at 62% 18%, rgba(255,106,77,0.30), transparent 60%),
     linear-gradient(160deg, var(--surface), var(--bg) 72%);
-  /* Drop a real photo here to use an image instead:  background-image: url('assets/band.jpg'); background-size: cover; background-position: center; */
+  /* Drop a real photo here to use an image instead:  background-image: url('../assets/band.jpg'); background-size: cover; background-position: center; */
 }
 .band__bg::after {
   content: ""; position: absolute; inset: 0;
@@ -679,7 +697,13 @@ ul, ol { list-style: none; }
    PROCESS
    ============================================================ */
 .process { height: 360vh; }   /* desktop: tall section; .process__container is CSS-sticky and the revolver SCRUBS over it (no ScrollTrigger pin → no spacer to desync later sections) */
-.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: center; align-content: center; position: sticky; top: 0; min-height: 100vh; min-height: 100svh; }
+/* overflow-x: clip — the 3D revolver's chapters are rotated, so their PROJECTED width is
+   wider than their box; on a narrow phone that spilled a few px past the screen and let the
+   whole document be dragged sideways. Clipped at this box (= the screen edge on mobile), so
+   nothing that was visible is lost; on tablet/desktop the steps never reach the edge, so this
+   is a no-op there. `clip` not `hidden`: hidden would make this a scroll container and kill
+   its own position: sticky. */
+.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: center; align-content: center; position: sticky; top: 0; min-height: 100vh; min-height: 100svh; overflow-x: clip; }
 .process__head { position: relative; z-index: 2; }
 .process__lead { color: var(--ink-dim); margin-top: 20px; max-width: 32ch; }
 /* Live chapter counter — the reader's position in the story; updated by JS */
@@ -847,6 +871,18 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
      change the line-box and re-center the whole title. Glyphs overflow freely
      into the generous line spacing above; the row never jumps. */
   height: 1em; line-height: 1; overflow: visible; vertical-align: baseline;
+  /* main.js locks the box width to the widest face so the line never shifts when the font
+     swaps. The glyphs sit at the right edge, not centred: "rast?" has to stay one unit, so
+     the width a narrow face gives up becomes word spacing before it, never a gap before
+     the question mark.
+     nowrap: the letters are separate inline-blocks (scroll reveal), and at exactly the
+     locked width the widest face broke onto a second line inside the box, which dropped
+     the element's baseline and stretched the whole title by a line. */
+  text-align: right; white-space: nowrap;
+  /* Optical spacing, in em so it follows the fluid font-size: a little air before the
+     question mark, a little less after "vēlies". Both are constant, so the line width
+     stays the same for every face and nothing moves during the morph. */
+  margin-left: -0.08em; margin-right: 0.07em;
 }
 .impact__q { color: var(--accent); }
 

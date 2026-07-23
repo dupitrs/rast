@@ -10,14 +10,19 @@ it to any host. Inspired in spirit by award-winning agency sites (fiddle.digital
 
 ## Preview locally
 
-The animation libraries load from a CDN, so just open `index.html` in a browser —
-or, to be safe with relative paths, run a tiny local server:
-
 ```powershell
 # from this folder
-python -m http.server 5173
+python serve.py
 # then open http://localhost:5173
 ```
+
+Use `serve.py` — **not** `python -m http.server`. The site links to clean URLs with no
+`.html` extension (`/majaslapu-izstrade`, `/raksti/cik-maksa-majaslapa`), which GitHub
+Pages resolves natively but `http.server` does not — every internal link would 404
+locally. `serve.py` is ~50 lines of standard library: it falls back to `<path>.html`
+when `<path>` has no file, keeps the usual `index.html` behaviour for folders, and
+sends `Cache-Control: no-store` so the browser never serves you stale CSS/JS while you
+work. Pass a port to override the default: `python serve.py 8080`.
 
 (You need an internet connection the first time so the CDN libraries — Lenis + GSAP —
 and Google Fonts can load. The page still works if they fail; it just shows without
@@ -76,6 +81,7 @@ rast/
 ├─ index.html        # markup + content
 ├─ css/styles.css    # design system + all styling
 ├─ js/main.js        # interactions (guarded; safe if a CDN fails)
+├─ serve.py          # local dev server (clean URLs, no caching)
 ├─ assets/           # add og.png, real project images here
 └─ README.md
 ```

@@ -617,12 +617,42 @@
     var head = document.querySelector('.svc__pin .section-head');
     var deck = document.querySelector('.svc__deck');
     if (!head || !deck) return;
+    var cards = deck.querySelectorAll('.svc__card');
     function measure() {
       var offset = parseFloat(getComputedStyle(head).top) || 96;   // resolved sticky top
       deck.style.setProperty('--deck-top', Math.round(offset + head.offsetHeight + 18) + 'px');
+      // Telefonā visas kārtis pinojas vienā augstumā (pilnīgs pārklājums, sk. CSS), tāpēc
+      // garākās kārts apakša izlīstu zem nākamās. Nomērām dabiskos augstumus un izlīdzinām
+      // visas uz garāko. Vispirms noņemam mainīgo, citādi mērītu iepriekšējo izlīdzinājumu.
+      deck.style.removeProperty('--card-h');
+      if (window.innerWidth > 760) return;
+      var tallest = 0;
+      Array.prototype.forEach.call(cards, function (c) { tallest = Math.max(tallest, c.offsetHeight); });
+      if (tallest) deck.style.setProperty('--card-h', Math.ceil(tallest) + 'px');
     }
+    // Sadaļas beigās pēdējā kārts aizslīd pāri piestiprinātajam virsrakstam. Kārts to nosedz,
+    // bet tās noapaļotie stūri ir caurspīdīgi, tāpēc stūrī pavīdēja virsraksta burts ("K"
+    // stūrītis). Tāpēc virsrakstu izdzēšam tieši tad, kad kārts pār to aizslīd: caurspīdība
+    // seko kārts augšmalai, tā ka līdz brīdim, kad kārts virsrakstu sedz, tas jau ir izdzisis.
+    var last = cards.length ? cards[cards.length - 1] : null;
+    var FADE = 48, lastOp = -1;            // dzišanas ceļš (px), kamēr kārts augšmala noiet virsrakstam pāri
+    var queued = false;
+    function syncCover() {
+      queued = false;
+      if (!last) return;
+      var h = head.getBoundingClientRect(), c = last.getBoundingClientRect();
+      var op = Math.max(0, Math.min(1, (c.top - h.top) / FADE));
+      if (op === lastOp) return;
+      lastOp = op;
+      head.style.opacity = op === 1 ? '' : op;
+    }
+    function onScroll() { if (!queued) { queued = true; requestAnimationFrame(syncCover); } }
+
     measure();
-    window.addEventListener('resize', measure);
+    syncCover();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', function () { measure(); syncCover(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);   // fonti maina teksta augstumu
     if (hasST) ScrollTrigger.addEventListener('refreshInit', measure);
   }
 
@@ -653,7 +683,7 @@
     return frag;
   }
 
-  /* ---------------- Impact: pinned letter reveal (static "rast", no font-morph — v3) ---------------- */
+  /* ---------------- Impact: pinned letter reveal + font-morphing "rast" ---------------- */
   function setupImpact() {
     var sec = document.getElementById('impact');
     if (!sec) return;
@@ -664,8 +694,8 @@
     title.innerHTML = '';
     title.appendChild(frag);
 
-    // v3: nav fontu morphing. "rast" paliek statisks display fontā (Bricolage) —
-    // tikai divas saimes sistēmā, un dekoratīvie fonti vairs netiek ielādēti.
+    var morph = document.getElementById('rastMorph');
+    if (morph && !reduce) setupRastMorph(morph, sec);
 
     var chars = sec.querySelectorAll('.ch');
     if (!hasST || reduce || !chars.length) return;   // no scrub → letters stay visible
@@ -680,6 +710,97 @@
         scrub: 0.6, invalidateOnRefresh: true
       }
     });
+  }
+
+  /* ---------------- "rast" font morph ----------------
+     The word cycles through display faces while the impact section is on screen.
+     The decorative families are deliberately NOT in the page's font links: the
+     document still loads with two families only, and these are fetched the first
+     time the section comes near. Phones get the same effect, not a heavier load. */
+  var MORPH_FONTS = [
+    ["'Bricolage Grotesque', sans-serif", ''],                          // already loaded
+    ["'Playfair Display', serif",          '700 100px "Playfair Display"'],
+    ["'Pacifico', cursive",                '400 100px "Pacifico"'],
+    ["'Bebas Neue', sans-serif",           '400 100px "Bebas Neue"'],
+    ["'Archivo Black', sans-serif",        '400 100px "Archivo Black"'],
+    ["'DM Serif Display', serif",          '400 100px "DM Serif Display"'],
+    ["'Caveat', cursive",                  '700 100px "Caveat"']
+    // Space Mono is deliberately absent: it is the widest of the set and pushed "rast?"
+    // onto a third line on 320px phones, which made the whole title jump mid-cycle.
+  ];
+  var MORPH_CSS = 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700' +
+                  '&family=Pacifico&family=Bebas+Neue&family=Archivo+Black&family=Caveat:wght@700' +
+                  '&family=DM+Serif+Display:ital@0;1&display=swap';
+  var morphFontsReady = null;
+
+  function loadMorphFonts() {
+    if (morphFontsReady) return morphFontsReady;
+    morphFontsReady = new Promise(function (res) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = MORPH_CSS;
+      link.onload = link.onerror = res;                  // resolve either way: a blocked CDN
+      document.head.appendChild(link);                   // just means the cycle uses fallbacks
+      setTimeout(res, 4000);                             // ...and never hangs
+    }).then(function () {
+      // A webfont file is only fetched once something renders in it, so ask for each face
+      // up front - otherwise the first pass through the list flashes fallback glyphs.
+      if (!document.fonts || !document.fonts.load) return;
+      var jobs = [];
+      MORPH_FONTS.forEach(function (f) {
+        if (f[1]) jobs.push(document.fonts.load(f[1], 'rast'));
+      });
+      return Promise.all(jobs)['catch'](function () { });
+    })['catch'](function () { });
+    return morphFontsReady;
+  }
+
+  function setupRastMorph(el, sec) {
+    var i = 0, timer = null, near = false, locked = false;
+
+    // Every face is a different width, and the title is centred on phones - so without
+    // this the whole line ("tu vēlies rast?") slid left and right on every swap. Lock the
+    // box to the widest face and centre the glyphs inside it: the line now never moves.
+    // Measured in em, so the lock still holds when the fluid font-size changes on resize.
+    function lockWidth() {
+      if (locked) return;
+      var fs = parseFloat(getComputedStyle(el).fontSize);
+      if (!fs) return;
+      var prev = el.style.fontFamily, max = 0;
+      el.style.width = 'auto';
+      MORPH_FONTS.forEach(function (f) {
+        el.style.fontFamily = f[0];
+        max = Math.max(max, el.getBoundingClientRect().width);
+      });
+      el.style.fontFamily = prev;
+      if (!max) return;
+      el.style.width = ((max + 2) / fs).toFixed(3) + 'em';   // +2px: sub-pixel headroom
+      locked = true;
+    }
+
+    function start() {
+      if (timer || !near) return;
+      loadMorphFonts().then(function () {
+        if (!near || timer) return;                      // scrolled away while fonts loaded
+        lockWidth();
+        timer = setInterval(function () {
+          i = (i + 1) % MORPH_FONTS.length;
+          el.style.fontFamily = MORPH_FONTS[i][0];
+        }, 130);
+      });
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+    // Only cycle while the section is on screen (saves work / avoids needless relayout).
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) {
+        near = en[0].isIntersecting;
+        if (near) start(); else stop();
+      }, { rootMargin: '200px' }).observe(sec);
+    } else {
+      near = true;
+      start();
+    }
   }
 
   /* ---------------- WebGL hero (Three.js particle wave) ---------------- */
@@ -958,8 +1079,13 @@
     // The small dot appears where the particles suck in; scrolling then grows it into the full sphere.
     // Stores its last output (gx/gy/gd/go) so the traveller can take over seamlessly.
     var gx = null, gy = null, gd = null, go = null;
-    function updateOrb(suckP, growP, hf) {
-      var oA = Math.min(1, Math.max(0, growP / 0.05));            // no separate dot: the DOM circle appears only over the particle-made white cluster as the grow begins
+    // NOTE: no canvas-fade factor here. That fade belongs to the particle canvas; multiplying it
+    // into the orb made the finished sphere sit at ~0.9 opacity for the last stretch of the grow,
+    // and a semi-transparent orb reads GREY (the white ink layer stops inverting the backdrop
+    // fully, so the multiply lands on a dim, desaturated base). The orb is opaque until the
+    // traveller's own opacity keyframes take over.
+    function updateOrb(suckP, growP) {
+      var oA = growP > 0 ? 1 : 0;                                 // no fade-in: a half-transparent dot would read PALE over the white particle cluster — it appears already fully orange, at dot size, on top of that cluster
       if (oA <= 0) { if (orb.style.opacity !== '0') orbCss('opacity', '0'); return; }
       var t = ez(growP);                                          // tiny white dot → big centred sphere (scroll)
       var vv = tmpV.copy(uniforms.uDotC.value).project(camera);
@@ -967,15 +1093,15 @@
       var dsx = (vv.x * 0.5 + 0.5) * w2, dsy = (-vv.y * 0.5 + 0.5) * h2;
       var cx2 = lerp(dsx, w2 / 2, t), cy2 = lerp(dsy, h2 / 2, t);
       var dia = lerp(14, Math.min(w2, h2) * 0.52, t);             // VERY small white dot → full sphere
-      gx = cx2; gy = cy2; gd = dia; go = oA * hf;                 // remembered for the traveller handoff
-      // Flat (no blend) only during the white→orange melt (--oj reaches 1 by growP≈0.40).
-      // Once the sphere is fully orange, switch to the SAME blend the traveller uses, while
-      // it's still small and over the empty black section — so the grow→travel handoff at
-      // max size has NO blend flip and therefore no visible colour jump.
-      orbFlat(growP < 0.5);                                       // early melt flat; fully-orange sphere already blended before it moves
-      orb.style.setProperty('--oj', ez(Math.min(1, Math.max(0, (growP - 0.05) / 0.35))).toFixed(3));   // white melts into orange slowly and smoothly (eased)
+      gx = cx2; gy = cy2; gd = dia; go = oA;                      // remembered for the traveller handoff
+      // ONE colour from the first pixel to #studio: full brand orange, never a white/pale phase.
+      // Flat (no blend) while the particle cluster under it is still bright — blending there would
+      // invert it to black; the switch to the traveller's blend happens once the sphere covers the
+      // cluster, over the empty black section, where difference+multiply reproduces the same orange.
+      orbFlat(growP < 0.5);
+      orb.style.setProperty('--oj', '1');
       orbCss('transform', 'translate(' + (cx2 - 50) + 'px,' + (cy2 - 50) + 'px) scale(' + (dia / 100) + ')');
-      orbCss('opacity', '' + (oA * hf));
+      orbCss('opacity', '' + oA);
     }
 
     /* -------- Travelling orb: a scroll-keyframed journey down the page ----------------------
@@ -1006,9 +1132,9 @@
       if (window.innerWidth <= 760) {
         if (st != null) {
           var dockY = st - vh * 0.30;                                              // statement ~1/3 down the viewport
-          K.push({ y: st - vh * 0.60, xf: 0.78, yf: 0.40, px: D(34), op: 0.95 });  // eases RIGHT as #studio rises
-          K.push({ y: dockY, xf: 0.80, yf: 0.34, px: D(26), op: 0.92 });           // docks beside the statement
-          K.push({ y: dockY + vh * 0.55, xf: 0.80, yf: -0.21, px: D(26), op: 0.92 }); // scrolls out the top with the section
+          K.push({ y: st - vh * 0.60, xf: 0.78, yf: 0.40, px: D(34), op: 1.0 });   // eases RIGHT as #studio rises
+          K.push({ y: dockY, xf: 0.80, yf: 0.34, px: D(26), op: 1.0 });            // docks beside the statement
+          K.push({ y: dockY + vh * 0.55, xf: 0.80, yf: -0.21, px: D(26), op: 1.0 }); // scrolls out the top with the section
           K.push({ y: dockY + vh * 0.65, xf: 0.80, yf: -0.21, px: D(26), op: 0.0 }); // hidden from here on
         }
         stops = K;
@@ -1017,11 +1143,14 @@
       }
       // Waypoints tuned for near-UNIFORM speed (screen-distance / scroll-distance kept in a
       // narrow band; intentional exceptions: FAQ vertical ride, impact entry, fading exits).
+      // op stays 1.0 all the way through #studio: a partly transparent orb reads GREY, not
+      // orange (the ink layer's inversion goes with it), so any dip here shows up as a colour
+      // change. The journey only starts fading once it sweeps into #services to exit left.
       if (st != null) {
-        K.push({ y: st - vh * 0.60, xf: 0.82, yf: 0.35, px: D(72), op: 0.95 });  // eases RIGHT as #studio rises — clear of the statement
-        K.push({ y: st, xf: 0.86, yf: 0.25, px: D(56), op: 0.92 });              // beside the statement, above the principles
-        K.push({ y: st + stH * 0.45, xf: 0.94, yf: 0.42, px: D(32), op: 0.90 }); // tucks into the right gutter while the principles pass
-        K.push({ y: st + stH * 0.95, xf: 0.64, yf: 0.46, px: D(48), op: 0.85 }); // then curves LEFT (into the behind-the-cards zone)
+        K.push({ y: st - vh * 0.60, xf: 0.82, yf: 0.35, px: D(72), op: 1.0 });   // eases RIGHT as #studio rises — clear of the statement
+        K.push({ y: st, xf: 0.86, yf: 0.25, px: D(56), op: 1.0 });               // beside the statement, above the principles
+        K.push({ y: st + stH * 0.45, xf: 0.94, yf: 0.42, px: D(32), op: 1.0 });  // tucks into the right gutter while the principles pass
+        K.push({ y: st + stH * 0.95, xf: 0.64, yf: 0.46, px: D(48), op: 1.0 });  // then curves LEFT (into the behind-the-cards zone)
       }
       if (sv != null) {
         K.push({ y: sv + svH * 0.22, xf: 0.30, yf: 0.54, px: D(48), op: 0.80 });  // sweeps LEFT through the "Ko tu iegūsi." cards
@@ -1128,8 +1257,7 @@
           if (orb.style.zIndex !== '800') orbCss('zIndex', '800');   // an instant jump up (Ctrl+F, scrollbar flick) must not keep a card-zone z-index
           var suckP = Math.min(1, Math.max(0, (y - suckStart) / suckLen));
           var growP = Math.min(1, Math.max(0, (y - suckStart - suckLen) / growSpan));
-          var hf = 1 - Math.min(1, Math.max(0, (y - fadeA) / Math.max(1, fadeB - fadeA)));
-          updateOrb(suckP, growP, hf);
+          updateOrb(suckP, growP);
         }
       }
       requestAnimationFrame(orbLoop);
@@ -1269,7 +1397,9 @@
     // If we arrived with a hash (e.g. from a case-study/article via "Citi darbi"/"Citi ieskati"),
     // honour it: refresh first, THEN jump to that section. Otherwise start at the top
     // (a plain reload must not start mid-page, or the pinned sections miscalculate).
-    var hash = location.hash;
+    // __rastDropHash is set by the boot script in index.html when this load is a manual
+    // refresh — then the hash is ignored and we start at the top like any other reload.
+    var hash = window.__rastDropHash ? '' : location.hash;
     var target = (hash && hash.length > 1) ? document.querySelector(hash) : null;
     if (!target) { window.scrollTo(0, 0); if (lenis) lenis.scrollTo(0, { immediate: true }); }
     setTimeout(function () {
@@ -1300,7 +1430,14 @@
     } catch (err) { return false; }
   }
   window.addEventListener('pageshow', function (e) {
-    if (e.persisted || isBackForward()) window.location.reload();
+    if (e.persisted || isBackForward()) {
+      // Mark the reload as ours. The boot script in index.html strips the hash on a *user*
+      // refresh; without this mark our own back/forward reload would look the same to it and
+      // returning from an article would land at the top instead of at #insights.
+      // The mark rides on history.state (kept across the reload, no storage permission needed).
+      try { history.replaceState({ rastBfReload: 1 }, ''); } catch (err) { }
+      window.location.reload();
+    }
   });
 
   /* ---------------- White text goes black ONLY where the sphere's circle covers it ----------
