@@ -1,7 +1,6 @@
 # Local tooling / scratch
 .claude/
-*.log
-_shot.html
+server.log
 node_modules/
 package.json
 package-lock.json

@@ -43,26 +43,26 @@
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/styles.css" />
   <style>
     /* Case-study page - reuses the site's tokens, buttons and type from styles.css */
     .cs-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
       padding: 18px var(--gutter); background: rgba(var(--bg-rgb), .72); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
     .cs-nav .brand { display: inline-flex; align-items: flex-start; gap: 5px; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; }
-    .cs-back { font-family: var(--font-sans); font-size: 13px; color: var(--ink-dim); letter-spacing: .04em; }
+    .cs-back { font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); letter-spacing: .04em; }
     .cs-back:hover { color: var(--accent); }
     .cs-hero { padding: clamp(56px, 9vw, 120px) 0 clamp(28px, 4vw, 50px); }
     .cs-title { font-family: var(--font-display); font-weight: 700; letter-spacing: -.03em; line-height: 1.02;
       font-size: clamp(40px, 8vw, 104px); margin: 14px 0 22px; }
-    .cs-meta { display: flex; flex-wrap: wrap; gap: 12px 28px; font-family: var(--font-sans); font-size: 13px; color: var(--ink-dim); letter-spacing: .03em; }
+    .cs-meta { display: flex; flex-wrap: wrap; gap: 12px 28px; font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); letter-spacing: .03em; }
     .cs-meta b { color: var(--ink); font-weight: 400; }
     .cs-cover { margin: clamp(28px,4vw,52px) 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line);
-      aspect-ratio: 16/9; background: var(--surface) center/cover no-repeat; }
+      aspect-ratio: 16/9; background: #fff center/cover no-repeat; }
     .cs-body { display: grid; grid-template-columns: 1fr; gap: clamp(40px,6vw,80px); padding-bottom: clamp(60px,9vw,120px); }
     .cs-block { display: grid; grid-template-columns: 0.5fr 1fr; gap: clamp(18px,4vw,60px); align-items: start; }
     .cs-block h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,3vw,40px); letter-spacing: -.02em; }
-    .cs-block .k { font-family: var(--font-sans); font-size: 12px; color: var(--accent); letter-spacing: .14em; text-transform: uppercase; display: block; margin-bottom: 10px; }
+    .cs-block .k { font-family: var(--font-mono); font-size: 12px; color: var(--accent); letter-spacing: .14em; text-transform: uppercase; display: block; margin-bottom: 10px; }
     .cs-block p { color: var(--ink-dim); font-size: clamp(16px,1.3vw,18px); line-height: 1.75; max-width: 62ch; }
     .cs-block p + p { margin-top: 16px; }
     .cs-list { list-style: none; margin: 10px 0 0; padding: 0; }
@@ -70,11 +70,11 @@
     .cs-list li:first-child { border-top: 0; }
     .cs-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
     .cs-stack { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-    .cs-stack span { font-family: var(--font-sans); font-size: 12px; color: var(--ink-dim); letter-spacing: .02em;
+    .cs-stack span { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); letter-spacing: .02em;
       padding: 7px 13px; border: 1px solid var(--line-2); border-radius: 999px; }
     .cs-result { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px,3vw,40px); margin-top: 8px; }
     .cs-stat .n { font-family: var(--font-display); font-weight: 600; font-size: clamp(20px,2vw,27px); letter-spacing: -.02em; line-height: 1.15; color: var(--ink); display: block; }
-    .cs-stat .l { font-family: var(--font-sans); font-size: 12px; color: var(--ink-dim); margin-top: 8px; display: block; }
+    .cs-stat .l { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); margin-top: 8px; display: block; }
     .cs-cta { border-top: 1px solid var(--line); padding: clamp(50px,8vw,100px) 0; text-align: center; }
     .cs-cta h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px,5vw,64px); letter-spacing: -.03em; line-height: 1.05; }
     .cs-cta .row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }

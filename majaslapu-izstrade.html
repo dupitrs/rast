@@ -24,7 +24,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 
   <script type="application/ld+json">
@@ -61,7 +61,7 @@
     .art-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
       padding: 18px var(--gutter); background: rgba(var(--bg-rgb), .72); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
     .art-nav .brand { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; }
-    .art-back { font-family: var(--font-sans); font-size: 13px; color: var(--ink-dim); letter-spacing: .04em; }
+    .art-back { font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); letter-spacing: .04em; }
     .art-back:hover { color: var(--accent); }
     .art { max-width: 760px; margin-inline: auto; padding-inline: var(--gutter); }
     .art-head { padding: clamp(50px,8vw,110px) 0 clamp(24px,3vw,40px); }
@@ -81,7 +81,7 @@
     .art-body li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
     .art-body ol { counter-reset: soli; }
     .art-body ol li { counter-increment: soli; padding-left: 34px; }
-    .art-body ol li::before { content: counter(soli, decimal-leading-zero); font-family: var(--font-sans); font-size: 13px; top: 12px; }
+    .art-body ol li::before { content: counter(soli, decimal-leading-zero); font-family: var(--font-mono); font-size: 13px; top: 12px; }
     .art-lead { color: var(--ink); font-size: clamp(18px,1.6vw,21px); line-height: 1.6; }
     .art-cta { border-top: 1px solid var(--line); padding: clamp(44px,7vw,90px) 0; text-align: center; }
     .art-cta h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px,4vw,48px); letter-spacing: -.03em; }
@@ -96,11 +96,12 @@
 
   <article class="art">
     <header class="art-head">
+      <p class="eyebrow"><span class="dot"></span> Pakalpojums</p>
       <h1 class="art-h1">Mājaslapu izstrāde</h1>
     </header>
 
     <div class="art-body">
-      <p class="art-lead">Mājaslapa ir tavs pārdevējs, kas strādā visu diennakti. Mēs izstrādājam lapas, kas ne tikai labi izskatās, bet arī palīdz sasniegt mērķi - vairāk zvanu, pieteikumu vai pārdevumu.</p>
+      <p class="art-lead">Mājaslapa ir tavs pārdevējs, kas strādā visu diennakti. Mēs izstrādājam lapas, kas ne tikai labi izskatās, bet arī palīdz sasniegt mērķi - vairāk zvanu, pieteikumu vai pārdošanu.</p>
 
       <h2>Kas ietilpst mājaslapas izstrādē</h2>
       <p>Katru projektu veidojam no nulles, bez gatavām veidnēm. Cenā vienmēr ietilpst viss, kas lapai nepieciešams, lai tā strādātu:</p>

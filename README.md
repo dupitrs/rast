@@ -44,10 +44,10 @@ No build command is needed for any of them.
 | **Social links** | footer `href="#"` | Add your Instagram / Dribbble / Behance / LinkedIn URLs. |
 | **Work projects** | `index.html` → `.work__grid` | The cards are **CONCEPT placeholders** (tagged "Concept"). Swap in real work as you land it — update the title, category and the `.work__media--1/2/3` art (or drop in a real `<img>`). |
 | **Copy** | hero / studio / capabilities | Wording is a strong starting point — make it yours. |
-| **Accent colour** | `css/styles.css` → `--accent` | The single vermilion accent `#FF4A2E` (one accent only, ≤10% of any view; text on an accent fill is `--bg`, never white). Change one variable to re-skin. |
+| **Accent colour** | `css/styles.css` → `--accent` | Currently `#FF4A2E` (a vermilion that nods to Latvia's carmine). Change one variable to re-skin. |
 | **Parallax band image** | `css/styles.css` → `.band__bg` | It's a generated gradient by default. To use a real photo, uncomment `background-image: url('assets/band.jpg')` and drop your image in `assets/`. |
 | **WebGL wave colours** | `js/main.js` → `uColorA` / `uColorB` | The hero particle field's two colours. |
-| **Fonts** | `<link>` in `index.html` + `--font-*` | Two families only: Bricolage Grotesque (display) · Inter (UI + labels). No monospace. |
+| **Fonts** | `<link>` in `index.html` + `--font-*` | Bricolage Grotesque (display) · Inter (UI) · Space Mono (labels). |
 | **OG share image** | `assets/og.png` | Add a 1200×630 image for nice link previews (referenced in `<meta og:image>`). |
 
 ### Honesty note
