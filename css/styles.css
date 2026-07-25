@@ -394,18 +394,17 @@ ul, ol { list-style: none; }
    STUDIO
    ============================================================ */
 /* Normal flowing section — no overlap / opacity handoff (the intro video that needed it
-   is gone), so it just scrolls in like any other section. overflow-y stays visible so the
-   vermilion bloom (::before) still bleeds softly past the TOP edge instead of being clipped
-   into a hard line between sections; only the horizontal axis is clipped, because the bloom
-   sits at right: -4% and that overhang was widening the page on phones (the whole document
-   could be dragged sideways ~4% of the screen, which turned every downward swipe into a
-   diagonal one). `clip` not `hidden`: hidden would make this a scroll container and cut the
-   vertical bleed too. Nothing visible is lost — the gradient is fully transparent well
-   before that edge (transparent at 64% of the circle's radius). */
-.studio { padding: clamp(90px, 13vw, 200px) 0; position: relative; background: var(--bg); overflow-x: clip; }
-/* Atmosphere — a faint vermilion bloom so the section reads as designed space, not a void */
+   is gone), so it just scrolls in like any other section. */
+.studio { padding: clamp(90px, 13vw, 200px) 0; position: relative; background: var(--bg); }
+/* Atmosphere — a faint vermilion bloom so the section reads as designed space, not a void.
+   It is kept ENTIRELY inside the section box (no negative top/right). It used to overhang
+   at top:-12%/right:-4%, which forced `overflow-x: clip` on the section to stop the overhang
+   widening the page on phones — but WebKit clips BOTH axes for `clip`, so the bloom came out
+   as a hard-edged rectangle starting exactly at the section seam. The travelling sphere
+   multiplies with whatever is painted beneath it, so that seam drew a straight line right
+   across the sphere. No overhang → nothing to clip → no seam, on any engine. */
 .studio::before {
-  content: ""; position: absolute; top: -12%; right: -4%; z-index: 0;
+  content: ""; position: absolute; top: 0; right: 0; z-index: 0;
   width: min(48vw, 640px); aspect-ratio: 1; pointer-events: none;
   background: radial-gradient(circle, rgba(var(--accent-rgb), 0.12), transparent 64%);
 }
@@ -447,6 +446,16 @@ ul, ol { list-style: none; }
 @media (max-width: 860px) {
   .studio__grid { grid-template-columns: 1fr; align-items: start; gap: 26px; }
   .studio__principles { grid-template-columns: repeat(2, 1fr); gap: 24px 22px; }
+}
+/* Phone: the travelling sphere docks beside the statement at ~34% of the viewport height
+   (see buildStops in main.js), which is only ~80px below this section's top edge. Start the
+   bloom BELOW that, and spread it wider/softer, so the sphere reads as sitting ABOVE the
+   glow instead of inside it — no orange halo hugging the sphere. */
+@media (max-width: 760px) {
+  .studio::before {
+    top: clamp(120px, 19vh, 200px);
+    width: min(84vw, 420px);
+  }
 }
 @media (max-width: 460px) { .studio__principles { grid-template-columns: 1fr; } }
 
