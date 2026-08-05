@@ -47,7 +47,6 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
   /* The whole site is dark — without this, Windows browsers paint scrollable areas
      (e.g. the service dropdown) with the default WHITE scrollbar. */
   color-scheme: dark;
@@ -55,8 +54,15 @@ html {
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
 }
+/* CSS gludā ritināšana paliek tikai lapās bez JS (raksti, darbi — enkuru saitēm). Sākum-
+   lapā, kur ritina Lenis un ScrollTrigger, tā ir kaitīga: pārlūka enkura lēciens, atverot
+   /#insights no raksta ("Citi raksti"), CSS smooth dēļ kļūst par lēnu slīdējumu, un tā
+   laikā notiekošie ScrollTrigger.refresh() izmēra trigeru pozīcijas ar ritinājuma vērtību,
+   kas neatbilst faktiskajam stāvoklim — visi scrub trigeri iesalst pie progress 1, un
+   lapa pēc atgriešanās izskatās sasalusi. (Iepriekšējā .lenis.lenis-smooth rinda no tā
+   nesargāja: šī Lenis versija klasi lenis-smooth pati nepievieno.) */
+html:not(.js) { scroll-behavior: smooth; }
 html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
 
 body {
   background: var(--bg);
