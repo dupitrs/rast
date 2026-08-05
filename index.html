@@ -103,6 +103,22 @@
     (function () {
       var d = document.documentElement;
       d.classList.add('js');
+      // Skatloga augstums iesaldēts pikseļos (--svh1 = 1% no augstuma ielādes brīdī).
+      // Mobilajos pārlūkos — īpaši Instagram iekšējā, kas rīkjoslai parādoties maina
+      // visa skatloga izmēru — vh/svh vienības pārrēķinās ikreiz, kad ritinot josla
+      // ieslīd vai izslīd: garās sadaļas (hero, impact, process u.c.) maina augstumu,
+      // un visa lapa palecas. CSS šīs sadaļas mēra ar var(--svh1), tāpēc joslu
+      // slīdēšana izkārtojumu vairs neietekmē. Pārrēķinām tikai tad, kad mainās
+      // platums (pagriešana) vai ierīcei ir pele (galddatora loga maiņa).
+      var bootW = window.innerWidth;
+      var freezeVh = function () { d.style.setProperty('--svh1', (window.innerHeight / 100).toFixed(2) + 'px'); };
+      freezeVh();
+      window.addEventListener('resize', function () {
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches || window.innerWidth !== bootW) {
+          bootW = window.innerWidth;
+          freezeVh();
+        }
+      });
       // Always boot from the top: restoring a mid-page scroll on reload made the pinned/
       // scrubbed sections (video, impact) initialise at the wrong offset and break the layout.
       if ('scrollRestoration' in history) history.scrollRestoration = 'manual';

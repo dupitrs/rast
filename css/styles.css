@@ -264,8 +264,11 @@ ul, ol { list-style: none; }
    ============================================================ */
 .hero {
   /* svh, NOT dvh: dvh re-resolves every time the mobile browser bar slides in/out,
-     which resized the hero mid-scroll and made the whole page jump. */
-  position: relative; min-height: 100vh; min-height: 100svh;
+     which resized the hero mid-scroll and made the whole page jump. --svh1 ir tas
+     pats svh, tikai iesaldēts pikseļos (boot skripts index.html galvā) — Instagram
+     iekšējais pārlūks, joslai slīdot, maina VISU skatlogu, tāpēc tur pārrēķinās pat
+     svh; iesaldētā vērtība notur sadaļu augstumus un lapa ritinot vairs nepalecas. */
+  position: relative; min-height: 100vh; min-height: calc(var(--svh1, 1svh) * 100);
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: 0 var(--gutter) clamp(40px, 6vh, 70px);
   overflow: hidden;
@@ -388,7 +391,7 @@ ul, ol { list-style: none; }
    last screen is where #studio scrolls up over it (margin-top:-100vh).
    ============================================================ */
 /* Transparent so the fixed .fx-canvas behind it stays visible (the page bg shows through). */
-.assembly { position: relative; height: 150vh; height: 150svh; background: transparent; }
+.assembly { position: relative; height: 150vh; height: calc(var(--svh1, 1svh) * 150); background: transparent; }
 /* Transparent (same colour) so the orb can ride BEHIND the service cards here. */
 #services { background: transparent; }
 /* Handoff off (JS failed / reduced motion): #studio no longer overlaps, so don't
@@ -655,7 +658,7 @@ ul, ol { list-style: none; }
    PARALLAX BAND (background + scroll effect)
    ============================================================ */
 .band {
-  position: relative; min-height: 94vh; min-height: 94svh;
+  position: relative; min-height: 94vh; min-height: calc(var(--svh1, 1svh) * 94);
   display: grid; place-items: center; overflow: hidden;
   margin-block: clamp(40px, 7vw, 100px);
 }
@@ -711,14 +714,14 @@ ul, ol { list-style: none; }
 /* ============================================================
    PROCESS
    ============================================================ */
-.process { height: 360vh; }   /* desktop: tall section; .process__container is CSS-sticky and the revolver SCRUBS over it (no ScrollTrigger pin → no spacer to desync later sections) */
+.process { height: 360vh; height: calc(var(--svh1, 1vh) * 360); }   /* desktop: tall section; .process__container is CSS-sticky and the revolver SCRUBS over it (no ScrollTrigger pin → no spacer to desync later sections) */
 /* overflow-x: clip — the 3D revolver's chapters are rotated, so their PROJECTED width is
    wider than their box; on a narrow phone that spilled a few px past the screen and let the
    whole document be dragged sideways. Clipped at this box (= the screen edge on mobile), so
    nothing that was visible is lost; on tablet/desktop the steps never reach the edge, so this
    is a no-op there. `clip` not `hidden`: hidden would make this a scroll container and kill
    its own position: sticky. */
-.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: center; align-content: center; position: sticky; top: 0; min-height: 100vh; min-height: 100svh; overflow-x: clip; }
+.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: center; align-content: center; position: sticky; top: 0; min-height: 100vh; min-height: calc(var(--svh1, 1svh) * 100); overflow-x: clip; }
 .process__head { position: relative; z-index: 2; }
 .process__lead { color: var(--ink-dim); margin-top: 20px; max-width: 32ch; }
 /* Live chapter counter — the reader's position in the story; updated by JS */
@@ -859,9 +862,9 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
    ============================================================ */
 /* Tall section + sticky inner "holds" the question while you scroll (the stop),
    and the letters scrub in. No ScrollTrigger pin → no position drift. */
-.impact { position: relative; height: 260vh; }
+.impact { position: relative; height: 260vh; height: calc(var(--svh1, 1vh) * 260); }
 .impact__sticky {
-  position: sticky; top: 0; height: 100vh; height: 100svh;
+  position: sticky; top: 0; height: 100vh; height: calc(var(--svh1, 1svh) * 100);
   display: grid; place-items: center; overflow: hidden;
   padding: clamp(60px, 10vh, 120px) var(--gutter);
 }
@@ -1006,7 +1009,7 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
 @media (max-width: 560px) {
   /* Centre the text block vertically with a gentle downward bias so it sits
      in the lower-middle of the screen — balanced air above and below. */
-  .hero { justify-content: center; padding-top: 18vh; padding-bottom: 14vh; }
+  .hero { justify-content: center; padding-top: calc(var(--svh1, 1vh) * 18); padding-bottom: calc(var(--svh1, 1vh) * 14); }
 
   .hero__eyebrow {
     margin-bottom: 18px;
