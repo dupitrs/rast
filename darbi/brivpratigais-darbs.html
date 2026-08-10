@@ -69,8 +69,29 @@
       font-size: clamp(40px, 8vw, 104px); margin: 14px 0 22px; }
     .cs-meta { display: flex; flex-wrap: wrap; gap: 12px 28px; font-family: var(--font-sans); font-size: 13px; color: var(--ink-dim); letter-spacing: .03em; }
     .cs-meta b { color: var(--ink); font-weight: 400; }
-    .cs-cover { margin: clamp(28px,4vw,52px) 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line);
-      aspect-ratio: 16/9; background: var(--surface) center/cover no-repeat; }
+    /* Vāka attēla vietā — dzīva sistēmas demonstrācija (9:16 animācija iframe rāmī).
+       Animācija pati mērogojas pēc rāmja izmēra un sākas tikai ar klikšķi, tāpēc
+       lapa paliek mierīga, kamēr apmeklētājs pats neizvēlas skatīties. */
+    .cs-demo { margin: clamp(28px,4vw,52px) 0; border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--surface); display: grid; grid-template-columns: 1fr auto;
+      gap: clamp(20px,3vw,56px); align-items: center; padding: clamp(18px,2.6vw,36px) clamp(20px,3.5vw,60px); }
+    .cs-demo .k { font-family: var(--font-sans); font-size: 12px; color: var(--accent); letter-spacing: .14em; text-transform: uppercase; display: block; margin-bottom: 10px; }
+    .cs-demo h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,3vw,40px); letter-spacing: -.02em; }
+    .cs-demo p { color: var(--ink-dim); font-size: clamp(16px,1.3vw,18px); line-height: 1.75; max-width: 44ch; margin-top: 14px; }
+    /* Ielādes plīvurs: lapa parādās tikai tad, kad demonstrācijas rāmis ir ielādējies
+       (logs "load" gaida arī iframe). Drošības slieksnis skriptā to noņem vienmēr. */
+    #veil { position: fixed; inset: 0; z-index: 999; background: var(--bg); opacity: 1; transition: opacity .5s var(--ease); }
+    #veil.hide { opacity: 0; pointer-events: none; }
+    /* Fons caurspīdīgs (bez melnā taisnstūra) - telefons ar savu korpusu un ēnu stāv tieši
+       uz kartītes. Noapaļojums bez malām un fona: to redz tikai tuvinājuma brīžos, kad
+       lietotne aizpilda visu laukumu, - tad stūri ir noapaļoti kā telefona ekrānam. */
+    .cs-demo__frame { width: clamp(280px, 28vw, 390px); aspect-ratio: 390 / 693.33;
+      border-radius: 30px; overflow: hidden; }
+    .cs-demo__frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+    @media (max-width: 760px) {
+      .cs-demo { grid-template-columns: 1fr; gap: 16px; }
+      .cs-demo__frame { width: min(88%, 330px); margin-inline: auto; }
+    }
     .cs-body { display: grid; grid-template-columns: 1fr; gap: clamp(40px,6vw,80px); padding-bottom: clamp(60px,9vw,120px); }
     .cs-block { display: grid; grid-template-columns: 0.5fr 1fr; gap: clamp(18px,4vw,60px); align-items: start; }
     .cs-block h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,3vw,40px); letter-spacing: -.02em; }
@@ -94,8 +115,10 @@
   </style>
 </head>
 <body>
+  <div id="veil" aria-hidden="true"></div>
+  <noscript><style>#veil { display: none; }</style></noscript>
   <nav class="cs-nav">
-    <a href="/" class="brand">rast<span class="accent" style="font-weight:800">.</span></a>
+    <a href="/" class="brand"><span class="brand__word">rast</span><span class="brand__dot" aria-hidden="true"></span></a>
     <a href="/#work" class="cs-back">← Visi darbi</a>
   </nav>
 
@@ -110,7 +133,16 @@
           <span>Gads: <b>2026</b></span>
           <span><a class="accent" href="https://www.brivpratigaisdarbs.lv" target="_blank" rel="noopener">Aplūkot lapu ↗</a></span>
         </div>
-        <div class="cs-cover" style="background-image:url('../assets/work-brivpratigais.webp')" role="img" aria-label="Brīvprātīgais darbs platformas ekrānuzņēmums"></div>
+        <div class="cs-demo">
+          <div class="cs-demo__info">
+            <span class="k">Demonstrācija</span>
+            <h2>Sistēma darbībā</h2>
+            <p>Animācija izved cauri visam ceļam - no pieteikšanās un stundu ievades līdz punktiem, līmeņiem un gatavam PDF apliecinājumam.</p>
+          </div>
+          <div class="cs-demo__frame">
+            <iframe src="../instagram-reklama-lietotajs.html?embed=1" title="Brīvprātīgā darba sistēmas demonstrācijas animācija"></iframe>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -165,5 +197,27 @@
     </section>
   </main>
   <script src="../js/tab-title.js"></script>
+  <script>
+    // Lapa parādās tikai tad, kad demonstrācijas rāmis ielādējies: loga "load" gaida
+    // arī iframe. Pēc plīvura noņemšanas dodam animācijai signālu sākties, lai tās
+    // pirmie kadri (telefona pacelšanās) nenotiek aiz plīvura. Drošības slieksnis
+    // plīvuru noņem vienmēr - arī tad, ja rāmis kāda iemesla dēļ neielādējas.
+    (function () {
+      var veil = document.getElementById('veil');
+      var frame = document.querySelector('.cs-demo__frame iframe');
+      var done = false;
+      function reveal() {
+        if (done) return;
+        done = true;
+        if (frame && frame.contentWindow) try { frame.contentWindow.postMessage('rast-demo-go', '*'); } catch (e) { }
+        if (veil) {
+          veil.classList.add('hide');
+          setTimeout(function () { if (veil.parentNode) veil.parentNode.removeChild(veil); }, 700);
+        }
+      }
+      window.addEventListener('load', reveal);
+      setTimeout(reveal, 4000);
+    })();
+  </script>
 </body>
 </html>
