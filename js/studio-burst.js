@@ -12,6 +12,9 @@
 (function () {
   'use strict';
 
+  function viewportHeight() { return window.rastViewport ? window.rastViewport.height() : window.innerHeight; }
+  var resizeEvent = window.rastViewport ? 'rast:viewport' : 'resize';
+
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!window.gsap || !window.ScrollTrigger || reduce) return;
   gsap.registerPlugin(ScrollTrigger);
@@ -123,14 +126,15 @@
       // Same box as main.js's #heroCanvas (fixed, inset 0), so cx/cy land exactly on the orb.
       W = cv.clientWidth; H = cv.clientHeight;
       if (!W || !H) return;
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-      V = Math.min(window.innerWidth, window.innerHeight) / 100;   // main.js D()
+      dpr = Math.min(W <= 760 ? 1.5 : 2, window.devicePixelRatio || 1);
+      var pixelW = Math.round(W * dpr), pixelH = Math.round(H * dpr);
+      if (cv.width !== pixelW || cv.height !== pixelH) { cv.width = pixelW; cv.height = pixelH; }
+      V = Math.min(window.innerWidth, viewportHeight()) / 100;   // main.js D()
       R = V * 8;                                      // = the parked orb, D(16)
       cx = W / 2; cy = H / 2;
       var y = window.pageYOffset || 0;
       secTop = sec.getBoundingClientRect().top + y;
-      range = Math.max(1, sec.offsetHeight - window.innerHeight);   // = main.js burstY maths
+      range = Math.max(1, sec.offsetHeight - viewportHeight());   // = main.js burstY maths
       var ar = after.getBoundingClientRect();
       aftTop = ar.top + y; aftBottom = ar.bottom + y;
       var narrow = W <= 760;
@@ -428,9 +432,18 @@
       // cream line on the edge) for the whole section; they leave as it ends, peeling away from the
       // bottom up just above the next section's top edge — 1:1 with the scroll, until the bend
       // has carried their top ends off the screen too.
-      var peel = clamp01((y - (aftBottom - H)) / (1.45 * H));
-      var ex = 0.5 * clamp01((y - (aftTop - 0.95 * H)) / (0.75 * H)) + 0.5 * peel;
-      peelY = peel > 0 ? aftBottom - y : null;
+      var peel, ex;
+      if (W <= 760) {
+        // On phones, clear both walls before the services heading enters the screen.
+        var exit = seg(y, aftTop - H * 1.2, aftTop - H * 0.9);
+        ex = exit;
+        peel = seg(exit, 0.5, 1);
+        peelY = peel > 0 ? lerp(H, -0.5 * H, peel) : null;
+      } else {
+        peel = clamp01((y - (aftBottom - H)) / (1.45 * H));
+        ex = 0.5 * clamp01((y - (aftTop - 0.95 * H)) / (0.75 * H)) + 0.5 * peel;
+        peelY = peel > 0 ? aftBottom - y : null;
+      }
       // ---- opening, dive and questions: a pure function of the scroll position (Lenis already
       // smooths the scroll). No easing of its own: an eased copy lags, so scrolling back up the
       // rift lingered after the strike point and hid the white dot — not the mirror of going down.
@@ -617,7 +630,7 @@
     measure();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); queueCloud(true); });   // the questions' sizes follow the fonts
     if (ScrollTrigger.addEventListener) ScrollTrigger.addEventListener('refresh', measure);
-    window.addEventListener('resize', measure);
+    window.addEventListener(resizeEvent, measure);
     window.addEventListener('load', measure);
     requestAnimationFrame(frame);
   }

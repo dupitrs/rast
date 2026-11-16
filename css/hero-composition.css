@@ -5,7 +5,7 @@
 .hero--solutions {
   justify-content: stretch;
   padding-top: 112px;
-  padding-bottom: clamp(32px, 5vh, 56px);
+  padding-bottom: clamp(32px, calc(var(--svh1, 1vh) * 5), 56px);
 }
 
 .hero--solutions .hero__inner {

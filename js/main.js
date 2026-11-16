@@ -5,6 +5,9 @@
 (function () {
   'use strict';
 
+  function viewportHeight() { return window.rastViewport ? window.rastViewport.height() : window.innerHeight; }
+  var resizeEvent = window.rastViewport ? 'rast:viewport' : 'resize';
+
   window.__rastBooted = true;            // signal the head-script safety timer that JS is alive
 
   var html   = document.documentElement;
@@ -65,7 +68,7 @@
       else if (Math.abs(delta) > 6) header.classList.toggle('header--hidden', delta > 0);
     }
     if (scrollBar) {
-      var max = document.documentElement.scrollHeight - window.innerHeight;
+      var max = document.documentElement.scrollHeight - viewportHeight();
       scrollBar.style.width = (max > 0 ? Math.max(0, Math.min(100, (y / max) * 100)) : 0) + '%';
     }
     if (Math.abs(y - lastY) > 6 || y <= 0) lastY = y;
@@ -374,7 +377,7 @@
   if (fine) {
     var dot = document.getElementById('cursorDot');
     if (dot) {
-      var mx = window.innerWidth / 2, my = window.innerHeight / 2, dx = mx, dy = my;
+      var mx = window.innerWidth / 2, my = viewportHeight() / 2, dx = mx, dy = my;
       window.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; });
       (function loop() {
         dx += (mx - dx) * 0.18; dy += (my - dy) * 0.18;     // trails the real pointer
@@ -607,7 +610,7 @@
       });
       hostEl.addEventListener('mouseleave', function () { mouse.x = -9999; mouse.y = -9999; });
     }
-    window.addEventListener('resize', size);
+    window.addEventListener(resizeEvent, size);
     document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
 
     // Pause when the host section scrolls out of view
@@ -778,7 +781,7 @@
       btn.appendChild(document.createTextNode(step.querySelector('.step__title').textContent));
       btn.addEventListener('click', function () {
         // Land the chapter just past the activation line so it lights up on arrival
-        var y = Math.max(0, step.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.3);
+        var y = Math.max(0, step.getBoundingClientRect().top + window.scrollY - viewportHeight() * 0.3);
         if (lenis) lenis.scrollTo(y, { duration: 1.1 });
         else window.scrollTo({ top: y, behavior: 'smooth' });
       });
@@ -802,7 +805,7 @@
     // layout on every update (not per-step toggles), so a jump straight past the section
     // (menu link, restored position) still leaves the right number showing.
     function sync() {
-      var line = window.innerHeight * 0.6, i = 0;
+      var line = viewportHeight() * 0.6, i = 0;
       for (var k = 1; k < steps.length; k++) if (steps[k].getBoundingClientRect().top <= line) i = k;
       setActive(i);
     }
@@ -899,7 +902,7 @@
     measure();
     syncCover();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', function () { measure(); syncCover(); });
+    window.addEventListener(resizeEvent, function () { measure(); syncCover(); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);   // fonti maina teksta augstumu
     if (hasST) ScrollTrigger.addEventListener('refreshInit', measure);
   }
@@ -1202,7 +1205,7 @@
     camera.position.set(0, 4.2, 9);
     camera.lookAt(0, 0, 0);
 
-    var small = Math.min(window.innerWidth, window.innerHeight) < 640;
+    var small = Math.min(window.innerWidth, viewportHeight()) < 640;
     var SX = small ? 26 : 34, SY = small ? 18 : 24;
     var segX = small ? 76 : 112, segY = small ? 48 : 74;
     var geo = new THREE.PlaneGeometry(SX, SY, segX, segY);
@@ -1258,7 +1261,7 @@
       fadeGL();
     }
     function fadeGL() {
-      var hb = heroEl ? heroEl.getBoundingClientRect().bottom : 0, vh = window.innerHeight || 1;
+      var hb = heroEl ? heroEl.getBoundingClientRect().bottom : 0, vh = viewportHeight() || 1;
       var t = Math.min(1, Math.max(0, (vh * 0.9 - hb) / (vh * 0.5)));   // hero bottom 90% → 40% of the screen
       uniforms.uColorA.value.copy(palA[0]).lerp(palB[0], t);
       uniforms.uColorB.value.copy(palA[1]).lerp(palB[1], t);
@@ -1381,7 +1384,7 @@
     var PT_START = 0.4, PT_V0 = 0, PT_V1 = 0, ptT0 = 0;
     // On the dot's top edge (where the splash starts, studio-burst.js level), not inside it: deeper in, the
     // dot covered the drop ~30px before the strike and the scroll seemed to stall.
-    function pointEnd(h) { return h * 0.5 - Math.min(window.innerWidth, window.innerHeight) * 0.08 * 0.92; }
+    function pointEnd(h) { return h * 0.5 - Math.min(window.innerWidth, viewportHeight()) * 0.08 * 0.92; }
     function pointY(y) {                                         // the dot's screen y, from the gather to the strike
       var h = canvas.clientHeight, T = Math.max(1, vidStartY - ptT0), t = clamp01((y - ptT0) / T);
       var t2 = t * t, t3 = t2 * t;
@@ -1510,7 +1513,7 @@
     var aTop = 0, aH = 0, suckStart = 0, suckLen = 1, orbInY = 1e9, swellStart = 1e9, swellLen = 1, vidStartY = 1e9, vidLen = 1,
         holdStartY = 1e9, fadeLen = 1, fadeA = 1, fadeB = 1, travelStartY = 1e9;
     function measure() {
-      var a = document.getElementById('assembly'), vh = window.innerHeight;
+      var a = document.getElementById('assembly'), vh = viewportHeight();
       aTop = a ? a.offsetTop : vh;
       aH = a ? a.offsetHeight : vh;
       // Fully scroll-driven and overlapping, always moving down the screen (see pointY): from the
@@ -1591,7 +1594,7 @@
        Positions are easy to retune — just edit the numbers. */
     var stops = [], faqHover = null, faqZone = [1e9, 1e9], svcZone = [1e9, 1e9], insZone = [1e9, 1e9], wkZone = [1e9, 1e9];
     function buildStops() {
-      var vmin = Math.min(window.innerWidth, window.innerHeight), vh = window.innerHeight;
+      var vmin = Math.min(window.innerWidth, viewportHeight()), vh = viewportHeight();
       function D(p) { return vmin * p / 100; }
       function top(sel) { var e = document.querySelector(sel); return e ? e.offsetTop : null; }
       function ht(sel) { var e = document.querySelector(sel); return e ? e.offsetHeight : 0; }
@@ -1665,7 +1668,7 @@
       if (dX === null) { dX = (gx != null ? gx : tx); dY = (gy != null ? gy : ty); dP = (gd != null ? gd : px); dO = (go != null ? go : op); }
       // Damping eases in from none at the handoff: right after the logo the orb is locked to the
       // scroll, so scrolling back up lands it exactly on the logo's dot — no lag, no snap.
-      var lock = 1 - clamp01((y - travelStartY) / (window.innerHeight * 0.6));
+      var lock = 1 - clamp01((y - travelStartY) / (viewportHeight() * 0.6));
       dX = damp(dX, tx, lerp(0.05, 1, lock), lock > 0 ? 0 : 1.6); dY = damp(dY, ty, lerp(0.05, 1, lock), lock > 0 ? 0 : 1.6);   // speed ∝ distance, with a floor
       dP = damp(dP, px, lerp(0.06, 1, lock), 0);  dO = damp(dO, op, lerp(0.08, 1, lock), 0);
       var zi = '800';
@@ -1744,7 +1747,7 @@
     function stop() { if (running) { running = false; cancelAnimationFrame(raf); } }
 
     resize(); measure(); syncCanvasVisibility();
-    window.addEventListener('resize', resize);
+    window.addEventListener(resizeEvent, resize);
     if (hasST && ScrollTrigger.addEventListener) ScrollTrigger.addEventListener('refresh', measure);
     window.addEventListener('mousemove', function (e) { pointer(e.clientX, e.clientY); });
     window.addEventListener('touchmove', function (e) { if (e.touches[0]) pointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
@@ -1991,9 +1994,9 @@
       styleClone(tg);
       targets.push(tg);
     }
-    var vh = window.innerHeight;
-    window.addEventListener('resize', function () {
-      vh = window.innerHeight;
+    var vh = viewportHeight();
+    window.addEventListener(resizeEvent, function () {
+      vh = viewportHeight();
       for (var i = 0; i < targets.length; i++) styleClone(targets[i]);
     });
     // circle (centre cx,cy radius r) intersects rect b?

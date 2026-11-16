@@ -22,7 +22,7 @@
   white-space: nowrap;
 }
 
-.svc--catalogue .svc__deck { --deck-top: clamp(20px, 3vh, 40px); }
+.svc--catalogue .svc__deck { --deck-top: clamp(20px, calc(var(--svh1, 1vh) * 3), 40px); }
 
 .svc--catalogue .svc__extra {
   max-width: var(--container);
@@ -109,7 +109,7 @@
 }
 
 @media (min-width: 761px) {
-  .svc--catalogue .svc__card { min-height: clamp(520px, 74vh, 820px); }
+  .svc--catalogue .svc__card { min-height: clamp(520px, calc(var(--svh1, 1vh) * 74), 820px); }
   .svc--catalogue .svc__card-main { padding: clamp(36px, 4.5vw, 76px) clamp(56px, 7vw, 136px); }
 }
 
@@ -120,7 +120,7 @@
 @media (max-width: 760px) {
   .svc--catalogue .svc__card { border-radius: 10px; }
   /* Let tall cards scroll into full view before the next card covers them. */
-  .svc--catalogue .svc__card:nth-child(n) { top: min(var(--deck-top), calc(100svh - var(--card-h, 0px) - 20px)); }
+  .svc--catalogue .svc__card:nth-child(n) { top: min(var(--deck-top), calc(var(--svh1, 1vh) * 100 - var(--card-h, 0px) - 20px)); }
   .svc--catalogue .svc__heading { font-size: 20px; }
   .svc--catalogue .svc__card-main { grid-template-rows: auto auto; align-content: start; gap: 28px; padding: 28px clamp(32px, 9vw, 48px) 38px; }
   .svc--catalogue .svc__card-aside { grid-template-columns: 1fr; align-self: start; gap: 28px; }

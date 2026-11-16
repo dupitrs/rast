@@ -59,7 +59,7 @@
    Below the header (1000). JS toggles visibility. */
 .js:not(.no-anim) .burst__fx {
   display: block; position: fixed; inset: 0; z-index: 801;
-  width: 100%; height: 100%;
+  width: 100%; height: calc(var(--svh1, 1svh) * 100);
   pointer-events: none; visibility: hidden;
 }
 /* While the rift is on screen it IS the orange dot — the travelling orb hides, so scrolling

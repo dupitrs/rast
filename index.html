@@ -138,18 +138,19 @@
   <!-- Bricolage Grotesque for headings, Inter for body text. -->
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&family=Lexend+Deca:wght@400..800&family=Karla:wght@400..800&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/css/styles.css?v=13323150f542" />
+  <script src="/js/viewport.js?v=7ff81bba2dff"></script>
+  <link rel="stylesheet" href="/css/styles.css?v=b6780731f848" />
   <link rel="stylesheet" href="/css/fonts.css?v=5016d729235a" />
   <link rel="stylesheet" href="/css/header-center.css?v=cf273eb23f8d" />
   <link rel="stylesheet" href="/css/hero-scrim.css?v=75054deeb6e4" />
-  <link rel="stylesheet" href="/css/hero-composition.css?v=8e82e9f089ec" />
-  <link rel="stylesheet" href="/css/studio-burst.css?v=6f8767595dba" />
+  <link rel="stylesheet" href="/css/hero-composition.css?v=0cdc882a1a22" />
+  <link rel="stylesheet" href="/css/studio-burst.css?v=2342167307bf" />
   <link rel="stylesheet" href="/css/ajns-portfolio.css?v=920fbd3ffc57" />
   <link rel="stylesheet" href="/css/principles.css?v=0734aac78681" />
   <link rel="stylesheet" href="/css/work-title.css?v=797e04e38099" />
   <link rel="stylesheet" href="/css/buttons.css?v=db61ecc55d21" />
   <link rel="stylesheet" href="/css/palette.css?v=d3ea35b0ae8b" />
-  <link rel="stylesheet" href="/css/services.css?v=89c94e0687da" />
+  <link rel="stylesheet" href="/css/services.css?v=4a1cdd10c57f" />
   <!-- copy/: the palette goes on before the first paint, so the original colours never flash -->
   <link rel="stylesheet" href="/css/legal.css?v=177563756d7c" />
   <link rel="stylesheet" href="/css/reviews.css?v=976e8452983e" />
@@ -161,22 +162,6 @@
     (function () {
       var d = document.documentElement;
       d.classList.add('js');
-      // Skatloga augstums iesaldēts pikseļos (--svh1 = 1% no augstuma ielādes brīdī).
-      // Mobilajos pārlūkos — īpaši Instagram iekšējā, kas rīkjoslai parādoties maina
-      // visa skatloga izmēru — vh/svh vienības pārrēķinās ikreiz, kad ritinot josla
-      // ieslīd vai izslīd: garās sadaļas (hero, impact, process u.c.) maina augstumu,
-      // un visa lapa palecas. CSS šīs sadaļas mēra ar var(--svh1), tāpēc joslu
-      // slīdēšana izkārtojumu vairs neietekmē. Pārrēķinām tikai tad, kad mainās
-      // platums (pagriešana) vai ierīcei ir pele (galddatora loga maiņa).
-      var bootW = window.innerWidth;
-      var freezeVh = function () { d.style.setProperty('--svh1', (window.innerHeight / 100).toFixed(2) + 'px'); };
-      freezeVh();
-      window.addEventListener('resize', function () {
-        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches || window.innerWidth !== bootW) {
-          bootW = window.innerWidth;
-          freezeVh();
-        }
-      });
       // Restore only after fonts and scroll scenes have settled in main.js.
       if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
       setTimeout(function () {
@@ -721,10 +706,10 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <script src="/js/main.js?v=d657378774ba"></script>
+  <script src="/js/main.js?v=b103c85b840e"></script>
   <script src="/js/principles-flip.js?v=f3e90e7e2fec"></script>
   <script src="/js/header-center.js?v=b11c5d79d130"></script>
-  <script src="/js/studio-burst.js?v=9b9ff4501a5d"></script>
+  <script src="/js/studio-burst.js?v=447dc4e10320"></script>
   <script src="/js/tab-title.js?v=d77450d2b0f2"></script>
 </body>
 </html>

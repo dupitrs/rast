@@ -283,13 +283,13 @@ ul, ol { list-style: none; }
      pats svh, tikai iesaldēts pikseļos (boot skripts index.html galvā) — Instagram
      iekšējais pārlūks, joslai slīdot, maina VISU skatlogu, tāpēc tur pārrēķinās pat
      svh; iesaldētā vērtība notur sadaļu augstumus un lapa ritinot vairs nepalecas. */
-  position: relative; min-height: 100vh; min-height: calc(var(--svh1, 1svh) * 100);
+  position: relative; min-height: calc(var(--svh1, 1vh) * 100); min-height: calc(var(--svh1, 1svh) * 100);
   display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 0 var(--gutter) clamp(40px, 6vh, 70px);
+  padding: 0 var(--gutter) clamp(40px, calc(var(--svh1, 1vh) * 6), 70px);
   overflow: hidden;
 }
 /* Fixed particle canvas spans hero + the placeholder section; JS morphs & fades it on scroll. */
-.fx-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: .9; pointer-events: none; }
+.fx-canvas { position: fixed; inset: 0; width: 100%; height: calc(var(--svh1, 1svh) * 100); z-index: 0; opacity: .9; pointer-events: none; }
 /* Brand-orange circle that grows out of the dot; position/size/opacity set in JS.
    Two stacked fixed layers moved in lockstep (see orbCss in main.js):
    .fx-orb-ink (white, difference) inverts the backdrop — white text → black, dark bg → white;
@@ -334,7 +334,7 @@ ul, ol { list-style: none; }
    frames). lighten: frame black is 0, darker than --bg, so the page colour wins everywhere except
    the smoke and the logo — no visible frame edge or seam. */
 .fx-seq {
-  position: fixed; inset: 0; width: 100%; height: 100%;
+  position: fixed; inset: 0; width: 100%; height: calc(var(--svh1, 1svh) * 100);
   z-index: 1; pointer-events: none; opacity: 0; visibility: hidden; mix-blend-mode: lighten;
 }
 /* Swell + handoff: the orb stands in for the intro's white sphere (shaded grey at the centre,
@@ -386,15 +386,15 @@ ul, ol { list-style: none; }
 .hero__title i.accent { font-style: normal; }
 
 .hero__sub {
-  margin-top: clamp(24px, 3.4vh, 40px);
+  margin-top: clamp(24px, calc(var(--svh1, 1vh) * 3.4), 40px);
   max-width: 52ch; font-size: clamp(16px, 1.4vw, 20px);
   color: var(--ink-dim); line-height: 1.6;
 }
 
-.hero__actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: clamp(28px, 4vh, 44px); }
+.hero__actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: clamp(28px, calc(var(--svh1, 1vh) * 4), 44px); }
 
 .hero__scroll {
-  position: absolute; right: var(--gutter); bottom: clamp(40px, 6vh, 70px); z-index: 2;
+  position: absolute; right: var(--gutter); bottom: clamp(40px, calc(var(--svh1, 1vh) * 6), 70px); z-index: 2;
   display: inline-flex; align-items: center; gap: 14px;
   font-family: var(--font-sans); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-dim);
 }
@@ -435,7 +435,7 @@ ul, ol { list-style: none; }
    sphere and starts playing the intro frames while still scrolling up into place (1.0) → as the
    logo completes, "rast" scrolls away, #studio rises behind it and the dot flies on. The phase
    lengths live in measure() in main.js — keep the two in step. */
-.assembly { position: relative; height: 170vh; height: calc(var(--svh1, 1svh) * 170); background: transparent; }
+.assembly { position: relative; height: calc(var(--svh1, 1vh) * 170); height: calc(var(--svh1, 1svh) * 170); background: transparent; }
 /* Transparent (same colour) so the orb can ride BEHIND the service cards here. */
 #services { background: transparent; }
 /* Handoff off (JS failed / reduced motion): #studio no longer overlaps, so don't
@@ -506,7 +506,7 @@ ul, ol { list-style: none; }
    glow instead of inside it — no orange halo hugging the sphere. */
 @media (max-width: 760px) {
   .studio::before {
-    top: clamp(120px, 19vh, 200px);
+    top: clamp(120px, calc(var(--svh1, 1vh) * 19), 200px);
     width: min(84vw, 420px);
   }
 }
@@ -526,26 +526,26 @@ ul, ol { list-style: none; }
    away with the whole section. Cards clear it via --deck-top (kept in sync by JS). */
 /* z-index below the cards: the header stays visible above the cards' pin zone during the
    cascade, but the last card slides cleanly OVER it at the end (no text overlap). */
-.svc__pin .section-head { position: sticky; top: clamp(80px, 11vh, 116px); z-index: 1; margin-bottom: clamp(28px, 4vw, 56px); }
+.svc__pin .section-head { position: sticky; top: clamp(80px, calc(var(--svh1, 1vh) * 11), 116px); z-index: 1; margin-bottom: clamp(28px, 4vw, 56px); }
 /* Kārts noapaļotie stūri ir caurspīdīgi, tāpēc sadaļas beigās, kad pēdējā kārts aizslīd
    virsrakstam pāri, stūrī pavīdēja virsraksta burts. JS (setupServicesHeader) virsrakstu
    izdzēš tieši tajā brīdī — caurspīdība tiek likta inline. */
 .no-anim .svc__pin .section-head, .no-anim .svc__card { position: static; }
 
 .svc__deck {
-  --deck-top: clamp(78px, 10vh, 112px);   /* where the first card pins, below the fixed header */
-  --peek: clamp(64px, 8vh, 96px);         /* title-bar strip each covered card keeps visible */
+  --deck-top: clamp(78px, calc(var(--svh1, 1vh) * 10), 112px);   /* where the first card pins, below the fixed header */
+  --peek: clamp(64px, calc(var(--svh1, 1vh) * 8), 96px);         /* title-bar strip each covered card keeps visible */
   display: flex; flex-direction: column;
-  gap: clamp(16px, 2.2vh, 26px);
+  gap: clamp(16px, calc(var(--svh1, 1vh) * 2.2), 26px);
   /* Small trailing room only: keep it short so the sticky header releases together with
      the last card instead of floating alone after it. */
-  padding-bottom: clamp(24px, 4vh, 60px);
+  padding-bottom: clamp(24px, calc(var(--svh1, 1vh) * 4), 60px);
 }
 .svc__card {
   position: sticky;
   z-index: 2;   /* above the sticky section header, so cards slide over it at the cascade's end */
   display: flex; flex-direction: column;
-  min-height: clamp(380px, 54vh, 540px);
+  min-height: clamp(380px, calc(var(--svh1, 1vh) * 54), 540px);
   background:
     radial-gradient(120% 80% at 50% -10%, rgba(var(--ink-rgb), 0.035), transparent 60%),
     linear-gradient(150deg, var(--surface-2) 0%, var(--bg-2) 72%);
@@ -616,10 +616,10 @@ ul, ol { list-style: none; }
 .svc__mini-ico svg { width: 100%; height: 100%; }
 
 @media (max-width: 760px) {
-  .svc__deck { --peek: clamp(46px, 10vh, 64px); padding-bottom: clamp(16px, 3vh, 40px); }   /* small trailing room so the header releases with the last card and the gap before "Papildu pakalpojumi" stays tight */
+  .svc__deck { --peek: clamp(46px, calc(var(--svh1, 1vh) * 10), 64px); padding-bottom: clamp(16px, calc(var(--svh1, 1vh) * 3), 40px); }   /* small trailing room so the header releases with the last card and the gap before "Papildu pakalpojumi" stays tight */
   /* --card-h: JS izlīdzina visas kārtis uz garākās augstumu, lai garākās apakša neizlīstu
      zem nākamās (visas pinojas vienā augstumā). Bez JS paliek parastais minimums. */
-  .svc__card { min-height: var(--card-h, clamp(300px, 54vh, 430px)); }
+  .svc__card { min-height: var(--card-h, clamp(300px, calc(var(--svh1, 1vh) * 54), 430px)); }
   /* Telefonā kārtis pilnībā pārklāj viena otru: visas piestiprinās vienā augstumā, tāpēc
      iepriekšējās kārts virsraksta josla nepaliek redzama augšā un saturam atliek visa ekrāna daļa. */
   .svc__card:nth-child(1),
@@ -710,7 +710,7 @@ ul, ol { list-style: none; }
 /* Default (no JS / reduced motion / phone) = a plain readable list. On desktop JS adds
    .is-flow: the left column (title + a huge faint chapter number) sticks while the
    chapters scroll past on the right — the number rolls to whichever chapter is in view. */
-.process { padding: clamp(100px, 16vh, 180px) 0; }
+.process { padding: clamp(100px, calc(var(--svh1, 1vh) * 16), 180px) 0; }
 .process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: start; }
 .process__head { position: relative; z-index: 2; }
 .process__lead { color: var(--ink-dim); margin-top: 20px; max-width: 32ch; }
@@ -718,7 +718,7 @@ ul, ol { list-style: none; }
 .process__list { display: flex; flex-direction: column; }
 .step {
   display: grid; grid-template-columns: clamp(64px, 8vw, 132px) 1fr; gap: clamp(22px, 4vw, 64px);
-  align-items: start; padding: clamp(30px, 5vh, 60px) 0;
+  align-items: start; padding: clamp(30px, calc(var(--svh1, 1vh) * 5), 60px) 0;
   border-top: 1px solid var(--line);
 }
 .step:last-child { border-bottom: 1px solid var(--line); }
@@ -735,10 +735,10 @@ ul, ol { list-style: none; }
 
 @media (min-width: 861px) {
   .process.is-flow .process__head {
-    position: sticky; top: clamp(96px, 14vh, 140px);
+    position: sticky; top: clamp(96px, calc(var(--svh1, 1vh) * 14), 140px);
     display: flex; flex-direction: column;
-    height: calc(100vh - clamp(96px, 14vh, 140px) - clamp(40px, 8vh, 90px));
-    height: calc(var(--svh1, 1vh) * 100 - clamp(96px, 14vh, 140px) - clamp(40px, 8vh, 90px));
+    height: calc(calc(var(--svh1, 1vh) * 100) - clamp(96px, calc(var(--svh1, 1vh) * 14), 140px) - clamp(40px, calc(var(--svh1, 1vh) * 8), 90px));
+    height: calc(var(--svh1, 1vh) * 100 - clamp(96px, calc(var(--svh1, 1vh) * 14), 140px) - clamp(40px, calc(var(--svh1, 1vh) * 8), 90px));
   }
   /* The rolling chapter number — a vertical reel of digits behind a 1em window */
   .process.is-flow .process__big {
@@ -753,7 +753,7 @@ ul, ol { list-style: none; }
 
   /* Chapter index above the chapters — clickable, the active row lights up */
   .process.is-flow .process__index {
-    display: block; list-style: none; margin: 6px 0 clamp(48px, 9vh, 110px);
+    display: block; list-style: none; margin: 6px 0 clamp(48px, calc(var(--svh1, 1vh) * 9), 110px);
   }
   .process__index button {
     display: flex; align-items: baseline; gap: 16px; padding: 7px 0;
@@ -769,8 +769,8 @@ ul, ol { list-style: none; }
   /* Chapters: tall blocks so each one owns the screen for a while; the big number
      on the left replaces the per-step number */
   .process.is-flow .step {
-    grid-template-columns: 1fr; min-height: 58vh; min-height: calc(var(--svh1, 1vh) * 58);
-    padding: clamp(28px, 4vh, 44px) 0 clamp(60px, 10vh, 120px);
+    grid-template-columns: 1fr; min-height: calc(var(--svh1, 1vh) * 58); min-height: calc(var(--svh1, 1vh) * 58);
+    padding: clamp(28px, calc(var(--svh1, 1vh) * 4), 44px) 0 clamp(60px, calc(var(--svh1, 1vh) * 10), 120px);
     border-top: 0; border-bottom: 1px solid var(--line);
   }
   .process.is-flow .step__num { display: none; }
@@ -850,19 +850,19 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
    ============================================================ */
 /* Tall section + sticky inner "holds" the question while you scroll (the stop),
    and the letters scrub in. No ScrollTrigger pin → no position drift. */
-.impact { position: relative; height: 260vh; height: calc(var(--svh1, 1vh) * 260); }
+.impact { position: relative; height: calc(var(--svh1, 1vh) * 260); height: calc(var(--svh1, 1vh) * 260); }
 .impact__sticky {
-  position: sticky; top: 0; height: 100vh; height: calc(var(--svh1, 1svh) * 100);
+  position: sticky; top: 0; height: calc(var(--svh1, 1vh) * 100); height: calc(var(--svh1, 1svh) * 100);
   display: grid; place-items: center; overflow: hidden;
-  padding: clamp(60px, 10vh, 120px) var(--gutter);
+  padding: clamp(60px, calc(var(--svh1, 1vh) * 10), 120px) var(--gutter);
 }
 .impact__inner { width: 100%; max-width: var(--container); margin-inline: auto; }
 @media (prefers-reduced-motion: reduce) {
   .impact { height: auto; }
-  .impact__sticky { position: static; height: auto; min-height: 60vh; }
+  .impact__sticky { position: static; height: auto; min-height: calc(var(--svh1, 1vh) * 60); }
 }
 .no-anim .impact { height: auto; }
-.no-anim .impact__sticky { position: static; height: auto; min-height: 60vh; }
+.no-anim .impact__sticky { position: static; height: auto; min-height: calc(var(--svh1, 1vh) * 60); }
 .impact__title {
   font-family: var(--font-display); font-weight: 700;
   /* Floor raised for a bolder presence on phones; the morphing "rast" still has the
@@ -909,7 +909,7 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
 .cta__email { font-family: var(--font-sans); font-size: clamp(14px, 1.6vw, 18px); color: var(--ink-dim); border-bottom: 1px solid var(--line-2); padding-bottom: 4px; transition: color .3s, border-color .3s; }
 @media (max-width: 880px) {
   .cta {
-    min-height: 100svh;
+    min-height: calc(var(--svh1, 1vh) * 100);
     min-height: calc(var(--svh1, 1svh) * 100);
     display: flex; align-items: center;
     padding: 96px 0 64px;
