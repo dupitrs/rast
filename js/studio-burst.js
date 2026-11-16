@@ -115,6 +115,7 @@
     function buf() { return { x: new Float32Array(MAXN + 1), y: new Float32Array(MAXN + 1), nx: new Float32Array(MAXN + 1), ny: new Float32Array(MAXN + 1), a: new Float32Array(MAXN + 1), n: 0, len: 0 }; }
     var SIDES = [buf(), buf()];
 
+    var mobile = false;
     var W = 0, H = 0, V = 0, R = 0, cx = 0, cy = 0, dpr = 1, secTop = 0, range = 1, aftTop = 0, aftBottom = 0;
     var C0, CT, CV, CF, EXIT_FOOT, EXIT_HEAD, K = 0.5523;   // K: cubic-bezier circle constant
     function pt(x, y) { return { x: x, y: y }; }
@@ -126,7 +127,8 @@
       // Same box as main.js's #heroCanvas (fixed, inset 0), so cx/cy land exactly on the orb.
       W = cv.clientWidth; H = cv.clientHeight;
       if (!W || !H) return;
-      dpr = Math.min(W <= 760 ? 1.5 : 2, window.devicePixelRatio || 1);
+      mobile = W <= 760 || (window.matchMedia('(pointer: coarse)').matches && Math.min(W, H) <= 760);
+      dpr = Math.min(mobile ? 1.5 : 2, window.devicePixelRatio || 1);
       var pixelW = Math.round(W * dpr), pixelH = Math.round(H * dpr);
       if (cv.width !== pixelW || cv.height !== pixelH) { cv.width = pixelW; cv.height = pixelH; }
       V = Math.min(window.innerWidth, viewportHeight()) / 100;   // main.js D()
@@ -433,7 +435,7 @@
       // bottom up just above the next section's top edge — 1:1 with the scroll, until the bend
       // has carried their top ends off the screen too.
       var peel, ex;
-      if (W <= 760) {
+      if (mobile) {
         // On phones, clear both walls before the services heading enters the screen.
         var exit = seg(y, aftTop - H * 1.2, aftTop - H * 0.9);
         ex = exit;

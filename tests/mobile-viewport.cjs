@@ -73,6 +73,9 @@ async function metrics(page) {
       await page.waitForTimeout(800);
       assert(Math.abs(await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--svh1')) * 100) - profile.width) < 1, 'Orientation refreshes viewport height');
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'No horizontal overflow after rotation');
+      await page.evaluate(() => scrollTo({ top: document.querySelector('#services').offsetTop - 150, behavior: 'instant' }));
+      await page.waitForTimeout(300);
+      assert.equal(await page.locator('.burst__fx').evaluate(e => getComputedStyle(e).visibility), 'hidden', 'Phone landscape also clears the walls');
       console.log('PASS', profile.name, 'toolbar heights, orb, cloud, card offsets, flame exit, rewind and rotation');
       await page.close();
     }
