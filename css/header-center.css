@@ -1,0 +1,26 @@
+/* copy/: centred brand between the section links and the language/CTA group.
+   At the very top of the page there is no brand at all (the intro is the logo); once the
+   page scrolls down the "r." mark (proportions of assets/logo-512.png) fades in. */
+.header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 24px; }
+.nav--start { justify-self: start; }
+.nav--end { justify-self: end; }
+.nav__cta { white-space: nowrap; }
+
+/* The "r." mark. In logo-512 the dot is 0.306 of the r's height, sits 0.083 of it to the
+   right of the r and its top 0.277 of it above the r's top. At 36px the rendered "r" is
+   ~19.5px tall, so: dot 6px, gap 1.5px, 4px down (measured on the rendered pixels; the
+   browser snaps the dot to whole pixels, so other sizes drift from the logo). */
+.header .brand { justify-self: center; font-size: 36px; gap: .042em; }
+.header .brand__rest { display: none; }
+.header .brand__dot { width: .167em; height: .167em; margin-top: .111em; }
+
+/* Hidden at the top; only scrolling down brings the mark in. */
+.header .brand { opacity: 0; visibility: hidden; transition: opacity .4s var(--ease), visibility .4s; }
+.header--mark .brand { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) {
+  .header .brand { transition: none; }
+}
+
+@media (max-width: 880px) {
+  .header { display: flex; justify-content: space-between; }
+}

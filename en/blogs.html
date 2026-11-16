@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0C" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <title>Blog | rast studio</title>
+  <meta name="description" content="Articles on website development: costs, choosing a solution and preparing for your project." />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400..800&family=Karla:wght@400..800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/fonts.css" />
+  <link rel="stylesheet" href="/css/header-center.css" />
+  <link rel="stylesheet" href="/css/buttons.css" />
+  <link rel="stylesheet" href="/css/palette.css" />
+  <link rel="stylesheet" href="/css/legal.css" />
+  <script src="/js/palette.js"></script>
+  <style>
+    .blog { padding: clamp(140px, 18vw, 220px) 0 clamp(70px, 10vw, 130px); }
+    .blog__title { font-family: var(--font-display); font-weight: 700; letter-spacing: -.03em; line-height: 1.02;
+      font-size: clamp(48px, 9vw, 120px); }
+    .blog__lead { margin-top: 18px; color: var(--ink-dim); font-size: clamp(17px, 1.5vw, 20px); }
+    .blog .insights__grid { margin-top: clamp(48px, 6vw, 90px); }
+    .nav > a[aria-current="page"] { color: var(--ink); }
+    @media (max-width: 860px) { .blog .insight { min-height: 0; } }
+  </style>
+<link rel="canonical" href="https://www.raststudio.lv/en/blogs" />
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ============ HEADER (the same as copy/index.html; the "r." mark is always on here) ============ -->
+  <header class="header header--mark header--scrolled" id="header">
+    <nav class="nav nav--start" aria-label="Main navigation">
+      <a href="/en/#services" data-cursor="hover">Services</a>
+      <a href="/en/#work" data-cursor="hover">Work</a>
+      <a href="/en/#principles" data-cursor="hover">How we work</a>
+
+      <a href="/en/blogs" aria-current="page" data-cursor="hover">Blog</a>
+    </nav>
+
+    <a href="/en/" class="brand" data-cursor="hover" aria-label="rast — home">
+      <span class="brand__word">r<span class="brand__rest">ast</span></span>
+      <span class="brand__dot" aria-hidden="true"></span>
+    </a>
+
+    <div class="nav nav--end">
+      <div class="lang"><a href="/blogs" lang="lv" hreflang="lv">LV</a><span aria-current="true">EN</span></div>
+      <a href="/en/?project=1" class="nav__cta cta-button" data-cursor="hover"><span class="cta-button__label">Discuss your project</span><span class="cta-button__spacer" aria-hidden="true">Discuss your project</span><span class="cta-button__arrow" aria-hidden="true"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></span></a>
+    </div>
+
+    <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ============ MOBILE MENU ============ -->
+  <div class="menu" id="menu" aria-hidden="true" inert>
+    <nav class="menu__nav" aria-label="Mobile navigation">
+      <a href="/en/#services"><span class="menu__idx">01</span> Services</a>
+      <a href="/en/#work"><span class="menu__idx">02</span> Work</a>
+      <a href="/en/#principles"><span class="menu__idx">03</span> How we work</a>
+
+      <a href="/en/blogs" aria-current="page"><span class="menu__idx">04</span> Blog</a>
+      <a href="/en/?project=1"><span class="menu__idx">05</span> Contact</a>
+    </nav>
+    <div class="menu__foot"><a href="/blogs" lang="lv" hreflang="lv">LV</a>
+      <a href="mailto:hello@raststudio.lv">hello@raststudio.lv</a>
+      <span>Latvia</span>
+    </div>
+  </div>
+
+  <main id="main" class="blog">
+    <div class="container">
+      <h1 class="blog__title">Blog<span class="accent">.</span></h1>
+      <p class="blog__lead">Useful reading before you begin.</p>
+
+      <div class="insights__grid">
+        <a class="insight" href="/en/raksti/cik-maksa-majaslapa" data-cursor="hover">
+          <h2 class="insight__title">How much does a website cost in Latvia?</h2>
+          <p class="insight__desc">What determines the price and what to compare when reviewing proposals.</p>
+        </a>
+        <a class="insight" href="/en/raksti/wordpress-vai-pielagots" data-cursor="hover">
+          <h2 class="insight__title">WordPress or a custom website?</h2>
+          <p class="insight__desc">How to compare long-term costs and choose the right solution for your needs.</p>
+        </a>
+        <a class="insight" href="/en/raksti/ka-sagatavoties-izstradei" data-cursor="hover">
+          <h2 class="insight__title">How to prepare for website development</h2>
+          <p class="insight__desc">What to consider and prepare before your first conversation about a website.</p>
+        </a>
+      </div>
+    </div>
+  </main>
+  <footer class="container"><nav class="legal-footer" aria-label="Legal information"><a href="/en/privatums">Privacy policy</a><a href="/en/privatums#sikdatnes">Cookies</a><a href="/en/noteikumi">Terms</a></nav></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script src="/js/legal-scroll.js"></script>
+  <script src="/js/tab-title.js"></script>
+</body>
+</html>

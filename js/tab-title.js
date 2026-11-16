@@ -7,7 +7,10 @@
 (function () {
   'use strict';
 
-  var AWAY_TITLE = 'Kur tu pazudi?';   // shown while the tab is in the background
+  // Shown while the tab is in the background — picked by page language (<html lang>).
+  var AWAY_TITLES = { lv: 'Kur tu pazudi?', en: 'Where did you go?', ru: 'Ты куда?' };
+  var lang = (document.documentElement.lang || 'lv').slice(0, 2).toLowerCase();
+  var AWAY_TITLE = AWAY_TITLES[lang] || AWAY_TITLES.lv;
 
   if (typeof document.hidden === 'undefined') return;   // very old browser: do nothing
 

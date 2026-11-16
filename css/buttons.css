@@ -1,0 +1,33 @@
+/* ICX40 sliding-arrow interaction, with the original RAST button sizes,
+   typography, palette and pill shape. Attribution: button-design-LICENSE.txt. */
+.cta-button {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  overflow: hidden; font-family: var(--font-sans);
+}
+.cta-button::before { content: none; }
+.cta-button > .cta-button__spacer {
+  position: relative; visibility: hidden; display: inline-flex; align-items: center; gap: 10px;
+}
+.cta-button > .cta-button__label,
+.cta-button > .cta-button__arrow {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  gap: 10px; pointer-events: none; transition: transform .3s ease;
+}
+.cta-button > .cta-button__arrow {
+  background: var(--ink); color: var(--accent); transform: translateX(-100%);
+}
+.cta-button.nav__cta > .cta-button__arrow { background: var(--accent); color: var(--bg); }
+.cta-button.btn--solid:is(:hover, :focus-visible) {
+  background: var(--accent); color: var(--bg); transform: none; box-shadow: none;
+}
+.cta-button:is(:hover, :focus-visible) > .cta-button__label { transform: translateX(100%); }
+.cta-button:is(:hover, :focus-visible) > .cta-button__arrow { transform: translateX(0); }
+.cta-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .cta-button > .cta-button__label, .cta-button > .cta-button__arrow { transition: none; }
+}
+
+/* copy/: rounded rectangles instead of pills (Raivis, 2026-10-16). One value for every button,
+   so it is easy to tune; the sliding arrow follows it through overflow: hidden. */
+:root { --btn-radius: 12px; }
+.btn, .nav__cta, .cta-button { border-radius: var(--btn-radius); }

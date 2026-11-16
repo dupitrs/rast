@@ -1,0 +1,62 @@
+Juridisko lapu publicēšanas dati — /copy priekšskatījums
+Sagatavots 2026-11-11. Šis fails ir darba piezīme, nevis klientu līgums.
+
+Apstiprināts sarunā
+- Zīmols: rast.
+- Klientu līgumus slēdz Raivis Reinfelds; viņš ir pakalpojuma sniedzējs.
+- Emins Nasirovs piedalās darbā, bet nav automātiski klienta līguma puse.
+- Abi ir reģistrējuši saimniecisko darbību un kopīgi apstrādā pieteikumus.
+- Hostings: GitHub Pages. E-pasts: Gmail. Domēns reģistrēts NIC.
+- Forma kodā: Web3Forms; nav analītikas vai reklāmas skriptu.
+
+Pirms juridiskos dokumentus uzskatīt par pabeigtiem
+1. Precizēt faktisko pakalpojuma sniedzēju(-us) un piemērojamos publiskos
+   rekvizītus. Nedrīkst automātiski pieprasīt abu mājas adreses. VID
+   e-komercijas skaidrojums norāda faktisko saimnieciskās darbības vietu
+   (arī tīmekļvietni), nevis deklarēto dzīvesvietu, un fiziskas personas
+   identifikācijas koda otro daļu. Informācijas sabiedrības pakalpojumu
+   likuma 4. pantā savukārt ir norāde uz deklarēto dzīvesvietu. Šo prasību
+   piemērošana konkrētajai vietnei jāprecizē ar VID/PTAC pirms publicēt
+   mājas adreses vai atzīt rekvizītu sadaļu par pabeigtu. Precizēt PVN
+   statusu. Personas kodi šajā projektā nav ievietoti.
+2. Precizēt datu apstrādes lomas pēc faktiskās lēmumu pieņemšanas.
+   Līgumu slēdzējs vai piekļuve pieteikumiem vien nenosaka VDAR lomu.
+   Ja abi nosaka apstrādes nolūkus un līdzekļus, fiksēt 26. panta
+   vienošanos; ja Emins apstrādā datus Raivja uzdevumā, noteikt
+   attiecībām atbilstošu pilnvarojumu / apstrādes līgumu.
+   Gala lomas un tiesību īstenošanas kārtību norādīt privātuma politikās.
+3. Apstiprināt piedāvāto 12 mēnešu termiņu neslēgtu projektu sarakstei.
+   Tas ir organizatorisks noteikums; vietnes kods Gmail neko automātiski
+   nedzēš. Ieviest regulāru pārskatīšanu un dzēšanu arī pie apstrādātājiem.
+   Web3Forms publicētā maksimālā glabāšana ir līdz 3 gadiem; īsāku termiņu
+   mūsu pastkastē nedrīkst aprakstīt kā dzēšanu visās sistēmās.
+4. Web3Forms kontā pārbaudīt faktiskos saņēmējus, papildintegrācijas,
+   dzēšanas iespējas, apstrādes līgumu un starptautisko pārsūtīšanu.
+   Pārbaudīt Gmail konta veidu un uzņēmējdarbības datu apstrādei
+   piemērojamos noteikumus; patērētāju Gmail un Workspace līgumi atšķiras.
+   Ārējo Google Fonts/CDN lietošana politikā ir atklāta. Lokāla resursu
+   glabāšana samazinātu ārējo saņēmēju skaitu, bet šajā izmaiņā nav veikta.
+5. Apmeklētāju skatā darba piezīmes ir noņemtas un dizains saskaņots ar
+   esošo lapu. Tas neatceļ iepriekš minētos nepabeigtos juridiskos jautājumus.
+   Pirms publicēšanas jāsakrīt faktiskajiem rekvizītiem, datu apstrādes
+   lomām un glabāšanas kārtībai. /copy paliek lokāls priekšskatījums;
+   publicēšana nav veikta.
+
+Līgumi
+Kontaktforma ir tikai pieprasījums. Konkrētā līguma sniedzējs, nodokļi,
+darba apjoms, apmaksa, autortiesības un patērētāja pirmslīguma informācija
+jānosaka faktiskajā piedāvājumā/līgumā. Šis darbs neveido klienta līgumu.
+
+Avoti
+https://likumi.lv/ta/id/96619 (4. un 7.1 pants)
+https://eur-lex.europa.eu/eli/reg/2016/679/oj?locale=lv (6., 13., 26., 28. pants)
+https://www.dvi.gov.lv/lv/jaunums/dviskaidro-kas-ir-sikdatnu-politika
+https://web3forms.com/privacy
+https://web3forms.com/dpa
+https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
+https://policies.google.com/privacy
+
+Precizējums par publiskajiem rekvizītiem:
+https://www.vid.gov.lv/lv/biezak-uzdotie-jautajumi-katalogs/e-komercija
+
+Valodas: /copy priekšskatījumā uzturam tikai LV un EN.

@@ -1,0 +1,131 @@
+/* ============================================================
+   STUDIO — the orange dot tears open into a rift, the questions unfold out of it
+   (copy/ page only; driven by /js/studio-burst.js)
+   Default = a plain static section (no JS, reduced motion, .no-anim).
+   With JS the section grows tall and the stage sticks, so the rift is
+   scrubbed by scroll. .burst__fx is a FIXED full-screen layer: its walls
+   fade away as the next section ends.
+   ============================================================ */
+.burst { position: relative; background: var(--bg); }
+.burst__stage {
+  position: relative;
+  display: grid; place-items: center;
+  padding: clamp(90px, 13vw, 200px) 0;
+  overflow: hidden;
+}
+.burst__fx { display: none; }
+/* No visible heading — the questions speak for themselves; the h2 is there for screen readers
+   and the page outline. */
+.burst__title {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* Questions ordered by service priority: broad needs first, specific tasks last.
+   The tier sets size and brightness: 1 loud (the main needs), 4 quiet (specific tasks).
+   Static layout: one centred block, centre-weighted — the loud lines in the middle, each quieter
+   tier split into a row above and a row below them. */
+.burst__qs {
+  position: relative; z-index: 1;
+  list-style: none; margin: 0 auto; padding: 0 var(--gutter);
+  max-width: 1180px;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline;
+  gap: 0.7em 1.5em;
+  text-align: center;
+}
+.bq { font-family: var(--font-display); line-height: 1.12; letter-spacing: -0.02em; text-wrap: balance; }
+.bq__t { display: inline-block; }
+.bq--1 { flex-basis: 100%; font-size: clamp(34px, 5.8vw, 104px); font-weight: 600; letter-spacing: -0.03em; color: var(--ink); }
+.bq--2 { font-size: clamp(17px, 2.65vw, 46px); font-weight: 500; color: rgba(var(--ink-rgb), 0.86); }
+.bq--3 { font-family: var(--font-sans); font-size: clamp(14px, 1.75vw, 30px); letter-spacing: 0; color: var(--ink-dim); }
+.bq--4 { font-family: var(--font-sans); font-size: clamp(12.5px, 1.3vw, 23px); letter-spacing: 0.01em; color: var(--ink-faint); }
+.bq--4:nth-child(odd of .bq--4) { order: 1; }
+.bq--3:nth-child(odd of .bq--3) { order: 2; }
+.bq--2:nth-child(odd of .bq--2) { order: 3; }
+.bq--1 { order: 4; }
+.bq--2:nth-child(even of .bq--2) { order: 5; }
+.bq--3:nth-child(even of .bq--3) { order: 6; }
+.bq--4:nth-child(even of .bq--4) { order: 7; }
+
+/* ---- Animated: tall section, sticky full-screen stage ---- */
+.js:not(.no-anim) .burst { height: calc(var(--svh1, 1svh) * 290); }   /* keep in step with RANGE_H in studio-burst.js */
+.js:not(.no-anim) .burst__stage {
+  position: sticky; top: 0;
+  height: calc(var(--svh1, 1svh) * 100);
+  padding: 0;
+}
+/* Above the section contents (the questions unfold BEHIND the walls and the liquid) AND above
+   the orb (800): the orb fades out over the hand-over dot, and its blend layers would grey it.
+   Below the header (1000). JS toggles visibility. */
+.js:not(.no-anim) .burst__fx {
+  display: block; position: fixed; inset: 0; z-index: 801;
+  width: 100%; height: 100%;
+  pointer-events: none; visibility: hidden;
+}
+/* While the rift is on screen it IS the orange dot — the travelling orb hides, so scrolling
+   back up never shows two dots (main.js keeps driving it; this only masks it). */
+html.burst-live #fxOrb, html.burst-live #fxOrbInk { visibility: hidden !important; }
+/* The cloud: studio-burst.js sets the type as large as still fits, packs the questions around the
+   centre between the walls (--qs-w = the free width there) and moves each one in with the scroll. */
+.js:not(.no-anim) .burst__qs { position: absolute; inset: 0; max-width: none; padding: 0; display: block; }
+.js:not(.no-anim) .bq {
+  position: absolute; left: 0; top: 0;
+  width: max-content; max-width: calc(var(--qs-w, 80vw) * 0.7);
+  opacity: 0; will-change: transform, opacity;
+}
+.js:not(.no-anim) .bq--1 { max-width: var(--qs-w, 90vw); }
+.js:not(.no-anim) .bq--2 { max-width: var(--qs-w, 90vw); }
+.js:not(.no-anim) .bq--3 { max-width: calc(var(--qs-w, 80vw) * 0.8); }
+/* Compact longer questions so the cloud can spread sideways instead of forming full-width rows. */
+@media (min-width: 900px) {
+  .js:not(.no-anim) .bq--2 { max-width: calc(var(--qs-w, 90vw) * 0.48); }
+  .js:not(.no-anim) .bq--3 { max-width: calc(var(--qs-w, 80vw) * 0.4); }
+}
+/* The two loud lines rise out of a mask, like a line of type; padding keeps ā, ī inside it. */
+.js:not(.no-anim) .bq--1 { overflow: hidden; padding: 0.06em 0.08em 0.12em; }
+.js:not(.no-anim) .bq--1 .bq__t { transform: translateY(130%); }
+/* Left out when it does not fit between the walls (small screens): stays readable to screen
+   readers, never shown. */
+.js:not(.no-anim) .bq.is-out { opacity: 0 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .burst { height: auto !important; }
+  .burst__stage { position: relative !important; height: auto !important; padding: clamp(90px, 13vw, 200px) 0 !important; }
+  .burst__fx { display: none !important; }
+  .burst__qs { position: relative !important; display: flex !important; padding: 0 var(--gutter) !important; max-width: 1180px !important; }
+  .bq { position: static !important; width: auto !important; max-width: none !important; opacity: 1 !important; transform: none !important; }
+  .bq--1 { overflow: visible !important; padding: 0 !important; }
+  .bq__t { transform: none !important; }
+}
+
+/* ============================================================
+   INTRO without the video (copy/ only) — see measure()/updateOrb in copy/js/main.js
+   ============================================================ */
+/* No empty stretch: #studio overlaps the hero's foot, transparent, so the orange dot at its
+   stage centre comes up from below as the particles gather into the white dot and runs into it
+   as the stage pins (≈1.05 screens in). The shorter assembly and earlier overlap bring the
+   strike half a screen closer; main.js measures this position and shortens the gather with it.
+   pointer-events off, so nothing
+   under the transparent stage is blocked. */
+.js:not(.no-anim) .assembly { height: calc(var(--svh1, 1svh) * 20); }
+.js:not(.no-anim) #studio.burst {
+  margin-top: calc(var(--svh1, 1svh) * -15);
+  background: transparent; pointer-events: none;
+}
+/* The white orb now fades straight into the ORANGE dot (not the video's grey sphere):
+   --ow is a white overlay on top of the brand gradient. */
+.fx-orb.is-white::after {
+  background:
+    linear-gradient(rgba(255, 255, 255, var(--ow, 0)), rgba(255, 255, 255, var(--ow, 0))),
+    radial-gradient(circle at 38% 34%, var(--accent-soft), var(--accent) 46%, var(--accent-deep) 100%);
+}
+/* Flat, the orange must already sit at the blend pair's ~4% darker tone the traveller uses,
+   so the hand-over to the travelling (blended) orb is a no-op on screen; pure white stays 100%. */
+.fx-orb.is-flat.is-white { filter: brightness(calc(0.96 + 0.04 * var(--ow, 0))); }
+
+/* The real wordmark inline in running text ("Esam rast•"): the header's .brand, sized to the line. */
+.brand--inline {
+  display: inline-flex; gap: 0.16em; vertical-align: baseline;
+  font-size: 1.18em; color: var(--ink); white-space: nowrap;
+}
+.brand--inline .brand__dot { width: 0.34em; height: 0.34em; margin-top: 0.02em; }

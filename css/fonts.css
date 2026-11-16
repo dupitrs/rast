@@ -1,0 +1,6 @@
+/* copy/: Lexend Deca for headlines, Karla for body text (picked in the font panel).
+   Bricolage and Inter stay loaded: a few principle illustrations and canvases name them. */
+:root {
+  --font-display: 'Lexend Deca', system-ui, sans-serif;
+  --font-sans:    'Karla', system-ui, sans-serif;
+}

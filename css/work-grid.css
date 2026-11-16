@@ -1,0 +1,10 @@
+/* The English portfolio uses a two-column grid rather than the LV mosaic. */
+.work__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
+}
+.work__grid > .work__card { width: 100%; min-width: 0; aspect-ratio: 1.55; min-height: 240px; }
+@media (max-width: 760px) {
+  .work__grid { grid-template-columns: minmax(0, 1fr); }
+}

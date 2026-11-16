@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0C" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <title>Jura Zuitiņa privātprakse - projekts | rast studija</title>
+  <meta name="description" content="Kā psihoterapeita Jura Zuitiņa lapa pārcēlās no Google Sites apakšdomēna lv.zuitins.lv uz savu adresi zuitins.lv: kā bija, kā ir tagad, kas mainījās katrā sadaļā un kā lapa tapa 11 dienās." />
+  <link rel="canonical" href="https://www.raststudio.lv/darbi/juris-zuitins" />
+
+  <!-- Open Graph / social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.raststudio.lv/darbi/juris-zuitins" />
+  <meta property="og:site_name" content="rast studija" />
+  <meta property="og:locale" content="lv_LV" />
+  <meta property="og:title" content="Jura Zuitiņa privātprakse - projekts | rast studija" />
+  <meta property="og:description" content="Kā psihoterapeita Jura Zuitiņa lapa pārcēlās no Google Sites apakšdomēna lv.zuitins.lv uz savu adresi zuitins.lv: kā bija, kā ir tagad, kas mainījās katrā sadaļā un kā lapa tapa 11 dienās." />
+  <meta property="og:image" content="https://www.raststudio.lv/assets/work-zuitins.png" />
+  <meta property="og:image:width" content="1300" />
+  <meta property="og:image:height" content="975" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Structured data: case study -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "Jura Zuitiņa privātprakses mājaslapa",
+    "headline": "Jura Zuitiņa privātprakse - projekts",
+    "url": "https://www.raststudio.lv/darbi/juris-zuitins",
+    "image": "https://www.raststudio.lv/assets/work-zuitins.png",
+    "inLanguage": "lv",
+    "creator": {
+      "@type": "Organization",
+      "name": "rast studija",
+      "url": "https://www.raststudio.lv/",
+      "logo": { "@type": "ImageObject", "url": "https://www.raststudio.lv/assets/logo-512.png" }
+    },
+    "about": "Jura Zuitiņa privātprakse, psihoterapija un psihologa konsultācijas Rīgā",
+    "description": "Mājaslapa latviešu un krievu valodā, pārcelta no Google Sites apakšdomēna uz galveno adresi zuitins.lv."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Sākums", "item": "https://www.raststudio.lv/" },
+      { "@type": "ListItem", "position": 2, "name": "Jura Zuitiņa privātprakse", "item": "https://www.raststudio.lv/darbi/juris-zuitins" }
+    ]
+  }
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400..800&family=Karla:wght@400..800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    /* Case-study page - reuses the site's tokens, buttons and type from styles.css */
+    .cs-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
+      padding: 18px var(--gutter); background: rgba(var(--bg-rgb), .72); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .cs-nav .brand { display: inline-flex; align-items: flex-start; gap: 5px; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; }
+    .cs-back { font-family: var(--font-sans); font-size: 13px; color: var(--ink-dim); letter-spacing: .04em; }
+    .cs-back:hover { color: var(--accent); }
+    .cs-hero { padding: clamp(56px, 9vw, 120px) 0 clamp(28px, 4vw, 50px); }
+    .cs-title { font-family: var(--font-display); font-weight: 700; letter-spacing: -.03em; line-height: 1.02;
+      font-size: clamp(40px, 8vw, 104px); margin: 14px 0 22px; }
+    .cs-lead { color: var(--ink-dim); font-size: clamp(17px,1.5vw,21px); line-height: 1.65; max-width: 60ch; margin: 0 0 26px; }
+    .cs-meta { display: flex; flex-wrap: wrap; gap: 12px 28px; font-family: var(--font-sans); font-size: 13px; color: var(--ink-dim); letter-spacing: .03em; }
+    .cs-meta b { color: var(--ink); font-weight: 400; }
+    .k { font-family: var(--font-sans); font-size: 12px; color: var(--accent); letter-spacing: .14em; text-transform: uppercase; display: block; margin-bottom: 10px; }
+
+    /* ---- Parādīšanās ritinot ---- */
+    [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+    [data-reveal].in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; transition: none; } }
+
+    /* ---- "Bija / ir" slīdnis ---- */
+    .cs-cmp { margin: clamp(28px,4vw,52px) 0 0; }
+    .cs-cmp__head { display: grid; grid-template-columns: 1fr auto; gap: 16px 40px; align-items: end; margin-bottom: 18px; }
+    .cs-cmp__head h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,3vw,40px); letter-spacing: -.02em; }
+    .cs-cmp__head p { color: var(--ink-dim); font-size: clamp(15px,1.2vw,17px); line-height: 1.6; max-width: 40ch; }
+    .cs-cmp__stage { --pos: 50%; position: relative; aspect-ratio: 1300 / 812; border: 1px solid var(--line-2); border-radius: var(--radius);
+      overflow: hidden; background: var(--surface); user-select: none; -webkit-user-select: none; touch-action: pan-y;
+      box-shadow: 0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.02); }
+    .cs-cmp__stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .cs-cmp__stage img.ir { clip-path: inset(0 0 0 var(--pos)); }
+    .cs-cmp__line { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: var(--accent); pointer-events: none; box-shadow: 0 0 0 1px rgba(0,0,0,.25); }
+    .cs-cmp__knob { position: absolute; top: 50%; left: var(--pos); transform: translate(-50%, -50%); width: 46px; height: 46px; border-radius: 50%;
+      background: var(--accent); color: var(--bg); display: grid; place-items: center; font-family: var(--font-sans); font-weight: 600; font-size: 15px;
+      letter-spacing: -.05em; pointer-events: none; box-shadow: 0 10px 30px -8px rgba(0,0,0,.6); transition: transform .25s var(--ease); }
+    .cs-cmp__stage:hover .cs-cmp__knob, .cs-cmp__stage:focus-within .cs-cmp__knob { transform: translate(-50%, -50%) scale(1.08); }
+    .cs-cmp__range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; -webkit-appearance: none; appearance: none; }
+    .cs-cmp__range::-webkit-slider-thumb { -webkit-appearance: none; width: 60px; height: 100%; }
+    .cs-cmp__range::-moz-range-thumb { width: 60px; height: 100%; border: 0; }
+    .cs-cmp__stage:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .cs-tag { position: absolute; top: 14px; font-family: var(--font-sans); font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+      padding: 7px 12px; border-radius: 999px; background: rgba(10,10,12,.78); color: var(--ink); backdrop-filter: blur(8px); pointer-events: none; }
+    .cs-tag--bija { left: 14px; }
+    .cs-tag--ir { right: 14px; color: var(--accent); }
+    .cs-cmp__hint { margin-top: 12px; font-family: var(--font-sans); font-size: 12px; color: var(--ink-faint); letter-spacing: .03em; text-align: center; }
+    @media (max-width: 760px) { .cs-cmp__head { grid-template-columns: 1fr; } .cs-cmp__knob { width: 40px; height: 40px; } }
+
+    /* ---- Teksta bloki ---- */
+    .cs-body { display: grid; grid-template-columns: 1fr; gap: clamp(56px,8vw,120px); padding: clamp(40px,6vw,80px) 0 clamp(60px,9vw,120px); }
+    .cs-block { display: grid; grid-template-columns: 0.5fr 1fr; gap: clamp(18px,4vw,60px); align-items: start; }
+    .cs-block h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,3vw,40px); letter-spacing: -.02em; }
+    .cs-block h3 { font-family: var(--font-display); font-weight: 600; font-size: clamp(19px,1.8vw,24px); letter-spacing: -.01em; margin: 0 0 8px; }
+    .cs-block p { color: var(--ink-dim); font-size: clamp(16px,1.3vw,18px); line-height: 1.75; max-width: 62ch; }
+    .cs-block p + p { margin-top: 16px; }
+    .cs-block p + h3, .cs-block ul + h3, .cs-block .cs-3d + h3 { margin-top: 30px; }
+    .cs-list { list-style: none; margin: 10px 0 0; padding: 0; }
+    .cs-list li { color: var(--ink-dim); padding: 10px 0 10px 26px; position: relative; border-top: 1px solid var(--line); line-height: 1.6; }
+    .cs-list li:first-child { border-top: 0; }
+    .cs-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+    .cs-list b { color: var(--ink); font-weight: 500; }
+    /* contain: inline-size, lai plaukta piecu parakstu min-content neizstiepj visu lapu telefonā */
+    .cs-wide { grid-column: 1 / -1; min-width: 0; contain: inline-size; }
+
+    /* ---- 3D pamats ----
+       Katrs .cs-3d ir perspektīvas skatuve. Kartītes tajā ir nedaudz pagrieztas, ar dziļuma
+       ēnu; pele skatuvi viegli pašūpo (JS), uz skārienekrāna un ar reduced-motion tā stāv mierā. */
+    .cs-3d { perspective: 1500px; }
+    .cs-3d__scene { transform-style: preserve-3d; transition: transform .6s var(--ease); will-change: transform; }
+    .cs-card { border: 1px solid var(--line-2); border-radius: 14px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 30px 60px -24px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.03) inset; }
+    .cs-card img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+    .cs-chip { position: absolute; left: 12px; bottom: 12px; font-family: var(--font-sans); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+      padding: 6px 10px; border-radius: 999px; background: rgba(10,10,12,.82); color: var(--ink); backdrop-filter: blur(8px); white-space: nowrap; }
+    .cs-chip.ir { color: var(--accent); }
+
+    /* Kaudze: trīs vecās lapas ekrāni cits aiz cita */
+    .cs-stack { position: relative; aspect-ratio: 4 / 3; margin: 8px 0 0; }
+    .cs-stack .cs-card { position: absolute; width: 70%; aspect-ratio: 1100 / 688; }
+    .cs-stack .c1 { left: 0; top: 0; transform: rotateY(-14deg) rotateX(5deg) translateZ(-120px); z-index: 1; opacity: .8; }
+    .cs-stack .c2 { left: 15%; top: 19%; transform: rotateY(-14deg) rotateX(5deg) translateZ(-60px); z-index: 2; opacity: .9; }
+    .cs-stack .c3 { left: 30%; top: 38%; transform: rotateY(-14deg) rotateX(5deg); z-index: 3; }
+
+    /* Rinda: piecas jaunās sadaļas kā grāmatas plauktā */
+    .cs-shelf { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin: 14px 0 0; padding: 30px 3% 24px 0; }
+    .cs-shelf figure { margin: 0; transform: rotateY(-28deg); transform-style: preserve-3d; transition: transform .5s var(--ease), z-index 0s; position: relative; z-index: 1; margin-right: -6%; }
+    .cs-shelf figure:hover { transform: rotateY(-4deg) translateZ(60px) scale(1.04); z-index: 5; }
+    .cs-shelf .cs-card { aspect-ratio: 1100 / 688; }
+    .cs-shelf figcaption { margin-top: 12px; font-family: var(--font-sans); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-dim); }
+    .cs-shelf figcaption small { display: block; text-transform: none; letter-spacing: 0; color: var(--ink-faint); font-size: 12px; margin-top: 3px; }
+    @media (max-width: 900px) {
+      .cs-shelf { display: flex; overflow-x: auto; gap: 14px; padding: 8px 0 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+      .cs-shelf figure { flex: 0 0 72%; margin-right: 0; transform: none; scroll-snap-align: start; }
+      .cs-shelf figure:hover { transform: none; }
+    }
+
+    /* Sadaļu bloki: attēls vienā pusē, teksts otrā; attēls pagriezts uz teksta pusi */
+    .cs-sec { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px,4vw,64px); align-items: center; }
+    .cs-sec__img { position: relative; }
+    .cs-sec__img .cs-card { aspect-ratio: 1100 / 688; }
+    .cs-sec__img .cs-card.tall { aspect-ratio: 900 / 1200; }
+    .cs-sec__img .cs-card.tall img { object-position: top; }
+    .cs-sec--l .cs-3d__scene { transform: rotateY(12deg) rotateX(3deg); }
+    .cs-sec--r .cs-3d__scene { transform: rotateY(-12deg) rotateX(3deg); }
+    .cs-sec--r .cs-sec__img { order: 2; }
+    .cs-sec__inset { position: absolute; right: -6%; bottom: -10%; width: 46%; aspect-ratio: 1100 / 688; transform: translateZ(70px); }
+    .cs-card.tall + .cs-sec__inset { bottom: 3%; width: 42%; aspect-ratio: 900 / 1200; }
+    .cs-sec__inset .cs-chip { left: 10px; bottom: 10px; }
+    .cs-sec__phone { position: absolute; right: -4%; bottom: -8%; width: 26%; aspect-ratio: 390 / 844; border-radius: 22px; transform: translateZ(90px) rotateY(-8deg); border: 6px solid #1c1c22; }
+    .cs-sec__phone img { object-position: top; }
+    @media (max-width: 760px) {
+      .cs-sec { grid-template-columns: 1fr; }
+      .cs-sec--r .cs-sec__img { order: 0; }
+      .cs-sec__img { margin-bottom: 26px; }
+      .cs-sec--l .cs-3d__scene, .cs-sec--r .cs-3d__scene { transform: rotateY(-6deg) rotateX(2deg); }
+      .cs-sec__inset { right: 0; bottom: -12%; }
+    }
+
+    /* Salīdzinājuma tabula */
+    .cs-diff { margin-top: 6px; border-top: 1px solid var(--line-2); }
+    .cs-diff__row { display: grid; grid-template-columns: 0.7fr 1fr 1fr; gap: 12px 24px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: start; }
+    .cs-diff__row--head { padding: 10px 0; font-family: var(--font-sans); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+    .cs-diff__row--head .ir { color: var(--accent); }
+    .cs-diff__k { font-family: var(--font-sans); font-size: 13px; color: var(--ink); letter-spacing: .02em; padding-top: 2px; }
+    .cs-diff__bija { color: var(--ink-faint); font-size: 15px; line-height: 1.55; }
+    .cs-diff__ir { color: var(--ink-dim); font-size: 15px; line-height: 1.55; }
+    .cs-diff__ir b { color: var(--ink); font-weight: 500; }
+    @media (max-width: 760px) {
+      .cs-diff__row { grid-template-columns: 1fr; gap: 6px; }
+      .cs-diff__row--head { display: none; }
+      .cs-diff__k { color: var(--accent); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+      .cs-diff__bija::before { content: "Bija: "; color: var(--ink-faint); font-family: var(--font-sans); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+      .cs-diff__ir::before { content: "Ir: "; color: var(--accent); font-family: var(--font-sans); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+    }
+
+    /* Telefoni: trīs, viegli pagriezti viens pret otru */
+    .cs-phones { display: grid; grid-template-columns: repeat(3, minmax(0, 230px)); gap: clamp(14px,3vw,40px); justify-content: start; margin-top: 14px; padding: 16px 0; }
+    .cs-phone { text-align: center; margin: 0; transform-style: preserve-3d; transition: transform .5s var(--ease); }
+    .cs-phone:nth-child(1) { transform: rotateY(18deg) rotateX(2deg); }
+    .cs-phone:nth-child(2) { transform: rotateY(0) translateZ(40px); }
+    .cs-phone:nth-child(3) { transform: rotateY(-18deg) rotateX(2deg); }
+    .cs-phone:hover { transform: rotateY(0) translateZ(70px); }
+    .cs-phone__frame { aspect-ratio: 390 / 844; border-radius: 30px; overflow: hidden; border: 7px solid #1c1c22; background: var(--surface);
+      box-shadow: 0 40px 70px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.06); }
+    .cs-phone__frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+    .cs-phone figcaption { margin-top: 14px; font-family: var(--font-sans); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+    .cs-phone--ir figcaption { color: var(--accent); }
+    @media (max-width: 600px) { .cs-phones { grid-template-columns: repeat(3, 1fr); gap: 10px; } .cs-phone__frame { border-width: 4px; border-radius: 18px; } }
+
+    /* Gaita: četras sākumlapas versijas kā kadri, kas iet dziļumā */
+    .cs-film { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px,2vw,28px); margin-top: 14px; padding: 20px 0 10px; }
+    .cs-film figure { margin: 0; transform-style: preserve-3d; transition: transform .5s var(--ease); }
+    .cs-film figure:nth-child(1) { transform: rotateY(14deg) translateZ(-40px); }
+    .cs-film figure:nth-child(2) { transform: rotateY(6deg) translateZ(-10px); }
+    .cs-film figure:nth-child(3) { transform: rotateY(-6deg) translateZ(-10px); }
+    .cs-film figure:nth-child(4) { transform: rotateY(-14deg) translateZ(-40px); }
+    .cs-film figure:hover { transform: rotateY(0) translateZ(50px); }
+    .cs-film .cs-card { aspect-ratio: 1100 / 688; }
+    .cs-film figcaption { margin-top: 12px; font-family: var(--font-sans); font-size: 12px; color: var(--ink-dim); line-height: 1.5; }
+    .cs-film figcaption b { display: block; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; font-weight: 500; margin-bottom: 4px; }
+    @media (max-width: 760px) { .cs-film { grid-template-columns: repeat(2, 1fr); } .cs-film figure { transform: none !important; } }
+
+    .cs-steps { list-style: none; margin: 26px 0 0; padding: 0; }
+    .cs-steps li { display: grid; grid-template-columns: 96px 1fr; gap: 18px; padding: 14px 0; border-top: 1px solid var(--line); }
+    .cs-steps li:first-child { border-top: 0; }
+    .cs-steps .d { font-family: var(--font-sans); font-size: 13px; color: var(--accent); letter-spacing: .04em; padding-top: 3px; white-space: nowrap; }
+    .cs-steps .t { color: var(--ink); font-size: 16px; }
+    .cs-steps .t small { display: block; color: var(--ink-dim); font-size: 15px; line-height: 1.6; margin-top: 3px; }
+    @media (max-width: 480px) { .cs-steps li { grid-template-columns: 1fr; gap: 4px; } }
+
+    /* Tehniskā puse: fakti režģī */
+    .cs-tech { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 8px; }
+    .cs-tech div { border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; background: var(--surface); }
+    .cs-tech b { display: block; color: var(--ink); font-weight: 500; font-size: 15px; margin-bottom: 6px; }
+    .cs-tech span { color: var(--ink-dim); font-size: 14px; line-height: 1.6; }
+    @media (max-width: 600px) { .cs-tech { grid-template-columns: 1fr; } }
+
+    .cs-result { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px,3vw,40px); margin-top: 8px; }
+    .cs-stat .n { font-family: var(--font-display); font-weight: 600; font-size: clamp(20px,2vw,27px); letter-spacing: -.02em; line-height: 1.15; color: var(--ink); display: block; }
+    .cs-stat .l { font-family: var(--font-sans); font-size: 12px; color: var(--ink-dim); margin-top: 8px; display: block; }
+    .cs-cta { border-top: 1px solid var(--line); padding: clamp(50px,8vw,100px) 0; text-align: center; }
+    .cs-cta h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px,5vw,64px); letter-spacing: -.03em; line-height: 1.05; }
+    .cs-cta .row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+    @media (max-width: 760px) { .cs-block { grid-template-columns: 1fr; gap: 12px; } .cs-result { grid-template-columns: 1fr; gap: 22px; } }
+    @media (prefers-reduced-motion: reduce) { .cs-3d__scene, .cs-phone, .cs-film figure, .cs-shelf figure { transition: none; } }
+  </style>
+<link rel="stylesheet" href="/css/fonts.css" /><link rel="stylesheet" href="/css/palette.css" /><script src="/js/palette.js"></script></head>
+<body>
+  <nav class="cs-nav">
+    <a href="/" class="brand"><span class="brand__word">rast</span><span class="brand__dot" aria-hidden="true"></span></a>
+    <a href="/#work" class="cs-back">← Visi darbi</a>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="container">
+        <p class="eyebrow"><span class="dot"></span> Projekts</p>
+        <h1 class="cs-title">Jura Zuitiņa privātprakse</h1>
+        <p class="cs-lead">Juris Zuitiņš ir psihologs un psihoterapijas speciālists Rīgā. Viņa lapa pastāvēja jau sen, bet Google Sites veidnē un apakšdomēnā. Šis ir stāsts par to, kā to pārcēlām uz savu adresi, saglabājot visu, kas Jurim bija svarīgs.</p>
+        <div class="cs-meta">
+          <span>Joma: <b>Psihoterapija un konsultācijas</b></span>
+          <span>Darbs: <b>Mājaslapa latviešu un krievu valodā</b></span>
+          <span>Gads: <b>2026</b></span>
+          <span><a class="accent" href="https://zuitins.lv" target="_blank" rel="noopener">Aplūkot lapu ↗</a></span>
+        </div>
+
+        <section class="cs-cmp" aria-labelledby="cmp-title">
+          <div class="cs-cmp__head">
+            <h2 id="cmp-title"><span class="k">Bija un ir</span>Pavelc un salīdzini</h2>
+            <p>Pa kreisi vecā lapa Google Sites vidē, pa labi jaunā zuitins.lv. Tas pats cilvēks, tie paši teksti, cita sajūta.</p>
+          </div>
+          <div class="cs-cmp__stage" id="cmp">
+            <img src="../assets/zuitins/bija-dators.webp" width="1300" height="812" alt="Vecā lapa lv.zuitins.lv: Google Sites veidne ar virsrakstu Sākums, garu teksta kolonnu un sīkdatņu paziņojumu angļu valodā" />
+            <img class="ir" src="../assets/zuitins/ir-dators.webp" width="1300" height="812" alt="Jaunā lapa zuitins.lv: Jura portrets, virsraksts Sastapšanās paver iespēju kļūt un poga Pieteikties konsultācijai" />
+            <span class="cs-tag cs-tag--bija">Bija</span>
+            <span class="cs-tag cs-tag--ir">Ir</span>
+            <div class="cs-cmp__line" aria-hidden="true"></div>
+            <div class="cs-cmp__knob" aria-hidden="true">&lt;&gt;</div>
+            <input class="cs-cmp__range" type="range" min="0" max="100" value="50" step="0.1" aria-label="Salīdzinājuma slīdnis: pa kreisi vecā lapa, pa labi jaunā" />
+          </div>
+          <p class="cs-cmp__hint">Velc slīdni pa kreisi un pa labi</p>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="cs-body">
+
+        <!-- ================= IZAICINĀJUMS ================= -->
+        <section class="cs-block" data-reveal>
+          <h2><span class="k">Izaicinājums</span>Lapa, kas dzīvoja apakšdomēnā</h2>
+          <div>
+            <p>Jurim Zuitiņam mājaslapa jau bija. Viņš pats to bija salicis Google Sites vidē, un tajā bija viss būtiskais: apraksts par psihoterapiju un psiholoģisko konsultēšanu, viņa skatījums uz dzīvi, portrets, kabineta bildes un kontakti. Saturs bija labs. Tas bija Jura paša vārdos, pārdomāts un patiess, un tieši tāpēc to nevajadzēja rakstīt no jauna.</p>
+            <p>Problēma bija čaulā, kurā šis saturs dzīvoja. Latviešu lapa atradās apakšdomēnā lv.zuitins.lv, krievu versija vēl citā adresē ru.zuitins.lv, un tās bija divas atsevišķas Google Sites lapas, kas viena par otru nezināja. Katru apmeklētāju vispirms sagaidīja Google sīkdatņu paziņojums angļu valodā, virs satura stāvēja veidnes virsraksts “Sākums”, un meklēšanas ikona lapas stūrī piedāvāja “Search this site”.</p>
+            <p>Lai piezvanītu, tālrunis bija jāmeklē sadaļā “Kontakti”, jo nevienā citā lapā tā nebija. Meklētājiem lapai nebija apraksta un vietnes kartes, tāpēc Google rādīja to, ko pats izdomāja. Un telefonā, kur psihoterapeitu meklē visbiežāk, viss saplaka vienā garā teksta kolonnā.</p>
+
+            <div class="cs-3d">
+              <div class="cs-stack cs-3d__scene" data-tilt>
+                <figure class="cs-card c1"><img src="../assets/zuitins/bija-ru.webp" width="1100" height="688" alt="Vecā krievu lapa ru.zuitins.lv Google Sites vidē" loading="lazy" /><figcaption class="cs-chip">ru.zuitins.lv</figcaption></figure>
+                <figure class="cs-card c2"><img src="../assets/zuitins/bija-kontakti.webp" width="1100" height="688" alt="Vecās lapas sadaļa Kontakti ar adresi, tālruni un karti" loading="lazy" /><figcaption class="cs-chip">lv.zuitins.lv/kontakti</figcaption></figure>
+                <figure class="cs-card c3"><img src="../assets/zuitins/bija-dators.webp" width="1300" height="812" alt="Vecās lapas sākums ar sīkdatņu paziņojumu" loading="lazy" /><figcaption class="cs-chip">lv.zuitins.lv</figcaption></figure>
+              </div>
+            </div>
+
+            <h3>Kas traucēja</h3>
+            <ul class="cs-list">
+              <li><b>Divas adreses, neviena galvenā.</b> Latviešu un krievu lapa apakšdomēnos, bet pati zuitins.lv adrese cilvēku uz Jura lapu neveda.</li>
+              <li><b>Google, ne Juris.</b> Sīkdatņu paziņojums, angliska saskarne un veidnes virsraksti radīja iespaidu par pagaidu lapu.</li>
+              <li><b>Septiņi punkti izvēlnē.</b> Sākums, Psihoterapija, Psiholoģiskā konsultēšana, Par mani, Bildes, Kontakti un Русский. Bez skaidra nākamā soļa.</li>
+              <li><b>Tālrunis vienā vietā.</b> Lai pieteiktos, bija jānonāk līdz sadaļai “Kontakti”. Nekur citur aicinājuma nebija.</li>
+              <li><b>Meklētājiem nekā.</b> Bez lapas apraksta, bez vietnes kartes, bez norādes, ka LV un RU ir viena un tā pati prakse.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ================= RISINĀJUMS ================= -->
+        <section class="cs-block" data-reveal>
+          <h2><span class="k">Risinājums</span>Tā pati prakse, savā mājā</h2>
+          <div>
+            <p>Lapu uzbūvējām no jauna, bet ne ar jaunu seju. Pirmais melnraksts bija ar citiem burtiem un krēmkrāsas fonu, un Juris teica skaidri: viņa klienti veco lapu pazīst, un viņš grib, lai jaunā ir tās turpinājums. Tāpēc krāsas un Lato fontu pārņēmām no vecās lapas, tekstus atstājām Jura paša vārdos un mainījām tikai to, kas traucēja: struktūru, ritmu, ceļu līdz pieteikšanās brīdim un pašu adresi.</p>
+            <p>Septiņu izvēlnes punktu vietā palika pieci. Sadaļu “Bildes” ievietojām “Kontaktos”, lai kabinetu redz tur, kur skatās adresi, un krievu valoda kļuva par pārslēgu katras lapas augšā, nevis atsevišķu vietni.</p>
+          </div>
+
+          <div class="cs-wide cs-3d">
+            <div class="cs-shelf cs-3d__scene">
+              <figure><div class="cs-card"><img src="../assets/zuitins/ir-dators.webp" width="1300" height="812" alt="Jaunā sākumlapa" loading="lazy" /></div><figcaption>Sākums<small>Portrets, virsraksts, divas pogas</small></figcaption></figure>
+              <figure><div class="cs-card"><img src="../assets/zuitins/ir-psihoterapija.webp" width="1100" height="688" alt="Sadaļa Psihoterapija" loading="lazy" /></div><figcaption>Psihoterapija<small>Jura teksts divās kolonnās</small></figcaption></figure>
+              <figure><div class="cs-card"><img src="../assets/zuitins/ir-konsultacijas.webp" width="1100" height="688" alt="Sadaļa Konsultācijas" loading="lazy" /></div><figcaption>Konsultācijas<small>Ko darīt? Kā rīkoties?</small></figcaption></figure>
+              <figure><div class="cs-card"><img src="../assets/zuitins/ir-par-mani.webp" width="1100" height="688" alt="Sadaļa Par mani" loading="lazy" /></div><figcaption>Par mani<small>Izglītība, sertifikāti, kabinets</small></figcaption></figure>
+              <figure><div class="cs-card"><img src="../assets/zuitins/ir-kontakti.webp" width="1100" height="688" alt="Sadaļa Kontakti ar karti" loading="lazy" /></div><figcaption>Kontakti<small>Tālrunis, e-pasts, adrese, karte</small></figcaption></figure>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sākums -->
+        <section class="cs-sec cs-sec--l" data-reveal>
+          <div class="cs-sec__img cs-3d">
+            <div class="cs-3d__scene" data-tilt>
+              <div class="cs-card tall"><img src="../assets/zuitins/ir-sakums-pilna.webp" width="900" height="1600" alt="Jaunā sākumlapa pilnā garumā: portrets, iepazīšanās, divi pakalpojumi, Jura skatījums un tumšā aicinājuma josla" loading="lazy" /></div>
+              <figure class="cs-card cs-sec__inset" style="margin:0"><img src="../assets/zuitins/bija-sakums-pilna.webp" width="900" height="1600" alt="Vecā sākumlapa pilnā garumā" loading="lazy" /><figcaption class="cs-chip">Bija</figcaption></figure>
+            </div>
+          </div>
+          <div class="cs-block" style="grid-template-columns:1fr">
+            <h2><span class="k">Sākums</span>Viens ekrāns, kas pasaka visu</h2>
+            <div>
+              <p>Vecajā lapā sākums bija viens garš teksts. Jaunajā to sadalījām ritmā. Augšā portrets, virsraksts “Sastapšanās paver iespēju kļūt” un Jura teikums par to, ka traucējošo var apzināt, iepazīt, pieņemt vai mainīt. Divas pogas: pieteikties vai vispirms palasīt par psihoterapiju.</p>
+              <p>Tālāk iepazīšanās “Mani sauc Juris Zuitiņš”, divas kartītes ar pakalpojumiem, Jura skatījums ar kabineta fotogrāfiju un tumša josla ar vārdiem “Pirmais solis ir lēmums to darīt”. Tas viss ir vecās lapas teksts, tikai sakārtots tā, lai acs zina, kur iet.</p>
+              <p>Virsrakstu izvēlējās Juris pats. Melnrakstā bija jautājums no viņa teksta beigām, “Vai gribētu šādu pašu dzīvi nodzīvot vēlreiz?”, bet viņš gribēja, lai lapa sākas ar iespēju, nevis ar jautājumu.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Psihoterapija un konsultācijas -->
+        <section class="cs-sec cs-sec--r" data-reveal>
+          <div class="cs-sec__img cs-3d">
+            <div class="cs-3d__scene" data-tilt>
+              <div class="cs-card"><img src="../assets/zuitins/ir-psihoterapija.webp" width="1100" height="688" alt="Sadaļa Psihoterapija: teksts divās kolonnās un smilšu pulksteņa fotogrāfija ar parakstu Vai visu dziedē laiks?" loading="lazy" /></div>
+              <figure class="cs-card cs-sec__inset" style="margin:0"><img src="../assets/zuitins/ir-konsultacijas.webp" width="1100" height="688" alt="Sadaļa Psiholoģiskā konsultēšana" loading="lazy" /><figcaption class="cs-chip ir">Konsultācijas</figcaption></figure>
+            </div>
+          </div>
+          <div class="cs-block" style="grid-template-columns:1fr">
+            <h2><span class="k">Psihoterapija un konsultācijas</span>Divi pakalpojumi, divas lapas</h2>
+            <div>
+              <p>Juris skaidri nošķir psihoterapiju no psiholoģiskās konsultēšanas, un lapa to ciena. Psihoterapija ir ilgāks ceļš, iespēja saņemt nedalītu speciālista uzmanību un paskatīties uz savu dzīvi kopumā. Konsultēšana ir konkrētas situācijas analīze, parasti ap desmit tikšanās reizēm, ar atbildēm uz jautājumiem “Ko darīt?” un “Kā rīkoties?”.</p>
+              <p>Garo tekstu salikām divās kolonnās, lai to ir viegli lasīt arī datorā. Svarīgākos teikumus Juris iezīmēja pats, un tie lapā ir tirkīza krāsā ar pasvītrojumu, kas uzzīmējas rindu pa rindai, kad lasītājs līdz tam noritina. Blakus stāv smilšu pulkstenis no Jura kabineta ar parakstu “Vai visu dziedē laiks?”, kas ir viņa teksta atslēgas jautājums.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Par mani -->
+        <section class="cs-sec cs-sec--l" data-reveal>
+          <div class="cs-sec__img cs-3d">
+            <div class="cs-3d__scene" data-tilt>
+              <div class="cs-card"><img src="../assets/zuitins/ir-par-mani.webp" width="1100" height="688" alt="Sadaļa Par mani: apaļš portrets blakus virsrakstam, izglītības apraksts un kamīna fotogrāfija" loading="lazy" /></div>
+            </div>
+          </div>
+          <div class="cs-block" style="grid-template-columns:1fr">
+            <h2><span class="k">Par mani</span>Kāpēc tieši pie Jura</h2>
+            <div>
+              <p>Cilvēks, kurš meklē psihoterapeitu, grib zināt, kam uztic savu stāstu. Sadaļā “Par mani” ir Jura ceļš: psiholoģijas studijas kopš 1999. gada, maģistra grāds, doktorantūra, sertifikāts Latvijas Psihoterapeitu biedrībā un eksistenciālās terapijas diploms no institūta Lietuvā. Tas viss bija arī vecajā lapā, bet tagad to lasa ar apaļu portretu blakus virsrakstam, nevis kā garu rindkopu.</p>
+              <p>Lapa beidzas ar Jura jautājumu “Vai es esmu tas cilvēks, pie kura gribat nākt?” un kamīna fotogrāfiju no kabineta. Neuzbāzīgs mājiens, ka atbildi var pārbaudīt klātienē.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Kontakti -->
+        <section class="cs-sec cs-sec--r" data-reveal>
+          <div class="cs-sec__img cs-3d">
+            <div class="cs-3d__scene" data-tilt>
+              <div class="cs-card"><img src="../assets/zuitins/ir-kontakti.webp" width="1100" height="688" alt="Sadaļa Kontakti: tālrunis, e-pasts, adrese Artilērijas ielā un Google karte" loading="lazy" /></div>
+              <figure class="cs-card cs-sec__inset" style="margin:0"><img src="../assets/zuitins/bija-kontakti.webp" width="1100" height="688" alt="Vecās lapas kontakti" loading="lazy" /><figcaption class="cs-chip">Bija</figcaption></figure>
+            </div>
+          </div>
+          <div class="cs-block" style="grid-template-columns:1fr">
+            <h2><span class="k">Kontakti</span>Viens klikšķis līdz zvanam</h2>
+            <div>
+              <p>Specifikācijā bija paredzēta kontaktforma, un mēs to uzbūvējām. Tad Juris pateica, ka viņš grib, lai cilvēki zvana vai raksta tieši, bez starpniekiem. Formu izņēmām un tās vietā ielikām trīs lielas rindas: tālrunis, e-pasts, adrese. Uz tālruņa var uzspiest, un telefonā tas uzreiz zvana.</p>
+              <p>Blakus ir karte ar Artilērijas ielu un zemāk kabineta fotogrāfijas, kuras var atvērt lielākas. Vecajā lapā tās bija atsevišķā sadaļā “Bildes”. Tagad tās ir tur, kur cilvēks skatās, kā līdz kabinetam nokļūt.</p>
+              <p>Poga “Pieteikties” ir katras lapas augšā, un kājenē visur ir tālrunis un e-pasts. Lai kurā lapā cilvēks būtu, līdz zvanam ir viens klikšķis.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- RU -->
+        <section class="cs-sec cs-sec--l" data-reveal>
+          <div class="cs-sec__img cs-3d">
+            <div class="cs-3d__scene" data-tilt>
+              <div class="cs-card"><img src="../assets/zuitins/ir-ru.webp" width="1100" height="688" alt="Krievu versija zuitins.lv/ru: Общение открывает возможность становиться" loading="lazy" /></div>
+              <div class="cs-card cs-sec__phone"><img src="../assets/zuitins/ir-telefons-ru.webp" width="390" height="844" alt="Krievu versija telefonā" loading="lazy" /></div>
+            </div>
+          </div>
+          <div class="cs-block" style="grid-template-columns:1fr">
+            <h2><span class="k">Krievu valoda</span>Tā pati vietne, otra valoda</h2>
+            <div>
+              <p>Daļa Jura klientu runā krieviski, un vecajā risinājumā viņiem bija atsevišķa Google Sites lapa ru.zuitins.lv. Jaunajā vietnē krievu valoda ir pārslēgs katras lapas augšā: Sākums, Psihoterapija, Konsultācijas, Par mani un Kontakti visas ir arī krieviski, tajā pašā izkārtojumā, adresē zuitins.lv/ru/.</p>
+              <p>Viena tehniska nianse: Lato fontam Google versijā nav kirilicas. Tāpēc krievu lapās latīņu burtus zīmē Lato, bet kirilicu tās tuvākais radinieks Open Sans, un pārlūks tos savieno pa burtam. Uzvārda rakstību krieviski (Зуитыньш) un saukli “Общение открывает возможность становиться” precizēja Juris pats.</p>
+              <p>Meklētājiem abas valodas ir savienotas ar hreflang norādēm, lai Google zina, ka tā ir viena prakse divās valodās, nevis divas dažādas lapas.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SALĪDZINĀJUMS ================= -->
+        <section class="cs-block" data-reveal>
+          <h2><span class="k">Salīdzinājums</span>Kas mainījās</h2>
+          <div class="cs-diff">
+            <div class="cs-diff__row cs-diff__row--head" aria-hidden="true"><span></span><span>Bija</span><span class="ir">Ir</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Adrese</span><span class="cs-diff__bija">lv.zuitins.lv un ru.zuitins.lv, divas atsevišķas lapas</span><span class="cs-diff__ir"><b>zuitins.lv</b> un zuitins.lv/ru/, e-pasts nemainīts</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Platforma</span><span class="cs-diff__bija">Google Sites veidne</span><span class="cs-diff__ir"><b>Pielāgots kods</b>, mitinām un uzturam mēs</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Izvēlne</span><span class="cs-diff__bija">Septiņi punkti, bez aicinājuma</span><span class="cs-diff__ir"><b>Pieci punkti</b>, valodas pārslēgs un poga “Pieteikties”</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Pirmais, ko redz</span><span class="cs-diff__bija">Virsraksts “Sākums” un Google sīkdatņu logs</span><span class="cs-diff__ir">Jura portrets un <b>“Sastapšanās paver iespēju kļūt”</b></span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Krāsas un fonts</span><span class="cs-diff__bija">Lato, balts fons, tirkīza akcents</span><span class="cs-diff__ir"><b>Tie paši</b>, apzināti saglabāti</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Pieteikšanās</span><span class="cs-diff__bija">Tālrunis jāatrod sadaļā “Kontakti”</span><span class="cs-diff__ir"><b>Poga katrā lapā</b>, tālrunis un e-pasts kājenē, zvans ar vienu pieskārienu</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Fotogrāfijas</span><span class="cs-diff__bija">Viens portrets un sadaļa “Bildes”</span><span class="cs-diff__ir"><b>Jauns portrets</b>, kabinets sākumlapā, “Par mani” un “Kontaktos”</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Telefonā</span><span class="cs-diff__bija">Viena gara teksta kolonna</span><span class="cs-diff__ir"><b>Savs izkārtojums</b> ar foto, virsrakstu un pogām pirmajā ekrānā</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Meklētājos</span><span class="cs-diff__bija">Bez lapas apraksta un vietnes kartes</span><span class="cs-diff__ir"><b>Nosaukumi, apraksti, vietnes karte</b>, hreflang, Search Console</span></div>
+            <div class="cs-diff__row"><span class="cs-diff__k">Sīkdatnes</span><span class="cs-diff__bija">Google paziņojums katram apmeklētājam</span><span class="cs-diff__ir"><b>Nav izsekošanas</b>, tāpēc nav paziņojuma</span></div>
+          </div>
+        </section>
+
+        <!-- ================= TELEFONĀ ================= -->
+        <section class="cs-block" data-reveal>
+          <h2><span class="k">Telefonā</span>Tur, kur lapu atver visbiežāk</h2>
+          <div>
+            <p>Lielākā daļa cilvēku psihoterapeitu meklē telefonā, bieži vakarā un bieži pēc grūtas dienas. Vecajā lapā pirmajā ekrānā bija virsraksts, teksta sākums un sīkdatņu logs pāri pusei ekrāna. Jaunajā pirmajā ekrānā ir portrets, virsraksts un teikums par to, ko var mainīt. Poga ir tūlīt zem tā.</p>
+            <p>Portrets telefonā izgaist baltā fonā, un teksts ieplūst tam virsū, tāpēc foto un vārdi ir viens bloks, nevis divi atsevišķi gabali. Izvēlne ir aiz vienas pogas, valodas pārslēgs blakus tai.</p>
+            <div class="cs-3d">
+              <div class="cs-phones cs-3d__scene">
+                <figure class="cs-phone"><div class="cs-phone__frame"><img src="../assets/zuitins/bija-telefons.webp" width="390" height="844" alt="Vecā lapa telefonā: virsraksts Sākums, teksta kolonna un sīkdatņu paziņojums" loading="lazy" /></div><figcaption>Bija</figcaption></figure>
+                <figure class="cs-phone cs-phone--ir"><div class="cs-phone__frame"><img src="../assets/zuitins/ir-telefons.webp" width="390" height="844" alt="Jaunā lapa telefonā: Jura portrets, virsraksts un pieteikšanās poga vienā skatā" loading="lazy" /></div><figcaption>Ir</figcaption></figure>
+                <figure class="cs-phone cs-phone--ir"><div class="cs-phone__frame"><img src="../assets/zuitins/ir-telefons-ru.webp" width="390" height="844" alt="Jaunā lapa telefonā krievu valodā" loading="lazy" /></div><figcaption>Ir · RU</figcaption></figure>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= GAITA ================= -->
+        <section class="cs-block" data-reveal>
+          <h2><span class="k">Gaita</span>No melnraksta līdz nodošanai 11 dienās</h2>
+          <div>
+            <p>Sākumlapa četrās versijās. Pirmā ir melnraksts, ko uzbūvējām pirms līguma, lai Jurim ir par ko runāt. Pārējās rāda, kā lapa soli pa solim kļuva par to, ko Juris gribēja.</p>
+            <div class="cs-3d">
+              <div class="cs-film cs-3d__scene">
+                <figure><div class="cs-card"><img src="../assets/zuitins/gaita-10-julijs.webp" width="1100" height="688" alt="Melnraksts 10. jūlijā: krēmkrāsas fons, serifa burti, virsraksts Vai gribētu šādu pašu dzīvi nodzīvot vēlreiz?" loading="lazy" /></div><figcaption><b>10. jūlijs</b>Melnraksts. Serifa burti, krēmkrāsas fons, jautājums no Jura teksta kā virsraksts.</figcaption></figure>
+                <figure><div class="cs-card"><img src="../assets/zuitins/gaita-16-julijs.webp" width="1100" height="688" alt="16. jūlija versija: Lato fonts un krāsas no vecās lapas, virsraksts Sastapšanās paver iespēju kļūt" loading="lazy" /></div><figcaption><b>16. jūlijs</b>Pēc līguma. Lato un krāsas no vecās lapas, kantains attēls, Jura virsraksts.</figcaption></figure>
+                <figure><div class="cs-card"><img src="../assets/zuitins/gaita-17-julijs.webp" width="1100" height="688" alt="17. jūlija versija dzīvajā adresē zuitins.lv ar garāku portretu" loading="lazy" /></div><figcaption><b>17. jūlijs</b>Dzīvā. Lapa zuitins.lv adresē, garāks portrets, animācijas.</figcaption></figure>
+                <figure><div class="cs-card"><img src="../assets/zuitins/ir-dators.webp" width="1300" height="812" alt="Nodotā versija ar jauno portretu" loading="lazy" /></div><figcaption><b>21. jūlijs</b>Nodota. Jauns portrets, kabineta foto, krievu teksti pēc Jura labojumiem.</figcaption></figure>
+              </div>
+            </div>
+            <ul class="cs-steps">
+              <li><span class="d">10. jūlijs</span><span class="t">Melnraksts<small>Pirmo versiju uzbūvējām no vecās lapas satura vēl pirms līguma. Piecas sadaļas, abas valodas, viens domēns. Tā Juris redzēja nevis prezentāciju, bet gatavu lapu, ko var klikšķināt.</small></span></li>
+              <li><span class="d">14. jūlijs</span><span class="t">Līgums un specifikācija<small>Vienojāmies rakstiski, ko mainīt melnrakstā: krāsas un fontu pārņemt no vecās lapas, sākuma attēlu veidot kantainu, izņemt atslēgvārdu bloku ar apļiem un nomainīt virsrakstu uz “Sastapšanās paver iespēju kļūt”.</small></span></li>
+              <li><span class="d">16. jūlijs</span><span class="t">Būve<small>Ieviesām specifikāciju, salikām krievu versiju ar Open Sans kirilicai, pievienojām pasvītrojuma animāciju, fotogrāfiju palielināšanu un telefona izkārtojumu ar portretu, kas izgaist tekstā.</small></span></li>
+              <li><span class="d">17. jūlijs</span><span class="t">Lapa dzīvā<small>DNS pārslēdzām uz jauno lapu, saglabājot e-pasta ierakstus, lai juris@zuitins.lv strādā bez pārtraukuma. Atvērām indeksēšanu, pievienojām vietnes karti un Open Graph birkas.</small></span></li>
+              <li><span class="d">20. jūlijs</span><span class="t">Jura labojumi<small>Juris atsūtīja jaunu portretu un kabineta fotogrāfijas, precizēja uzvārda rakstību un saukli krieviski, lūdza izņemt kontaktformu. Attēlus pārvērtām WebP formātā, un sākumlapa kļuva par divām trešdaļām vieglāka.</small></span></li>
+              <li><span class="d">21. jūlijs</span><span class="t">Nodošana<small>Parakstījām pieņemšanas aktu dienu pirms līgumā noteiktā termiņa. Pirmie divi uzturēšanas mēneši iekļauti cenā.</small></span></li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ================= TEHNISKĀ PUSE ================= -->
+        <section class="cs-block" data-reveal>
+          <h2><span class="k">Zem pārsega</span>Tehniskā puse</h2>
+          <div>
+            <p>Lapa ir statiska: tīrs HTML, viens CSS fails un viens JavaScript fails, bez satura vadības sistēmas, bez bibliotēkām un bez spraudņiem, kas jāatjauno. Tāpēc tā ielādējas ātri, tai nav, kam salūzt, un tā turpinās darboties arī pēc gadiem bez pieskaršanās.</p>
+            <div class="cs-tech">
+              <div><b>Mitināšana un adrese</b><span>GitHub Pages ar HTTPS, domēns zuitins.lv pievienots ar CNAME. DNS pārslēgts tā, lai e-pasta ieraksti paliek neskarti.</span></div>
+              <div><b>Attēli</b><span>WebP ar JPEG rezervi caur picture elementu. Sākumlapas attēlu svars no 967 KB līdz 302 KB.</span></div>
+              <div><b>Fonti</b><span>Lato no vecās lapas. Krievu lapās Open Sans kirilicai, jo Google Lato tās nav.</span></div>
+              <div><b>Meklētāji</b><span>Nosaukumi un apraksti katrai lapai, canonical, Open Graph, hreflang LV un RU, sitemap, robots un Search Console verifikācija.</span></div>
+              <div><b>Bez kešošanas ķibelēm</b><span>CSS un JS adresēs ir būves numurs, tāpēc labojumi parādās uzreiz, ne pēc tam, kad pārlūks iztukšo kešu.</span></div>
+              <div><b>Privātums</b><span>Nav analītikas, nav sīkdatņu, nav ārēju skriptu, izņemot fontus un karti. Tāpēc nav arī sīkdatņu paziņojuma.</span></div>
+              <div><b>Sīkumi, ko pamana</b><span>Pasvītrojums, kas uzzīmējas rindu pa rindai. Izvēlne, kas pievērš uzmanību pie kājenes. Foto palielināšana kontaktos. Rezervēta vieta attēliem, lai lapa nelēkā.</span></div>
+              <div><b>Svars</b><span>CSS 21 KB, JS 9 KB. Vecā Google Sites lapa vienam HTML failam vien tērēja 136 KB.</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= REZULTĀTS ================= -->
+        <section class="cs-block" data-reveal>
+          <h2><span class="k">Rezultāts</span>Sava adrese un skaidrs ceļš līdz zvanam</h2>
+          <div>
+            <p>Juris tagad ir savā domēnā ar lapu, kas pieder viņam pašam, nevis platformai. Apmeklētājs uzreiz redz, kas viņu sagaida, saprot, ar ko psihoterapija atšķiras no konsultācijas, un līdz pieteikšanās brīdim ir viens klikšķis. Krieviski runājošie klienti nonāk tajā pašā vietnē, nevis citā adresē.</p>
+            <p>Mitināšanu un uzturēšanu nodrošinām mēs, tāpēc par tehnisko pusi Jurim nav jādomā. Ja jāmaina teksts vai jāpievieno fotogrāfija, viņš uzraksta, un mēs izdarām.</p>
+            <div class="cs-result">
+              <div class="cs-stat"><span class="n">lv.zuitins.lv → zuitins.lv</span><span class="l">Sava adrese, nevis apakšdomēns</span></div>
+              <div class="cs-stat"><span class="n">967 KB → 302 KB</span><span class="l">Sākumlapas attēlu svars, par 69 % mazāk</span></div>
+              <div class="cs-stat"><span class="n">11 dienas</span><span class="l">No melnraksta līdz nodošanai</span></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="cs-cta">
+      <div class="container">
+        <h2>Arī tev ir lapa, ko sen gribējās atjaunot?<span class="accent">.</span></h2>
+        <div class="row">
+          <a href="/?project=1" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+          <a href="/#work" class="btn btn--ghost"><span>Citi darbi</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="../js/tab-title.js"></script>
+  <script>
+    (function () {
+      // Salīdzinājuma slīdnis: range lauks sedz visu rāmi, tā vērtība ieplūst CSS mainīgajā --pos.
+      var stage = document.getElementById('cmp');
+      if (stage) {
+        var range = stage.querySelector('.cs-cmp__range');
+        var set = function (v) { stage.style.setProperty('--pos', v + '%'); };
+        range.addEventListener('input', function () { set(range.value); });
+        set(range.value);
+      }
+
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Parādīšanās ritinot.
+      var items = document.querySelectorAll('[data-reveal]');
+      if (reduce || !('IntersectionObserver' in window)) {
+        items.forEach(function (el) { el.classList.add('in'); });
+      } else {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+        items.forEach(function (el) { io.observe(el); });
+      }
+
+      // 3D šūpošanās aiz peles: skatuve pagriežas pāris grādus uz kursora pusi.
+      // Uz skārienekrāna (bez hover) un ar reduced-motion nekas nekustas.
+      var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (reduce || !canHover) return;
+      document.querySelectorAll('[data-tilt]').forEach(function (el) {
+        var base = getComputedStyle(el).transform;
+        if (base === 'none') base = '';
+        var raf = null;
+        el.addEventListener('mousemove', function (ev) {
+          var r = el.getBoundingClientRect();
+          var x = (ev.clientX - r.left) / r.width - .5;
+          var y = (ev.clientY - r.top) / r.height - .5;
+          if (raf) cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(function () {
+            el.style.transition = 'transform .15s ease-out';
+            el.style.transform = 'rotateY(' + (x * 10).toFixed(2) + 'deg) rotateX(' + (-y * 8).toFixed(2) + 'deg) ' + base;
+          });
+        });
+        el.addEventListener('mouseleave', function () {
+          if (raf) cancelAnimationFrame(raf);
+          el.style.transition = '';
+          el.style.transform = '';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

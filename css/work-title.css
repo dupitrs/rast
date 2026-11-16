@@ -1,0 +1,40 @@
+/* "Mūsu darbi" heading as a full-bleed poster line.
+   Font size follows the header's own width (cqw), so "Mūsu darbi" (5.322em in
+   Lexend Deca 700 with -0.04em tracking — copy/css/fonts.css) always spans edge to edge;
+   5.35 leaves room for overhang. Change the font → re-measure this number.
+   opsz stays pinned for Bricolage, whose auto optical size widened small sizes. */
+.work__big {
+  container-type: inline-size;
+  padding-inline: var(--gutter);
+}
+.work__big-title.section-title {
+  max-width: none;
+  margin-top: 0;
+  /* No descenders in "Mūsu darbi": pull the empty space under the baseline back so the
+     heading sits right on top of the cards. */
+  margin-bottom: calc(clamp(12px, 1.6vw, 24px) - 0.2em);
+  font-weight: 700;
+  font-size: calc(100cqw / 5.35);
+  line-height: 1.05;   /* v3: latviešu display ≥1,05 */
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  font-optical-sizing: none;
+  font-variation-settings: "opsz" 96;
+}
+
+/* Clip-reveal mask, same as the hero headline: the word slides up from under the line.
+   Extra room keeps the ū macron and the edge overhang from being sliced. */
+.work__big-title .line {
+  display: block; overflow: hidden;
+  padding: 0.16em 0.06em 0.12em; margin: -0.16em -0.06em -0.08em;
+}
+.work__big-title .line > span { display: block; backface-visibility: hidden; }
+.js .work__big-title .line > span { transform: translateY(110%); }
+.no-anim .work__big-title .line > span { transform: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .js .work__big-title .line > span { transform: none; }
+}
+
+/* "Ko varam izveidot." — centred over the service cards. */
+#services .section-head { margin-inline: auto; text-align: center; }
+#services .section-title { margin-inline: auto; }

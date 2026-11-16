@@ -1,0 +1,92 @@
+/* Latvian / hero: three big words on the two edges, the lead set into the last word,
+   the note sitting on the first word's baseline.
+   Every size follows --e, so the lines interlock the same way at any width.
+   The existing intro reveals each line; all colours follow the palette picker. */
+.hero--solutions {
+  justify-content: stretch;
+  padding-top: 112px;
+  padding-bottom: clamp(32px, 5vh, 56px);
+}
+
+.hero--solutions .hero__inner {
+  flex: 1;
+  display: grid;
+  container-type: inline-size;
+  /* No 1320px cap: on wide screens the words keep growing to the gutters. */
+  max-width: none;
+  /* Left: the words. Right: as wide as the lead. */
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 1fr auto auto auto 1fr;
+  column-gap: 32px;
+  /* Word size: as big as the width allows — "risinājumus" (≈5.2em) plus the lead (≈2.3em)
+     fill one row — and the three lines must fit the screen height. */
+  --e: min(14cqw, calc((100cqw - 32px) / 7.6), calc((var(--svh1, 1svh) * 100 - 190px) / 3.3));
+}
+
+/* Subgrid keeps the <h1> a real heading while its words sit on the hero's own rows. */
+.hero--solutions .hero__title {
+  grid-column: 1 / -1;
+  grid-row: 2 / 5;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-template-rows: subgrid;
+  font-size: var(--e);
+  font-weight: 600;
+  line-height: 1.05;      /* v3: ne zemāk — garumzīmes saskrietos ar g un j astēm */
+  letter-spacing: -0.05em;
+}
+/* Optical edges: at this size the side bearings of "d", "r" and "m" show, so each word is
+   nudged until its ink, not its box, sits on the margin. The bottom margin cancels the
+   reveal mask's extra room, so the line pitch stays 1.05. */
+.hero--solutions .hero__word { grid-column: 1 / -1; margin-bottom: -0.12em; }
+.hero--solutions .hero__word--1 { grid-row: 1; align-self: last baseline; text-align: right; margin-right: -0.02em; }
+.hero--solutions .hero__word--2 { grid-row: 2; margin-left: -0.03em; }
+.hero--solutions .hero__word--3 { grid-row: 3; grid-column: 1; align-self: last baseline; margin-left: -0.07em; }
+
+/* The lead's last line shares the baseline of "risinājumus". */
+.hero__lead {
+  grid-row: 3;
+  grid-column: 2;
+  align-self: last baseline;
+  font-size: calc(var(--e) * .157);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+/* The note fills the empty corner left of "Veidojam", its first line's cap height level with
+   the top of the "V": a mirror of the lead, which ends on the baseline of "risinājumus".
+   0.2em of the word = its cap top inside the line box (Lexend Deca: ascent 1, cap .7, line 1.05);
+   text-box trims the note's own leading, so its top edge is the cap line. */
+.hero__note {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
+  margin-top: calc(var(--e) * .2);
+  text-box: trim-start cap alphabetic;
+  max-width: 32ch;
+  font-size: clamp(17px, calc(var(--e) * .11), 24px);
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* Tablets and phones: the same staggered words, everything else stacks under them. */
+@media (max-width: 1100px) {
+  .hero--solutions { justify-content: center; padding-top: 116px; padding-bottom: 48px; }
+  .hero--solutions .hero__inner {
+    flex: 0 1 auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    row-gap: 28px;
+    --e: min(18.8cqw, calc((var(--svh1, 1svh) * 100 - 340px) / 3.4));
+  }
+  /* As wide as "risinājumus": "Veidojam" then ends on that word's edge, so the lines still
+     interlock when the screen height keeps the words small. */
+  .hero--solutions .hero__title { display: block; width: max-content; max-width: 100%; grid-column: 1; grid-row: auto; font-size: var(--e); }
+  .hero__lead {
+    display: block;
+    margin-top: calc(var(--e) * .28);
+    font-size: clamp(19px, calc(var(--e) * .17), 28px);
+  }
+  .hero__note { grid-column: 1; grid-row: auto; max-width: 40ch; margin-top: 0; text-box: normal; font-size: clamp(17px, 2.2vw, 20px); }
+}

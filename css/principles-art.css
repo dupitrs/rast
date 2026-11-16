@@ -1,0 +1,62 @@
+/* Static geometry is the fallback for the independently looping illustrations. */
+.tenet__art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.principle-geometry :where(path, rect, circle, ellipse) {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.principle-line { fill: none; stroke: var(--ink); stroke-opacity: .5; }
+.principle-accent { fill: none; stroke: var(--accent); stroke-opacity: .8; }
+.principle-orange { fill: var(--accent); stroke: none; }
+.principle-cream { fill: var(--ink); stroke: none; }
+.principle-fill { fill: var(--accent); fill-opacity: .045; stroke: var(--accent); stroke-opacity: .65; }
+.principle-dim { opacity: .55; }
+.principle-faint { opacity: .22; }
+.principle-signal-halo { fill: var(--accent); fill-opacity: .12; stroke: none; }
+.principle-signal-halo--cream { fill: var(--ink); }
+
+.principle-opaque { fill: var(--bg); }
+
+.principle-together-done { fill: none; stroke: var(--bg); stroke-width: 2; }
+.principle-together-button { fill-opacity: 1; }
+.principle-together-server circle { fill: var(--accent); fill-opacity: 0; }
+.principle-together-button-idle,
+.principle-together-click,
+.principle-together-pointer,
+.principle-together-request,
+.principle-together-response { opacity: 0; }
+/* One selection block assembles a typographic, colour and image language. */
+.principle-choice-label { fill: var(--ink-dim); font: 16px var(--font-sans); letter-spacing: .08em; text-anchor: middle; }
+.principle-choice-letter { fill: var(--ink); font-size: 108px; text-anchor: middle; }
+.principle-choice-letter--a { font-family: Georgia, serif; font-weight: 400; }
+.principle-choice-letter--b { font-family: "Courier New", monospace; font-weight: 400; }
+.principle-choice-letter--c { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; }
+.principle-choice-charcoal { fill: #29282d; }
+.principle-choice-image-bg { fill: var(--bg); stroke: var(--ink); stroke-opacity: .3; }
+.principle-choice-connection { stroke-opacity: .2; }
+.principle-choice-phase--font,
+.principle-choice-phase--palette,
+.principle-choice-option,
+.principle-choice-selection,
+.principle-choice-transfer,
+.principle-choice-complete { opacity: 0; }
+.principle-choice-image--c { opacity: 1; }
+/* One clear hierarchy: navigation, offer, supporting text, contact. */
+.principle-clarity-heading {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 65px;
+  font-weight: 500;
+  letter-spacing: -2.5px;
+}
+.principle-clarity-action {
+  font-family: 'Inter', sans-serif;
+  font-size: 23px;
+  font-weight: 400;
+}
+.principle-clarity-button { fill-opacity: .12; stroke-opacity: .95; }
+.principle-clarity-copy { stroke-opacity: .5; }
+.principle-clarity-nav { stroke-opacity: .7; }
+.principle-clarity-alignment { pointer-events: none; }
+.principle-dialogue-agreed-left,
+.principle-dialogue-agreed-right { opacity: 0; }

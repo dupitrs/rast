@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0A0A0C" />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
   <title>Brīvprātīgais darbs - projekts | rast studija</title>
   <meta name="description" content="Brīvprātīgā darba uzskaites un motivācijas sistēma biedrībai Mums pieder pasaule: pieteikumi, nostrādāto stundu uzskaite, PDF apliecinājumi, punkti, līmeņi un balvas." />
-  <link rel="canonical" href="https://www.raststudio.lv/darbi/brivpratigais-darbs" />
 
   <!-- Open Graph / social -->
   <meta property="og:type" content="website" />
@@ -52,11 +51,11 @@
   }
   </script>
 
-  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400..800&family=Karla:wght@400..800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
   <style>
     /* Case-study page - reuses the site's tokens, buttons and type from styles.css */
     .cs-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
@@ -113,13 +112,17 @@
     .cs-cta .row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
     @media (max-width: 760px) { .cs-block { grid-template-columns: 1fr; gap: 12px; } .cs-result { grid-template-columns: 1fr; gap: 22px; } }
   </style>
+<link rel="stylesheet" href="/css/fonts.css" />
+<link rel="stylesheet" href="/css/palette.css" />
+<script src="/js/palette.js"></script>
+<link rel="canonical" href="https://www.raststudio.lv/darbi/brivpratigais-darbs" />
 </head>
 <body>
   <div id="veil" aria-hidden="true"></div>
   <noscript><style>#veil { display: none; }</style></noscript>
   <nav class="cs-nav">
     <a href="/" class="brand"><span class="brand__word">rast</span><span class="brand__dot" aria-hidden="true"></span></a>
-    <a href="/#work" class="cs-back">← Visi darbi</a>
+    <a href="/en/darbi/brivpratigais-darbs" lang="en" hreflang="en">EN</a><a href="/#work" class="cs-back">← Visi darbi</a>
   </nav>
 
   <main>
@@ -140,7 +143,7 @@
             <p>Animācija izved cauri visam ceļam - no pieteikšanās un stundu ievades līdz punktiem, līmeņiem un gatavam PDF apliecinājumam.</p>
           </div>
           <div class="cs-demo__frame">
-            <iframe src="../instagram-reklama-lietotajs.html?embed=1" title="Brīvprātīgā darba sistēmas demonstrācijas animācija"></iframe>
+            <iframe src="/instagram-reklama-lietotajs.html?embed=1" title="Brīvprātīgā darba sistēmas demonstrācijas animācija"></iframe>
           </div>
         </div>
       </div>
@@ -190,13 +193,13 @@
       <div class="container">
         <h2>Gribi līdzīgu sistēmu?<span class="accent">.</span></h2>
         <div class="row">
-          <a href="/#contact" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+          <a href="/?project=1" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
           <a href="/#work" class="btn btn--ghost"><span>Citi darbi</span></a>
         </div>
       </div>
     </section>
   </main>
-  <script src="../js/tab-title.js"></script>
+  <script src="/js/tab-title.js"></script>
   <script>
     // Lapa parādās tikai tad, kad demonstrācijas rāmis ielādējies: loga "load" gaida
     // arī iframe. Pēc plīvura noņemšanas dodam animācijai signālu sākties, lai tās
@@ -219,5 +222,7 @@
       setTimeout(reveal, 4000);
     })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script src="/js/smooth-scroll.js"></script>
 </body>
 </html>

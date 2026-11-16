@@ -50,19 +50,19 @@ html {
   /* The whole site is dark — without this, Windows browsers paint scrollable areas
      (e.g. the service dropdown) with the default WHITE scrollbar. */
   color-scheme: dark;
+  scrollbar-gutter: stable;
   /* Page scrollbar: same slim, quiet treatment as the dropdown/modal ones. */
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
 }
-/* CSS gludā ritināšana paliek tikai lapās bez JS (raksti, darbi — enkuru saitēm). Sākum-
-   lapā, kur ritina Lenis un ScrollTrigger, tā ir kaitīga: pārlūka enkura lēciens, atverot
-   /#insights no raksta ("Citi raksti"), CSS smooth dēļ kļūst par lēnu slīdējumu, un tā
-   laikā notiekošie ScrollTrigger.refresh() izmēra trigeru pozīcijas ar ritinājuma vērtību,
-   kas neatbilst faktiskajam stāvoklim — visi scrub trigeri iesalst pie progress 1, un
-   lapa pēc atgriešanās izskatās sasalusi. (Iepriekšējā .lenis.lenis-smooth rinda no tā
-   nesargāja: šī Lenis versija klasi lenis-smooth pati nepievieno.) */
+/* JS owns smooth navigation and history restoration on the homepage.
+   Native CSS smoothing remains available on the standalone content pages. */
 html:not(.js) { scroll-behavior: smooth; }
 html.lenis, html.lenis body { height: auto; }
+/* Animated layouts and explicit history restoration manage their own scroll position. */
+html.js { overflow-anchor: none; }
+/* Section focus advances keyboard navigation without outlining the entire section. */
+main[tabindex="-1"]:focus, section[tabindex="-1"]:focus, #top[tabindex="-1"]:focus { outline: none; }
 
 body {
   background: var(--bg);
@@ -113,6 +113,18 @@ ul, ol { list-style: none; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
 
 .accent { color: var(--accent); }
+/* Question mark in a heading: white hook, accent dot. The box is pinned to line-height 1
+   so the colour split lands at a fixed height — 0.66em from the top = 0.168em above the
+   baseline, between Bricolage's dot top and hook bottom at weights 600–700. Without
+   background-clip support it simply stays accent. */
+.q-split, .impact__q .ch { color: var(--accent); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .q-split, .impact__q .ch {
+    display: inline-block; line-height: 1; font-style: normal; color: transparent;   /* upright: a slanted glyph overhangs the box and loses its colour */
+    background: linear-gradient(to bottom, var(--ink) 0.66em, var(--accent) 0.66em);
+    -webkit-background-clip: text; background-clip: text;
+  }
+}
 
 /* Dark panel — the palette's own near-black (--bg), NOT pure #000: the user
    explicitly wants the brand background tone here, blending with the page.
@@ -212,7 +224,8 @@ ul, ol { list-style: none; }
   border-bottom: 1px solid var(--line);
   padding-block: 14px;
 }
-.header--hidden { transform: translateY(-110%); }
+.header:focus-within { transform: none; }
+.header--hidden:not(:focus-within) { transform: translateY(-110%); }
 
 .brand { display: inline-flex; align-items: flex-start; gap: 5px; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -0.02em; }
 .brand__word { line-height: 1; }
@@ -247,8 +260,10 @@ ul, ol { list-style: none; }
   padding: var(--gutter);
   clip-path: inset(0 0 100% 0); transition: clip-path .7s var(--ease);
   pointer-events: none;
+  visibility: hidden; overflow-y: auto; overscroll-behavior: contain;
+  padding-top: 100px; padding-bottom: 32px;
 }
-.menu.is-open { clip-path: inset(0 0 0 0); pointer-events: auto; }
+.menu.is-open { visibility: visible; clip-path: inset(0 0 0 0); pointer-events: auto; }
 .menu__nav { display: flex; flex-direction: column; gap: 6px; }
 .menu__nav a {
   font-family: var(--font-display); font-weight: 600; font-size: clamp(40px, 13vw, 84px);
@@ -283,10 +298,11 @@ ul, ol { list-style: none; }
    Light surfaces (photos, cards) would break the effect, so the travel path keeps the orb
    BEHIND every card zone (services, work, insights) — see the z-index zones in main.js. */
 .fx-orb-ink, .fx-orb {
-  position: fixed; top: 0; left: 0; z-index: 800; width: 100px; height: 100px; border-radius: 50%;
+  position: fixed; top: 0; left: 0; z-index: 800; width: 720px; height: 720px; border-radius: 50%;
   transform-origin: center; transform: scale(0);
   opacity: 0; pointer-events: none;
-  /* size driven by transform:scale (GPU-composited) — NOT width/height, which janks every frame */
+  /* size driven by transform:scale (GPU-composited) — NOT width/height, which janks every frame.
+     720px box (≥ the biggest sphere, ~650px), always scaled DOWN (ORB_R in main.js), so it stays sharp. */
   will-change: transform, opacity;
 }
 .fx-orb-ink { background: #fff; mix-blend-mode: difference; }
@@ -295,7 +311,10 @@ ul, ol { list-style: none; }
    phase, where the sphere passes over text. The toggle happens over the empty black section.
    Over that near-black bg the blend pair renders the gradient ~4% darker than flat does, so the
    flat phase is dimmed by the same 4% — the switch is then a true no-op on screen. */
-.fx-orb-ink.is-flat, .fx-orb.is-flat { mix-blend-mode: normal; filter: brightness(0.96); }
+.fx-orb-ink.is-flat, .fx-orb.is-flat { mix-blend-mode: normal; filter: brightness(calc(0.96 + 0.04 * var(--od, 0))); }
+/* The white ink layer only matters for the blend; flat, the opaque orb hides it anyway — but while
+   the orb fades in or out it would shine through and turn the dot pale pink. */
+.fx-orb-ink.is-flat { visibility: hidden; }
 /* ::after carries the brand gradient at --oj opacity. The sphere is fully orange (--oj = 1)
    from its very first pixel and never changes tone while it grows — see updateOrb in main.js. */
 .fx-orb {
@@ -304,11 +323,32 @@ ul, ol { list-style: none; }
 }
 .fx-orb::after {
   content: ''; position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(circle at 38% 34%, var(--accent-soft), var(--accent) 46%, var(--accent-deep) 100%);
+  /* --od (0..1, main.js) lays the intro logo dot's flat colour over the shading: the orb takes
+     over from that dot looking identical, then eases into the shaded sphere as it travels. */
+  background:
+    linear-gradient(rgba(255, 61, 13, var(--od, 0)), rgba(255, 61, 13, var(--od, 0))),
+    radial-gradient(circle at 38% 34%, var(--accent-soft), var(--accent) 46%, var(--accent-deep) 100%);
   opacity: var(--oj, 1);
 }
-.no-anim .fx-orb, .no-anim .fx-orb-ink, .no-anim .fx-canvas { display: none; }
-@media (prefers-reduced-motion: reduce) { .fx-orb, .fx-orb-ink, .fx-canvas { display: none; } }
+/* Kling intro frame sequence, fixed full-screen like the particle canvas (main.js draws the
+   frames). lighten: frame black is 0, darker than --bg, so the page colour wins everywhere except
+   the smoke and the logo — no visible frame edge or seam. */
+.fx-seq {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 1; pointer-events: none; opacity: 0; visibility: hidden; mix-blend-mode: lighten;
+}
+/* Swell + handoff: the orb stands in for the intro's white sphere (shaded grey at the centre,
+   bright rim — sampled from the first frame). */
+.fx-orb.is-white::after {
+  /* --ow (0..1, main.js): pure white at first, like the particle cluster it takes over from */
+  background:
+    linear-gradient(rgba(255, 255, 255, var(--ow, 0)), rgba(255, 255, 255, var(--ow, 0))),
+    url('../assets/intro/sphere.webp') center / 100% 100% no-repeat;   /* the intro's own sphere, cut from its first frame (f000) */
+}
+/* The white orb hands over to the frames, not to the blend pair — no 4 % dimming, or it pops at the swap. */
+.fx-orb.is-flat.is-white { filter: none; }
+.no-anim .fx-orb, .no-anim .fx-orb-ink, .no-anim .fx-canvas, .no-anim .fx-seq, .no-fx .fx-seq { display: none; }
+@media (prefers-reduced-motion: reduce) { .fx-orb, .fx-orb-ink, .fx-canvas, .fx-seq { display: none; } }
 
 /* Black text where the sphere covers it. For each white-text target JS builds a fixed black
    clone (.orb-cliptext) that sits ABOVE the sphere and is clip-path'd to the sphere's circle,
@@ -319,14 +359,13 @@ ul, ol { list-style: none; }
   color: var(--bg); pointer-events: none; -webkit-user-select: none; user-select: none;
   will-change: clip-path, left, top;
 }
-.hero__glow {
-  position: absolute; z-index: 0; top: 40%; left: 60%; width: 60vw; height: 60vw;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(var(--accent-rgb),0.22), transparent 62%);
-  filter: blur(40px); pointer-events: none;
-}
 .hero__inner { position: relative; z-index: 2; width: 100%; max-width: var(--container); margin-inline: auto; }
-.hero__eyebrow { margin-bottom: clamp(20px, 3vh, 34px); }
+/* Studio label stays in the markup for search engines and screen readers,
+   but is hidden visually — the hero opens straight on the headline. */
+.hero__eyebrow {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
 
 .hero__title {
   font-family: var(--font-display);
@@ -391,12 +430,17 @@ ul, ol { list-style: none; }
    last screen is where #studio scrolls up over it (margin-top:-100vh).
    ============================================================ */
 /* Transparent so the fixed .fx-canvas behind it stays visible (the page bg shows through). */
-.assembly { position: relative; height: 150vh; height: calc(var(--svh1, 1svh) * 150); background: transparent; }
+/* 170 screens' worth of scroll (with a ~1-screen hero above), every beat overlapping the next: over
+   the first half of the hero the wave falls into a dot in this section, which swells into the
+   sphere and starts playing the intro frames while still scrolling up into place (1.0) → as the
+   logo completes, "rast" scrolls away, #studio rises behind it and the dot flies on. The phase
+   lengths live in measure() in main.js — keep the two in step. */
+.assembly { position: relative; height: 170vh; height: calc(var(--svh1, 1svh) * 170); background: transparent; }
 /* Transparent (same colour) so the orb can ride BEHIND the service cards here. */
 #services { background: transparent; }
 /* Handoff off (JS failed / reduced motion): #studio no longer overlaps, so don't
    leave a big empty gap — collapse the placeholder entirely. */
-.no-anim .assembly { display: none; }
+.no-anim .assembly, .no-fx .assembly { display: none; }
 @media (prefers-reduced-motion: reduce) { .assembly { display: none; } }
 
 /* ============================================================
@@ -517,11 +561,6 @@ ul, ol { list-style: none; }
 .svc__card:nth-child(2) { top: calc(var(--deck-top) + var(--peek)); }
 .svc__card:nth-child(3) { top: calc(var(--deck-top) + var(--peek) * 2); }
 .svc__card:nth-child(4) { top: calc(var(--deck-top) + var(--peek) * 3); }
-/* Faint vermilion corner bloom — depth without imagery */
-.svc__card::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(54% 70% at 90% 4%, rgba(var(--accent-rgb), 0.10), transparent 60%);
-}
 
 /* Title bar — the strip that stays visible when the card is covered */
 .svc__card-bar {
@@ -532,10 +571,6 @@ ul, ol { list-style: none; }
   border-bottom: 1px solid var(--line);
 }
 .svc__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(23px, 2.5vw, 40px); letter-spacing: -0.02em; line-height: 1; }
-.svc__bar-mark {
-  flex: none; width: 11px; height: 11px; border-radius: 50%;
-  background: var(--accent);
-}
 
 /* Body */
 .svc__card-main {
@@ -549,14 +584,13 @@ ul, ol { list-style: none; }
 /* "Der, ja:" qualifier — mono meta line; loose line-height so the pill
    doesn't collide with its wrapped continuation lines */
 .svc__fit { font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--ink-dim); max-width: 46ch; }
-.svc__fit-tag { display: inline-block; line-height: 1.4; color: var(--ink); background: rgba(var(--ink-rgb), 0.035); border: 1px solid var(--line-2); border-radius: 100px; padding: 3px 10px; white-space: nowrap; }
+.svc__fit-tag { display: inline-block; line-height: 1.4; color: var(--ink); white-space: nowrap; }
 /* "Der, ja:" conditions — stacked column, each with a small accent dot */
 .svc__fit-list { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .svc__fit-list li { position: relative; padding-left: 20px; }
 .svc__fit-list li::before { content: ""; position: absolute; left: 2px; top: 0.72em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 @media (min-width: 861px) {
   .svc__fit { font-size: 16px; max-width: 60ch; }
-  .svc__fit-tag { padding: 4px 12px; }
 }
 .svc__card-link {
   margin-top: auto; padding-top: 26px; width: fit-content;
@@ -607,10 +641,30 @@ ul, ol { list-style: none; }
    WORK
    ============================================================ */
 .work { padding: clamp(70px, 9vw, 140px) 0; }
-.work__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(18px, 2.4vw, 36px); }
-.work__card { position: relative; display: block; border-radius: var(--radius); overflow: hidden; }
 
-.work__media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+/* Mosaic: near edge-to-edge, rows offset like brickwork, every tile fully in view.
+   Two "fill" tiles (Zuitiņš phone view, Brīvprātīgais detail) keep the rhythm dense. */
+.work__mosaic {
+  --mg: clamp(6px, .7vw, 12px);
+  display: grid; grid-template-columns: repeat(24, 1fr);
+  grid-auto-rows: clamp(230px, 26vw, 560px);
+  gap: var(--mg);
+  margin-inline: clamp(12px, 1.5vw, 24px);
+}
+.work__card, .work__fill { position: relative; display: block; border-radius: 12px; overflow: hidden; }
+.work__fill--1 { grid-area: 1 / 1 / 2 / 5; }
+.work__card--s1 { grid-area: 1 / 5 / 2 / 16; }
+.work__card--s2 { grid-area: 1 / 16 / 2 / 25; }
+.work__fill--2 { grid-area: 2 / 1 / 3 / 8; }
+.work__card--s3 { grid-area: 2 / 8 / 3 / 18; }
+.work__card--s4 { grid-area: 2 / 18 / 3 / 25; }
+
+.work__fill { background-color: var(--surface); background-repeat: no-repeat; }
+.work__fill::after { content: ""; position: absolute; inset: 0; background: rgba(var(--bg-rgb), .22); }
+.work__fill--1 { background-image: url('../assets/zuitins/ir-telefons.webp'); background-size: cover; background-position: center top; }
+.work__fill--2 { background-image: url('../assets/work-brivpratigais.webp'); background-size: auto 330%; background-position: 100% 14%; }
+
+.work__media { position: absolute; inset: 0; overflow: hidden; }
 /* The hover zoom rides on a background layer (::before), NOT the media box itself, so the
    overlay labels ("Projekta apraksts" / "Apskatīt") stay anchored — only the image scales. */
 .work__media--shot::before {
@@ -619,122 +673,48 @@ ul, ol { list-style: none; }
   transition: transform .9s var(--ease); will-change: transform;
 }
 .work__card:hover .work__media--shot::before { transform: scale(1.04); }
-.work__media::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(var(--bg-rgb),.55), transparent 55%); }
+.work__media::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(var(--bg-rgb),.94), rgba(var(--bg-rgb),.72) 28%, transparent 60%); }
 
-/* Real project thumbnail (live-site screenshot) + "view" caption */
+/* Real project thumbnail (live-site screenshot) */
 .work__media--shot { background-color: var(--surface); background-size: cover; background-position: top center; }
-.work__view {
-  position: absolute; bottom: 16px; right: 16px; z-index: 2;
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--font-sans); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink);
-  opacity: 0; transition: opacity .4s var(--ease);   /* fade in place — no vertical drift */
-}
-.work__card:hover .work__view { opacity: 1; }
-.work__view i { color: var(--accent); transition: transform .4s var(--ease); }
-.work__card:hover .work__view i { transform: translateX(4px); }
 
-.work__meta { padding: 22px 4px 4px; display: flex; flex-direction: column; gap: 4px; }
+.work__meta {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  padding: clamp(16px, 1.8vw, 28px); display: flex; flex-direction: column; gap: 4px;
+}
 .work__idx { font-family: var(--font-sans); font-size: 12px; color: var(--ink-faint); }
 .work__name { font-family: var(--font-display); font-weight: 600; font-size: clamp(22px, 2.4vw, 34px); letter-spacing: -0.02em; line-height: 1.05; }
 .work__cat { font-size: 14px; color: var(--ink-dim); }
 
-.work__card--cta { background: var(--surface); display: grid; place-items: center; text-align: center; min-height: 280px; transition: background .4s; border: 1px solid var(--line); }
+.work__card--cta { background: var(--surface); display: grid; place-items: center; text-align: center; transition: background .4s; border: 1px solid var(--line); }
 .work__card--cta:hover { background: var(--surface-2); }
-.work__cta-inner { padding: 40px; }
+.work__cta-inner { padding: clamp(24px, 3vw, 40px); }
 .work__card--cta .work__name { margin: 12px 0; font-size: clamp(28px, 3.4vw, 48px); }
 .work__card--cta .work__cat { color: var(--accent); }
 
+/* Phone: projects full width, the two fill tiles share one row (away from the Zuitiņš tile) */
 @media (max-width: 760px) {
-  .work__grid { grid-template-columns: 1fr; }
-  .work__card--cta { min-height: 220px; }
+  .work__mosaic { grid-template-columns: 1fr 1fr; grid-auto-rows: 62vw; gap: 8px; margin-inline: 12px; }
+  .work__card--s1 { grid-area: 1 / 1 / 2 / 3; }
+  .work__fill--1 { grid-area: 2 / 1; }
+  .work__fill--2 { grid-area: 2 / 2; }
+  .work__card--s2 { grid-area: 3 / 1 / 4 / 3; }
+  .work__card--s3 { grid-area: 4 / 1 / 5 / 3; }
+  .work__card--s4 { grid-area: 5 / 1 / 6 / 3; }
+  .work__card, .work__fill { border-radius: 10px; }
 }
-
-/* Touch devices have no hover — keep the "Apskatīt →" caption always visible */
-@media (hover: none) {
-  .work__view { opacity: 1; transform: none; }
-}
-
-/* ============================================================
-   PARALLAX BAND (background + scroll effect)
-   ============================================================ */
-.band {
-  position: relative; min-height: 94vh; min-height: calc(var(--svh1, 1svh) * 94);
-  display: grid; place-items: center; overflow: hidden;
-  margin-block: clamp(40px, 7vw, 100px);
-}
-/* Feather the top + bottom edges into the page background (--bg) so the band
-   blends into the previous (work) and next (impact) sections instead of showing
-   a hard rectangular line. Overlays sit on the static .band (not the parallax
-   layer), above the bg + giant word, below the centred title. */
-.band::before,
-.band::after {
-  content: ""; position: absolute; left: 0; right: 0;
-  height: clamp(90px, 18vh, 220px); z-index: 2; pointer-events: none;
-}
-.band::before { top: 0;    background: linear-gradient(to bottom, var(--bg) 0%, rgba(var(--bg-rgb), 0) 100%); }
-.band::after  { bottom: 0; background: linear-gradient(to top,    var(--bg) 0%, rgba(var(--bg-rgb), 0) 100%); }
-.band__bg {
-  position: absolute; inset: -38% 0; z-index: 0; will-change: transform;
-  background:
-    radial-gradient(58% 70% at 24% 28%, rgba(var(--accent-rgb),0.55), transparent 60%),
-    radial-gradient(52% 60% at 82% 72%, rgba(201,52,28,0.42), transparent 62%),
-    radial-gradient(42% 50% at 62% 18%, rgba(255,106,77,0.30), transparent 60%),
-    linear-gradient(160deg, var(--surface), var(--bg) 72%);
-  /* Drop a real photo here to use an image instead:  background-image: url('../assets/band.jpg'); background-size: cover; background-position: center; */
-}
-.band__bg::after {
-  content: ""; position: absolute; inset: 0;
-  background:
-    linear-gradient(90deg, rgba(var(--bg-rgb),0.55), rgba(var(--bg-rgb),0.30) 50%, rgba(var(--bg-rgb),0.55)),
-    radial-gradient(circle at 50% 50%, rgba(var(--bg-rgb),0.10), rgba(var(--bg-rgb),0.62));
-}
-.band__word {
-  position: absolute; inset: 0; z-index: 1; will-change: transform;
-  display: grid; place-items: center; white-space: nowrap; user-select: none;
-  font-family: var(--font-display); font-weight: 800;
-  font-size: clamp(110px, 33vw, 540px); line-height: 0.8; letter-spacing: -0.04em;
-  /* Outline word that "colours in" left→right as you scroll: JS drives --fill 0%→100%,
-     the gradient fills the glyphs via background-clip:text, the stroke stays as the outline. */
-  --fill: 0%;
-  color: transparent;
-  background-image: linear-gradient(90deg, rgba(var(--accent-rgb), 0.22) var(--fill), transparent var(--fill));
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1.5px rgba(var(--ink-rgb), 0.16);
-}
-.band__content { position: relative; z-index: 2; text-align: center; padding-block: clamp(80px, 12vw, 170px); }
-.band__title {
-  font-family: var(--font-display); font-weight: 600;
-  font-size: clamp(30px, 5.4vw, 84px); line-height: 1.08; letter-spacing: -0.025em;
-  max-width: 18ch; margin: 22px auto 0;
-}
-.band__title em { color: var(--accent); font-style: italic; }
-.band .eyebrow { justify-content: center; }
 
 /* ============================================================
    PROCESS
    ============================================================ */
-.process { height: 360vh; height: calc(var(--svh1, 1vh) * 360); }   /* desktop: tall section; .process__container is CSS-sticky and the revolver SCRUBS over it (no ScrollTrigger pin → no spacer to desync later sections) */
-/* overflow-x: clip — the 3D revolver's chapters are rotated, so their PROJECTED width is
-   wider than their box; on a narrow phone that spilled a few px past the screen and let the
-   whole document be dragged sideways. Clipped at this box (= the screen edge on mobile), so
-   nothing that was visible is lost; on tablet/desktop the steps never reach the edge, so this
-   is a no-op there. `clip` not `hidden`: hidden would make this a scroll container and kill
-   its own position: sticky. */
-.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: center; align-content: center; position: sticky; top: 0; min-height: 100vh; min-height: calc(var(--svh1, 1svh) * 100); overflow-x: clip; }
+/* Default (no JS / reduced motion / phone) = a plain readable list. On desktop JS adds
+   .is-flow: the left column (title + a huge faint chapter number) sticks while the
+   chapters scroll past on the right — the number rolls to whichever chapter is in view. */
+.process { padding: clamp(100px, 16vh, 180px) 0; }
+.process__container { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(40px, 6vw, 110px); align-items: start; }
 .process__head { position: relative; z-index: 2; }
 .process__lead { color: var(--ink-dim); margin-top: 20px; max-width: 32ch; }
-/* Live chapter counter — the reader's position in the story; updated by JS */
-.process__meter { margin-top: clamp(30px, 4vw, 56px); display: flex; align-items: baseline; gap: 10px; }
-.process__meter-cur {
-  font-family: var(--font-display); font-weight: 700; color: var(--accent);
-  font-size: clamp(46px, 5.6vw, 88px); line-height: 1; letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-.process__meter-tot { font-family: var(--font-sans); font-size: 15px; color: var(--ink-dim); }
 
-/* Steps = story chapters. DEFAULT = a plain readable list (no-JS / reduced-motion /
-   mobile fallback). On desktop, JS adds .is-drum and the section pins. */
 .process__list { display: flex; flex-direction: column; }
 .step {
   display: grid; grid-template-columns: clamp(64px, 8vw, 132px) 1fr; gap: clamp(22px, 4vw, 64px);
@@ -745,54 +725,67 @@ ul, ol { list-style: none; }
 .step__num {
   font-family: var(--font-display); font-weight: 700;
   font-size: clamp(40px, 7vw, 120px); line-height: 0.82; letter-spacing: -0.04em;
-  color: transparent; -webkit-text-stroke: 1.4px var(--ink-faint);
-  transition: color .5s var(--ease), -webkit-text-stroke-color .5s var(--ease);
+  color: transparent; -webkit-text-stroke: 1.4px var(--accent);
 }
-.step.is-active .step__num { color: var(--accent); -webkit-text-stroke-color: var(--accent); }
 .step__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 3.2vw, 50px); letter-spacing: -0.02em; line-height: 1.04; margin-bottom: clamp(12px, 1.4vw, 18px); }
 .step__desc { color: var(--ink-dim); max-width: 46ch; font-size: clamp(15px, 1.2vw, 18px); line-height: 1.7; }
 
-/* JS (desktop): the section PINS when centred and the chapters become a 3D "revolver"
-   — all stacked on one stage, revolving through one at a time as you scrub. */
-.process__list.is-drum {
-  display: block; position: relative; border: 0;
-  height: clamp(300px, 46vh, 440px);
-  perspective: 1700px; perspective-origin: 50% 50%;   /* stronger 3D cube feel (smaller perspective = more depth) */
-}
-.process__list.is-drum .step {
-  position: absolute; left: 0; top: 0; width: 100%; height: 100%;
-  align-content: center; padding: 0; border: 0;
-  transform-style: preserve-3d; backface-visibility: hidden;
-  will-change: transform, opacity;
+/* JS-built extras — hidden until .is-flow (desktop) switches them on */
+.process__big, .process__index { display: none; }
+
+@media (min-width: 861px) {
+  .process.is-flow .process__head {
+    position: sticky; top: clamp(96px, 14vh, 140px);
+    display: flex; flex-direction: column;
+    height: calc(100vh - clamp(96px, 14vh, 140px) - clamp(40px, 8vh, 90px));
+    height: calc(var(--svh1, 1vh) * 100 - clamp(96px, 14vh, 140px) - clamp(40px, 8vh, 90px));
+  }
+  /* The rolling chapter number — a vertical reel of digits behind a 1em window */
+  .process.is-flow .process__big {
+    display: block; margin-top: auto; overflow: hidden; height: 1em;
+    font-family: var(--font-display); font-weight: 400;
+    font-size: clamp(150px, 19vw, 300px); line-height: 1; letter-spacing: -0.05em;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+    user-select: none;
+  }
+  .process__big-reel { display: block; transition: transform 0.9s var(--ease); }
+  .process__big-reel span { display: block; height: 1em; }
+
+  /* Chapter index above the chapters — clickable, the active row lights up */
+  .process.is-flow .process__index {
+    display: block; list-style: none; margin: 6px 0 clamp(48px, 9vh, 110px);
+  }
+  .process__index button {
+    display: flex; align-items: baseline; gap: 16px; padding: 7px 0;
+    font: inherit; font-size: clamp(16px, 1.25vw, 19px); color: var(--ink-faint);
+    background: none; border: 0; cursor: pointer; text-align: left;
+    transition: color .4s var(--ease);
+  }
+  .process__index-num { font-variant-numeric: tabular-nums; color: rgba(var(--ink-rgb), 0.28); transition: color .4s var(--ease); }
+  .process__index button:hover,
+  .process__index li.is-active button { color: var(--ink); }
+  .process__index li.is-active .process__index-num { color: var(--accent); }
+
+  /* Chapters: tall blocks so each one owns the screen for a while; the big number
+     on the left replaces the per-step number */
+  .process.is-flow .step {
+    grid-template-columns: 1fr; min-height: 58vh; min-height: calc(var(--svh1, 1vh) * 58);
+    padding: clamp(28px, 4vh, 44px) 0 clamp(60px, 10vh, 120px);
+    border-top: 0; border-bottom: 1px solid var(--line);
+  }
+  .process.is-flow .step__num { display: none; }
+  .process.is-flow .step__text { opacity: 0.32; transition: opacity .6s var(--ease); }
+  .process.is-flow .step.is-active .step__text { opacity: 1; }
+  .process.is-flow .step__title { font-size: clamp(30px, 3.4vw, 54px); margin-bottom: clamp(16px, 2vw, 26px); }
+  .process.is-flow .step__desc { font-size: clamp(16px, 1.3vw, 20px); }
 }
 @media (max-width: 860px) {
+  .process { padding: clamp(60px, 14vw, 90px) 0; }
   .process__container { grid-template-columns: 1fr; gap: clamp(14px, 4vw, 26px); }
-  .process__meter { margin-top: 10px; }
-  .process__list.is-drum { height: clamp(300px, 52vh, 380px); perspective: 1500px; }
-  .process__list.is-drum .step { grid-template-columns: 1fr; gap: 6px; padding: 0 clamp(18px, 5vw, 28px); }
   .step__num { font-size: clamp(44px, 15vw, 78px); }
   .step__title { font-size: clamp(24px, 6.4vw, 36px); }
   .step__desc { font-size: clamp(14px, 3.6vw, 16px); max-width: none; }
 }
-/* Fallback (no JS / reduced motion): no sticky-scrub revolver — plain readable list */
-@media (prefers-reduced-motion: reduce) {
-  .process { height: auto; padding: clamp(60px, 14vw, 90px) 0; }
-  .process__container { position: static; min-height: 0; }
-}
-.no-anim .process { height: auto; padding: clamp(60px, 14vw, 90px) 0; }
-.no-anim .process__container { position: static; min-height: 0; }
-
-/* ============================================================
-   MANIFESTO
-   ============================================================ */
-.manifesto { padding: clamp(90px, 13vw, 200px) 0; text-align: center; }
-.manifesto__quote {
-  font-family: var(--font-display); font-weight: 500;
-  font-size: clamp(28px, 5vw, 76px); line-height: 1.1; letter-spacing: -0.025em;
-  max-width: 18ch; margin-inline: auto;
-}
-.manifesto__quote em { color: var(--accent); font-style: italic; }
-.manifesto__cite { display: block; margin-top: 40px; font-family: var(--font-sans); font-size: 14px; color: var(--ink-dim); font-style: normal; }
 
 /* ============================================================
    FAQ  (replaces the old stats band)
@@ -847,14 +840,9 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
   transition: transform .4s var(--ease), border-color .4s var(--ease);
 }
 .insight:not(.insight--soon):hover { transform: translateY(-5px); border-color: var(--line-2); }
-.insight__tag { font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
 .insight__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(19px, 1.7vw, 24px); letter-spacing: -.015em; line-height: 1.2; }
 .insight__desc { color: var(--ink-dim); font-size: 15px; line-height: 1.6; }
-.insight__more { margin-top: auto; font-family: var(--font-sans); font-size: 13px; color: var(--ink); letter-spacing: .03em; }
-.insight__more i { color: var(--accent); font-style: normal; display: inline-block; transition: transform .4s var(--ease); }
-.insight:not(.insight--soon):hover .insight__more i { transform: translateX(5px); }
 .insight--soon { opacity: .5; }
-.insight--soon .insight__tag, .insight--soon .insight__more { color: var(--ink-faint); }
 @media (max-width: 860px) { .insights__grid { grid-template-columns: 1fr; } }
 
 /* ============================================================
@@ -919,6 +907,14 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
 .cta__title .line > span { display: block; backface-visibility: hidden; }
 .cta__actions { display: flex; flex-direction: column; align-items: center; gap: 28px; margin-top: clamp(40px, 6vw, 70px); }
 .cta__email { font-family: var(--font-sans); font-size: clamp(14px, 1.6vw, 18px); color: var(--ink-dim); border-bottom: 1px solid var(--line-2); padding-bottom: 4px; transition: color .3s, border-color .3s; }
+@media (max-width: 880px) {
+  .cta {
+    min-height: 100svh;
+    min-height: calc(var(--svh1, 1svh) * 100);
+    display: flex; align-items: center;
+    padding: 96px 0 64px;
+  }
+}
 .cta__email:hover { color: var(--accent); border-color: var(--accent); }
 
 /* Lead line under the CTA headline */
@@ -1011,11 +1007,6 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
      in the lower-middle of the screen — balanced air above and below. */
   .hero { justify-content: center; padding-top: calc(var(--svh1, 1vh) * 18); padding-bottom: calc(var(--svh1, 1vh) * 14); }
 
-  .hero__eyebrow {
-    margin-bottom: 18px;
-    letter-spacing: 0.09em;   /* was .14em — stops the long label crowding the edges at 390px */
-  }
-
   .hero__title {
     font-size: clamp(37px, 12.2vw, 58px);   /* bigger, more presence than the 9.6vw default */
     letter-spacing: -0.046em;                /* slightly tighter tracking reads as premium display */
@@ -1039,27 +1030,12 @@ html { interpolate-size: allow-keywords; }   /* lets <details> animate open/clos
   /* On phones the primary is the hero of the block — give it a little more body. */
   .hero__actions .btn--solid { padding-block: 17px; }
 
-  /* Band + impact statements: let the display text fill nearly the whole screen width. */
-  .band__title {
-    font-size: clamp(29px, 7.7vw, 50px);
-    font-weight: 500;            /* was 600 — lighter reads softer, less "sharp" at this size */
-    line-height: 1.24;           /* more air between lines so it breathes */
-    letter-spacing: -0.015em;
-    max-width: 17ch;             /* small side breathing room instead of edge-to-edge */
-  }
+  /* Impact statement: let the display text fill nearly the whole screen width. */
   .impact__title {
     font-size: clamp(44px, 13.5vw, 80px);   /* bigger, but capped so each line stays whole (the split letters wrap mid-word if it overflows) */
     line-height: 1.28;   /* keep the slack — the morphing "rast" needs overflow room or it clips */
     max-width: none;
     text-align: center;
-  }
-  /* Manifesto quote: fill nearly the whole screen so it stands alone, not squeezed
-     between the neighbouring sections. */
-  .manifesto__quote {
-    font-size: clamp(30px, 8.4vw, 56px);
-    line-height: 1.22;
-    letter-spacing: -0.02em;
-    max-width: 15ch;
   }
 }
 
@@ -1083,9 +1059,9 @@ button.btn { font-family: inherit; cursor: pointer; }
   display: flex; align-items: center; justify-content: center;
   padding: var(--gutter);
   opacity: 0; visibility: hidden; pointer-events: none;
-  transition: opacity .4s var(--ease), visibility .4s;
+  transition: opacity .4s var(--ease), visibility 0s .4s;
 }
-.form-modal.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+.form-modal.is-open { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
 .form-modal__backdrop {
   position: absolute; inset: 0; cursor: pointer;
   background: rgba(5, 5, 7, 0.72);
@@ -1142,7 +1118,9 @@ button.btn { font-family: inherit; cursor: pointer; }
 /* Honeypot: hidden without pushing it off-screen (left:-9999px caused a horizontal
    scroll on phones — no scrollbar there, so the whole page shifted left). */
 .form__hp { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); opacity: 0; pointer-events: none; }
-body.modal-open { overflow: hidden; }
+html.overlay-open, html.overlay-open body { overflow: hidden; overscroll-behavior: none; }
+.cselect__opt:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@media (max-height: 650px) { .menu { justify-content: flex-start; } }
 @media (max-width: 480px) {
   .form__row { grid-template-columns: 1fr; }
   .form__submit { width: 100%; justify-content: center; align-self: stretch; }
@@ -1171,9 +1149,9 @@ body.modal-open { overflow: hidden; }
   overscroll-behavior: contain;   /* wheel/touch at the list edge mustn't scroll the form */
   scrollbar-width: thin; scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
   opacity: 0; visibility: hidden; transform: translateY(-6px);
-  transition: opacity .22s var(--ease), transform .22s var(--ease), visibility .22s;
+  transition: opacity .22s var(--ease), transform .22s var(--ease), visibility 0s .22s;
 }
-.cselect.is-open .cselect__list { opacity: 1; visibility: visible; transform: none; }
+.cselect.is-open .cselect__list { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
 .cselect__opt {
   padding: 11px 12px; border-radius: 8px; font-size: 14.5px; color: var(--ink-dim); cursor: pointer;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -1201,23 +1179,22 @@ button:focus-visible {
 .work__card--cta { transition: background .4s var(--ease), transform .4s var(--ease); }
 .work__card--cta:hover { transform: translateY(-4px); }
 
-/* Corner badge on a work card that opens a full case-study — invites the click */
-.work__badge {
-  position: absolute; top: 14px; left: 14px; z-index: 3;
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--font-sans); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--bg); padding: 7px 12px; border-radius: 999px;
-  background: var(--accent); border: 1px solid var(--accent);
-  transition: background .35s var(--ease), transform .35s var(--ease), box-shadow .35s var(--ease);
-  /* Solid accent pill with a looping pulse (scale + glow) — draws the eye to “click me”.
-     Stops on hover; off for reduced-motion. */
-  animation: workBadgePulse 2.2s var(--ease-in-out) infinite;
+
+/* ============================================================
+   LANGUAGE SWITCHER (galvene + mobilā izvēlne + raksta lapas)
+   ============================================================ */
+.lang { display: inline-flex; align-items: center; gap: 2px; font-family: var(--font-sans); font-size: 12px; letter-spacing: .06em; }
+.lang a, .lang span { padding: 4px 6px; color: var(--ink-faint); transition: color .3s; }
+.lang a:hover { color: var(--ink); }
+.lang span { color: var(--ink); }
+.menu .lang { margin-top: 40px; font-size: 14px; }
+
+/* ============================================================
+   IMPACT GLOSS — vārdnīcas rindiņa zem "rast?" EN/RU versijās
+   ============================================================ */
+.impact__gloss {
+  margin-top: clamp(16px, 2.6vw, 28px);
+  font-family: var(--font-sans); font-size: clamp(13px, 1.15vw, 15px);
+  letter-spacing: .02em; color: var(--ink-dim);
 }
-@keyframes workBadgePulse {
-  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
-  50%      { transform: scale(1.06); box-shadow: 0 0 0 5px rgba(var(--accent-rgb), 0.20), 0 8px 22px -4px rgba(var(--accent-rgb), 0.6); }
-}
-.work__badge i { color: var(--bg); font-style: normal; transition: transform .35s var(--ease); }
-.work__card:hover .work__badge { background: var(--accent-soft); animation: none; }
-.work__card:hover .work__badge i { transform: translateX(3px); }
-@media (prefers-reduced-motion: reduce) { .work__badge { animation: none; } }
+.impact__gloss em { font-style: normal; color: var(--accent); }

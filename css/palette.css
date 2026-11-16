@@ -1,0 +1,18 @@
+/* copy/: what the palette (copy/js/palette.js) needs beyond the tokens it sets on :root. */
+:root { --glow-rgb: 255, 255, 255; }        /* the intro's "white" (particle letters, the white orb) */
+
+/* The intro dot's flat colour over the sphere was the original orange — now the palette's accent. */
+html[data-palette] .fx-orb::after {
+  background:
+    linear-gradient(rgba(var(--accent-rgb), var(--od, 0)), rgba(var(--accent-rgb), var(--od, 0))),
+    radial-gradient(circle at 38% 34%, var(--accent-soft), var(--accent) 46%, var(--accent-deep) 100%);
+}
+html[data-palette] .fx-orb.is-white::after {
+  background:
+    linear-gradient(rgba(var(--glow-rgb), var(--ow, 0)), rgba(var(--glow-rgb), var(--ow, 0))),
+    radial-gradient(circle at 38% 34%, var(--accent-soft), var(--accent) 46%, var(--accent-deep) 100%);
+}
+html[data-palette] .fx-orb.is-white::before {
+  background: radial-gradient(circle, rgba(var(--glow-rgb), 0.55) 0%, rgba(var(--glow-rgb), 0.22) 30%, rgba(var(--glow-rgb), 0) 68%);
+}
+html[data-palette] .form-modal__backdrop { background: rgba(var(--bg-rgb), 0.78); }

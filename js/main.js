@@ -6,8 +6,6 @@
   'use strict';
 
   window.__rastBooted = true;            // signal the head-script safety timer that JS is alive
-  // NB: scroll-restoration is turned off and the page forced to the top in the <head> boot
-  // script (runs before this), so reload / back-navigation always starts cleanly at the top.
 
   var html   = document.documentElement;
   var body   = document.body;
@@ -18,7 +16,7 @@
   var hasST    = hasGSAP && typeof window.ScrollTrigger !== 'undefined';
   var hasLenis = typeof window.Lenis !== 'undefined';
 
-  if (!hasGSAP) html.classList.add('no-anim');           // CSS fallback: reveal everything
+  if (!hasST || reduce) html.classList.add('no-anim');           // CSS fallback: reveal everything
   if (hasST) {
     gsap.registerPlugin(ScrollTrigger);
     // Mobile browsers show/hide their address bar on scroll, which resizes the visual
@@ -62,14 +60,15 @@
     if (header) {
       header.classList.toggle('header--scrolled', y > 40);
       var menuOpen = menu && menu.classList.contains('is-open');
-      if (y > lastY && y > 600 && !menuOpen) header.classList.add('header--hidden');
-      else header.classList.remove('header--hidden');
+      var delta = y - lastY;
+      if (y <= 600 || menuOpen || header.contains(document.activeElement)) header.classList.remove('header--hidden');
+      else if (Math.abs(delta) > 6) header.classList.toggle('header--hidden', delta > 0);
     }
     if (scrollBar) {
       var max = document.documentElement.scrollHeight - window.innerHeight;
-      scrollBar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+      scrollBar.style.width = (max > 0 ? Math.max(0, Math.min(100, (y / max) * 100)) : 0) + '%';
     }
-    lastY = y;
+    if (Math.abs(y - lastY) > 6 || y <= 0) lastY = y;
   }
   window.addEventListener('scroll', function () { if (!lenis) onScroll(window.scrollY); }, { passive: true });
   onScroll(0);
@@ -78,21 +77,103 @@
   var toggle = document.getElementById('navToggle');
   var menu   = document.getElementById('menu');
 
+  var activeOverlay = null;
+  var overlayBackground = [];
+  var menuLabel = toggle && toggle.getAttribute('aria-label');
+
+  function syncScrollLock() {
+    html.classList.toggle('overlay-open', !!activeOverlay);
+    if (lenis) activeOverlay ? lenis.stop() : lenis.start();
+  }
+  function activateOverlay(panel) {
+    activeOverlay = panel;
+    panel.inert = false;
+    // Keep the mobile close button available, but exclude other header links.
+    var background = [].slice.call(body.children);
+    if (panel === menu && header) {
+      background = background.filter(function (el) { return el !== header; });
+      background = background.concat([].slice.call(header.children));
+    }
+    overlayBackground = background.filter(function (el) {
+      return el !== panel && el !== toggle && !el.inert && !/^(SCRIPT|STYLE|LINK)$/.test(el.tagName);
+    });
+    overlayBackground.forEach(function (el) { el.inert = true; });
+    syncScrollLock();
+  }
+  function deactivateOverlay(panel) {
+    if (activeOverlay !== panel) return;
+    overlayBackground.forEach(function (el) { el.inert = false; });
+    overlayBackground = [];
+    activeOverlay = null;
+    panel.inert = true;
+    syncScrollLock();
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!activeOverlay || e.key !== 'Tab') return;
+    var items = [].slice.call(activeOverlay.querySelectorAll('a[href], button, input, textarea, select, [tabindex="0"]'));
+    if (activeOverlay === menu && toggle) items.unshift(toggle);
+    items = items.filter(function (el) { return !el.disabled && el.tabIndex >= 0 && !el.closest('[inert]') && el.getClientRects().length; });
+    var first = items[0], last = items[items.length - 1];
+    if (!first) { e.preventDefault(); return; }
+    if (e.shiftKey && (document.activeElement === first || items.indexOf(document.activeElement) < 0)) {
+      e.preventDefault(); last.focus({ preventScroll: true });
+    } else if (!e.shiftKey && (document.activeElement === last || items.indexOf(document.activeElement) < 0)) {
+      e.preventDefault(); first.focus({ preventScroll: true });
+    }
+  });
   function openMenu() {
-    if (!menu) return;
+    if (!menu || !toggle) return;
     menu.classList.add('is-open'); toggle.classList.add('is-open');
     toggle.setAttribute('aria-expanded', 'true'); menu.setAttribute('aria-hidden', 'false');
-    if (lenis) lenis.stop();
+    var labels = { lv: 'Aizvērt izvēlni', en: 'Close menu', ru: 'Закрыть меню' };
+    toggle.setAttribute('aria-label', labels[document.documentElement.lang] || labels.lv);
+    if (header) header.classList.remove('header--hidden');
+    activateOverlay(menu);
+    menu.scrollTop = 0;
+    var first = menu.querySelector('a');
+    if (first) first.focus({ preventScroll: true });
   }
-  function closeMenu() {
-    if (!menu) return;
+  function closeMenu(restoreFocus) {
+    if (!menu || !toggle || !menu.classList.contains('is-open')) return;
+    deactivateOverlay(menu);
     menu.classList.remove('is-open'); toggle.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false'); menu.setAttribute('aria-hidden', 'true');
-    if (lenis) lenis.start();
+    toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-label', menuLabel);
+    if (restoreFocus) toggle.focus({ preventScroll: true });
+    menu.setAttribute('aria-hidden', 'true');
   }
-  if (toggle) toggle.addEventListener('click', function () {
-    menu.classList.contains('is-open') ? closeMenu() : openMenu();
+  if (toggle && menu) toggle.addEventListener('click', function () {
+    menu.classList.contains('is-open') ? closeMenu(true) : openMenu();
   });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && activeOverlay === menu) closeMenu(true);
+  });
+  window.matchMedia('(min-width: 881px)').addEventListener('change', function (e) {
+    if (e.matches) closeMenu(true);
+  });
+
+  /* ---------------- UI strings (lapas valoda no <html lang>; noklusējums LV) ---------------- */
+  var PAGE_LANG = (document.documentElement.lang || 'lv').slice(0, 2).toLowerCase();
+  var UI_STRINGS = {
+    lv: {
+      pickService: 'Lūdzu, izvēlies pakalpojumu.',
+      sending: 'Nosūtām…',
+      sent: 'Paldies! Ziņa nosūtīta. Atbildēsim vienas darba dienas laikā.',
+      failed: 'Ziņu neizdevās nosūtīt. Mēģini vēlreiz vai raksti uz hello@raststudio.lv.'
+    },
+    en: {
+      pickService: 'Please choose a service.',
+      sending: 'Sending…',
+      sent: 'Thank you! Your enquiry is on its way - we\'ll reply soon.',
+      failed: 'Something went wrong. Please try again or write to hello@raststudio.lv'
+    },
+    ru: {
+      pickService: 'Пожалуйста, выбери услугу.',
+      sending: 'Отправляем…',
+      sent: 'Спасибо! Заявка отправлена — скоро ответим.',
+      failed: 'Не получилось отправить. Попробуй ещё раз или напиши на hello@raststudio.lv'
+    }
+  };
+  var STR = UI_STRINGS[PAGE_LANG] || UI_STRINGS.lv;
 
   /* ---------------- Project form modal (Web3Forms — no backend) ---------------- */
   (function setupContactForm() {
@@ -103,6 +184,7 @@
     var statusEl   = form.querySelector('.form__status');
     var submitBtn  = form.querySelector('[type="submit"]');
     var lastFocus  = null;
+    var submitting = false;
 
     /* ---- Custom service dropdown ---- */
     var cs = document.getElementById('fServiceSelect');
@@ -111,14 +193,14 @@
     var csList = cs && cs.querySelector('.cselect__list');
     var csOpts = cs ? cs.querySelectorAll('.cselect__opt') : [];
     var csPlaceholder = csValue ? csValue.textContent : 'Izvēlies pakalpojumu';
-    function csOpen()  {
+    function csOpen() {
       if (!cs) return;
       cs.classList.add('is-open'); csBtn.setAttribute('aria-expanded', 'true');
-      // The modal body scrolls (max-height 90svh); on phones the opened list can sit
-      // below that scroll box's fold — bring it into view once it has expanded.
-      setTimeout(function () {
-        if (csList && csList.scrollIntoView) csList.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      }, 230);
+      var selected = cs.querySelector('[aria-selected="true"]') || csOpts[0];
+      if (selected) {
+        selected.focus({ preventScroll: true });
+        selected.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+      }
     }
     function csClose() { if (cs) { cs.classList.remove('is-open'); csBtn.setAttribute('aria-expanded', 'false'); } }
     function csSet(value) {
@@ -134,6 +216,28 @@
       csValue.classList.toggle('is-placeholder', !found);
     }
     if (cs) {
+      csList.id = 'fServiceOptions';
+      csBtn.setAttribute('aria-controls', csList.id);
+      csBtn.setAttribute('aria-labelledby', 'fServiceLabel fServiceValue');
+      csValue.id = 'fServiceValue';
+      Array.prototype.forEach.call(csOpts, function (o) { o.tabIndex = -1; o.setAttribute('aria-selected', 'false'); });
+      cs.addEventListener('keydown', function (e) {
+        var index = Array.prototype.indexOf.call(csOpts, document.activeElement);
+        if (e.key === 'Escape' && cs.classList.contains('is-open')) {
+          e.preventDefault(); e.stopPropagation(); csClose(); csBtn.focus({ preventScroll: true });
+        } else if (e.key === 'Tab') {
+          csClose(); csBtn.focus({ preventScroll: true });
+        } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].indexOf(e.key) >= 0) {
+          e.preventDefault();
+          if (!cs.classList.contains('is-open')) { csOpen(); return; }
+          var next = e.key === 'Home' ? 0 : e.key === 'End' ? csOpts.length - 1 :
+            Math.max(0, Math.min(csOpts.length - 1, index + (e.key === 'ArrowUp' ? -1 : 1)));
+          csOpts[next].focus({ preventScroll: true });
+          csOpts[next].scrollIntoView({ block: 'nearest' });
+        } else if ((e.key === 'Enter' || e.key === ' ') && index >= 0) {
+          e.preventDefault(); csOpts[index].click();
+        }
+      });
       csBtn.addEventListener('click', function (e) { e.stopPropagation(); cs.classList.contains('is-open') ? csClose() : csOpen(); });
       Array.prototype.forEach.call(csOpts, function (o) {
         o.addEventListener('click', function () { csSet(o.getAttribute('data-value')); csClose(); csBtn.focus(); });
@@ -144,21 +248,20 @@
     function openForm(service) {
       lastFocus = document.activeElement;
       if (service) csSet(service);
+      closeMenu();
       modal.classList.add('is-open');
       modal.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('modal-open');
-      closeMenu();
-      if (lenis) lenis.stop();
+      activateOverlay(modal);
+      modal.querySelector('.form').scrollTop = 0;
       var first = form.querySelector('input:not([type=hidden]):not(.form__hp), select, textarea');
-      setTimeout(function () { if (first) try { first.focus(); } catch (e) {} }, 90);
+      if (first) first.focus({ preventScroll: true });
     }
     function closeForm() {
       csClose();
       modal.classList.remove('is-open');
+      deactivateOverlay(modal);
+      if (lastFocus) lastFocus.focus({ preventScroll: true });
       modal.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('modal-open');
-      if (lenis) lenis.start();
-      if (lastFocus) try { lastFocus.focus(); } catch (e) {}
     }
 
     Array.prototype.forEach.call(document.querySelectorAll('.js-open-form'), function (el) {
@@ -174,6 +277,13 @@
       });
     });
 
+    if (new URLSearchParams(location.search).get('project') === '1') {
+      openForm();
+      var entryUrl = new URL(location.href);
+      entryUrl.searchParams.delete('project');
+      history.replaceState(history.state, '', entryUrl.pathname + entryUrl.search + entryUrl.hash);
+    }
+
     modal.addEventListener('click', function (e) {
       if (e.target === modal || (e.target.hasAttribute && e.target.hasAttribute('data-close'))) closeForm();
     });
@@ -183,18 +293,23 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (submitting) return;
       if (!serviceInput.value) {                       // custom dropdown isn't a native field → validate manually
-        if (statusEl) { statusEl.textContent = 'Lūdzu izvēlies pakalpojumu.'; statusEl.className = 'form__status is-err'; }
+        if (statusEl) { statusEl.textContent = STR.pickService; statusEl.className = 'form__status is-err'; }
         csOpen();
         return;
       }
-      if (statusEl) { statusEl.textContent = 'Sūta…'; statusEl.className = 'form__status is-sending'; }
+      if (statusEl) { statusEl.textContent = STR.sending; statusEl.className = 'form__status is-sending'; }
+      submitting = true;
+      form.setAttribute('aria-busy', 'true');
       if (submitBtn) submitBtn.disabled = true;
-      fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
-        .then(function (r) { return r.json(); })
+      var controller = new AbortController();
+      var timeout = setTimeout(function () { controller.abort(); }, 15000);
+      fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form), signal: controller.signal })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(function (json) {
           if (json && json.success) {
-            if (statusEl) { statusEl.textContent = 'Paldies! Pieteikums nosūtīts, atbildēsim drīz.'; statusEl.className = 'form__status is-ok'; }
+            if (statusEl) { statusEl.textContent = STR.sent; statusEl.className = 'form__status is-ok'; }
             form.reset();
             csSet('');
           } else {
@@ -202,24 +317,56 @@
           }
         })
         .catch(function () {
-          if (statusEl) { statusEl.textContent = 'Neizdevās nosūtīt. Mēģini vēlreiz vai raksti hello@raststudio.lv'; statusEl.className = 'form__status is-err'; }
+          if (statusEl) { statusEl.textContent = STR.failed; statusEl.className = 'form__status is-err'; }
         })
-        .finally(function () { if (submitBtn) submitBtn.disabled = false; });
+        .finally(function () {
+          clearTimeout(timeout); submitting = false; form.removeAttribute('aria-busy');
+          if (submitBtn) submitBtn.disabled = false;
+        });
     });
   })();
 
-  /* ---------------- Anchor smooth scroll ---------------- */
+  /* ---------------- Anchor navigation + history ---------------- */
+  function hashTarget(hash) {
+    if (!hash || hash === '#') return null;
+    try { return document.getElementById(decodeURIComponent(hash.slice(1))); }
+    catch (err) { return null; }
+  }
+  function scrollToPosition(y) {
+    if (lenis) { lenis.resize(); lenis.scrollTo(y, { immediate: true, force: true }); }
+    else window.scrollTo({ top: y, behavior: 'instant' });
+    onScroll(window.scrollY);
+  }
+  function anchorY(target) {
+    return Math.max(0, target.getBoundingClientRect().top + window.scrollY - (header ? header.offsetHeight + 16 : 16));
+  }
+  function focusTarget(target) {
+    if (!target.hasAttribute('tabindex')) {
+      target.setAttribute('tabindex', '-1');
+      target.addEventListener('blur', function () { target.removeAttribute('tabindex'); }, { once: true });
+    }
+    target.focus({ preventScroll: true });
+  }
   Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function (a) {
     a.addEventListener('click', function (e) {
-      if (a.classList.contains('js-open-form')) return;        // handled by the project-form modal
-      var id = a.getAttribute('href');
-      if (id === '#') { e.preventDefault(); return; }          // placeholder links
-      var target = document.querySelector(id);
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank') return;
+      if (a.classList.contains('js-open-form')) return;
+      var hash = a.getAttribute('href');
+      if (hash === '#') { e.preventDefault(); return; }
+      var target = hashTarget(hash);
       if (!target) return;
       e.preventDefault();
       closeMenu();
-      if (lenis) lenis.scrollTo(target, { offset: 0, duration: 1.2 });
-      else target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+      restorationDone = true;
+      savePosition();
+      var y = anchorY(target);
+      if (Math.abs(window.scrollY - y) > 2 || location.hash) {
+        // Keep section navigation in history without exposing fragments in the URL.
+        try { history.pushState(positionState(y, ''), '', location.pathname + location.search); } catch (err) { }
+      }
+      focusTarget(target);
+      if (lenis) lenis.scrollTo(y, { duration: 1, onComplete: savePosition });
+      else window.scrollTo({ top: y, behavior: reduce ? 'instant' : 'smooth' });
     });
   });
 
@@ -304,13 +451,25 @@
   function playIntro() {
     if (!hasGSAP || reduce) return;
     var heroReveals = heroEl ? heroEl.querySelectorAll('[data-reveal]') : [];
-    var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+    // copy/: the soft shadows behind the hero copy come in with their text (hero-scrim.css); once
+    // the lines have slid in, their reveal clip is lifted
+    var tl = gsap.timeline({ defaults: { ease: 'power4.out' }, onComplete: function () {
+      if (heroEl) heroEl.classList.add('is-intro-done');
+      gsap.set('.hero__title .line > span', { clearProps: 'transform,top' });   // no stacking context left: each word's shadow sits under every word, not over the line above
+    } });
     // NB: y:0 in the from-state is load-bearing. The CSS pre-hide is
     // translateY(110%), which GSAP imports as PIXELS (percentages are already
     // resolved in computed style); animating only yPercent would leave that
     // pixel offset behind and the title would stay clipped forever.
-    tl.fromTo('.hero__title .line > span', { y: 0, yPercent: 110 }, { y: 0, yPercent: 0, duration: 1.1, stagger: 0.12 })
-      .fromTo(heroReveals, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.12 }, '-=0.7');
+    // copy/: the big words slide on `top` (hero-scrim.css says why), the rest as before
+    var heroLead = document.querySelector('.hero--solutions .hero__lead');
+    var heroWords = gsap.utils.toArray('.hero--solutions .hero__word > span');
+    var otherLines = gsap.utils.toArray('.hero__title .line > span').filter(function (el) { return heroWords.indexOf(el) < 0; });
+    var leadAt = heroWords.length * 0.12;
+    if (heroWords.length) tl.fromTo(heroWords, { top: '2.2em' }, { top: '0em', duration: 1.1, stagger: 0.12 }, 0);
+    tl.fromTo(otherLines, { y: 0, yPercent: 110 }, { y: 0, yPercent: 0, duration: 1.1, stagger: 0.12 }, leadAt);
+    if (heroLead) tl.fromTo(heroLead, { '--scrim': 0 }, { '--scrim': 1, duration: 0.9, ease: 'power2.out' }, leadAt);
+    tl.fromTo(heroReveals, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.12 }, '-=0.7');
   }
 
   function setupReveals() {
@@ -327,7 +486,11 @@
       start: 'top 88%',
       once: true,                       // play the slide-in once; never replay on re-scroll
       onEnter: function (batch) {
-        gsap.fromTo(batch, { opacity: 0, y: 28 }, {
+        // A jump to Contact must not queue its content behind every skipped section.
+        var visible = batch.filter(function (el) { return el.getBoundingClientRect().bottom > 0; });
+        var passed = batch.filter(function (el) { return visible.indexOf(el) < 0; });
+        if (passed.length) gsap.set(passed, { opacity: 1, y: 0 });
+        gsap.fromTo(visible, { opacity: 0, y: 28 }, {
           opacity: 1, y: 0, duration: 0.9, stagger: 0.09, ease: 'power3.out', overwrite: true
         });
       }
@@ -358,6 +521,15 @@
         scrollTrigger: { trigger: '.cta__title', start: 'top 85%', once: true }
       });
     }
+
+    // "Mūsu darbi" — the same slide-up as the hero headline, played once on scroll.
+    var workLines = document.querySelectorAll('.work__big-title .line > span');
+    if (workLines.length) {
+      gsap.fromTo(workLines, { y: 0, yPercent: 110 }, {
+        y: 0, yPercent: 0, duration: 1.1, ease: 'power4.out',
+        scrollTrigger: { trigger: '.work__big-title', start: 'top 85%', once: true }
+      });
+    }
   }
 
   /* ---------------- Interactive 2D particle canvas (WebGL fallback) ---------------- */
@@ -372,6 +544,15 @@
     var w, h, dpr, parts = [], raf = null, running = false;
     var mouse = { x: -9999, y: -9999 };
     var LINK = 122, REPEL = 150;
+    // dot + link colours follow the palette (copy/js/palette.js)
+    var dotCol = 'rgba(244,240,233,0.55)', linkRgb = '255,74,46';
+    function recolor() {
+      if (!window.rastPalette) return;
+      var c = window.rastPalette.colors().intro, hx = function (h) { var n = parseInt(h.slice(1), 16); return ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255); };
+      dotCol = 'rgba(' + hx(c.ink) + ',0.55)'; linkRgb = hx(c.accent);
+    }
+    recolor();
+    window.addEventListener('rast:palette', recolor);
 
     function size() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -400,7 +581,7 @@
         var dx = p.x - mouse.x, dy = p.y - mouse.y, d = Math.sqrt(dx * dx + dy * dy);
         if (d < REPEL && d > 0) { var f = (REPEL - d) / REPEL * 1.6; p.x += dx / d * f; p.y += dy / d * f; }
         ctx.beginPath(); ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(244,240,233,0.55)'; ctx.fill();
+        ctx.fillStyle = dotCol; ctx.fill();
       }
       for (var a = 0; a < parts.length; a++) {
         for (var b = a + 1; b < parts.length; b++) {
@@ -409,7 +590,7 @@
           if (dist < LINK) {
             ctx.beginPath();
             ctx.moveTo(parts[a].x, parts[a].y); ctx.lineTo(parts[b].x, parts[b].y);
-            ctx.strokeStyle = 'rgba(255,74,46,' + (1 - dist / LINK) * 0.16 + ')';
+            ctx.strokeStyle = 'rgba(' + linkRgb + ',' + (1 - dist / LINK) * 0.16 + ')';
             ctx.lineWidth = 1; ctx.stroke();
           }
         }
@@ -550,56 +731,84 @@
     });
   }
 
-  /* ---------------- Process: sticky 3D cube (revolves left→right) ---------------- */
-  // Desktop: the section is tall and .process__container is CSS-sticky (held centred);
-  // this scrub (NO ScrollTrigger pin — its spacer was desyncing later sections) revolves
-  // the four chapters as faces of a 3D cube around the Y axis, left→right like a storyline.
-  // An ease-in-out scrub makes each face DWELL flat-on (text readable) and turn quickly
-  // between faces, so you never have to read a card mid-rotation. Mobile/reduced: plain list.
+  /* ---------------- Process: sticky number + scrolling chapters ---------------- */
+  // Desktop (CSS ≥861px): the left column (title + a huge faint chapter number) is
+  // CSS-sticky while the chapters scroll past on the right. JS only builds the decorative
+  // extras — the number reel and a clickable chapter index — and marks which chapter is
+  // in view. Mobile/reduced/no-JS: the plain list stays as is.
   function setupProcess() {
     if (!hasST || reduce) return;
     var section = document.getElementById('process');
     var listEl = document.getElementById('processList');
-    var counter = document.getElementById('procCount');
+    var head = section && section.querySelector('.process__head');
     var steps = gsap.utils.toArray('.step');
-    if (!section || !listEl || !steps.length) return;
+    if (!section || !listEl || !head || !steps.length) return;
 
-    listEl.classList.add('is-drum');
-    var N = steps.length;
+    // Rolling number: every chapter's number stacked in a reel behind a 1em window
+    var big = document.createElement('div');
+    big.className = 'process__big';
+    big.setAttribute('aria-hidden', 'true');
+    var reel = document.createElement('span');
+    reel.className = 'process__big-reel';
+    big.appendChild(reel);
+    head.appendChild(big);
 
-    function render(pos) {
-      var active = Math.round(Math.max(0, Math.min(N - 1, pos)));
-      var radius = window.innerWidth <= 860 ? 90 : 240;   // cube half-depth (px) — same geometry as before
-      for (var i = 0; i < N; i++) {
-        var delta = pos - i;                       // >0 already turned past (to the left), <0 upcoming (from the right)
-        var ad = Math.abs(delta);
-        // Each chapter is a face of a 3D cube 90° apart, revolving left→right around Y.
-        // The active face sits flat-on (rotateY 0deg) so its text reads perfectly straight.
-        steps[i].style.transform = 'rotateY(' + (-delta * 90) + 'deg) translateZ(' + radius + 'px)';
-        steps[i].style.opacity = ad < 1 ? String(1 - ad * ad) : '0';   // only the front chapter is lit; side faces fade out
-        steps[i].style.zIndex = ad < 0.5 ? '2' : '1';
-        steps[i].classList.toggle('is-active', i === active);
-      }
-      if (counter) counter.textContent = steps[active].getAttribute('data-step');
-    }
+    // Chapter index above the chapters (a duplicate of their titles → hidden from AT)
+    var body = document.createElement('div');
+    body.className = 'process__body';
+    var index = document.createElement('ol');
+    index.className = 'process__index';
+    index.setAttribute('aria-hidden', 'true');
+    listEl.parentNode.insertBefore(body, listEl);
+    body.appendChild(index);
+    body.appendChild(listEl);
 
-    // Ease-in-out within each step: the cube DWELLS flat-on (readable) and turns
-    // between faces. smoothstep (gentler midpoint slope than the old cubic in-out)
-    // keeps the flat-on dwell but rotates more smoothly — no abrupt mid-turn flip.
-    function easePos(raw) {
-      var base = Math.floor(raw), f = raw - base;
-      var fs = f * f * (3 - 2 * f);
-      return base + fs;
-    }
-    ScrollTrigger.create({
-      trigger: section,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1.4,
-      onUpdate: function (self) { render(easePos(self.progress * (N - 1))); },
-      onRefresh: function (self) { render(easePos(self.progress * (N - 1))); }
+    var rows = steps.map(function (step) {
+      var num = step.getAttribute('data-step');
+      var digit = document.createElement('span');
+      digit.textContent = num;
+      reel.appendChild(digit);
+
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.tabIndex = -1;
+      btn.setAttribute('data-cursor', 'hover');
+      btn.innerHTML = '<span class="process__index-num">' + num + '</span>';
+      btn.appendChild(document.createTextNode(step.querySelector('.step__title').textContent));
+      btn.addEventListener('click', function () {
+        // Land the chapter just past the activation line so it lights up on arrival
+        var y = Math.max(0, step.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.3);
+        if (lenis) lenis.scrollTo(y, { duration: 1.1 });
+        else window.scrollTo({ top: y, behavior: 'smooth' });
+      });
+      li.appendChild(btn);
+      index.appendChild(li);
+      return li;
     });
-    render(0);
+
+    var current = -1;
+    function setActive(i) {
+      if (i === current) return;
+      current = i;
+      reel.style.transform = 'translateY(' + (-i) + 'em)';
+      for (var k = 0; k < steps.length; k++) {
+        steps[k].classList.toggle('is-active', k === i);
+        rows[k].classList.toggle('is-active', k === i);
+      }
+    }
+
+    // Active = the last chapter whose top has crossed 60% of the screen. Read from the
+    // layout on every update (not per-step toggles), so a jump straight past the section
+    // (menu link, restored position) still leaves the right number showing.
+    function sync() {
+      var line = window.innerHeight * 0.6, i = 0;
+      for (var k = 1; k < steps.length; k++) if (steps[k].getBoundingClientRect().top <= line) i = k;
+      setActive(i);
+    }
+    section.classList.add('is-flow');
+    ScrollTrigger.create({ trigger: section, start: 'top bottom', end: 'bottom top', onUpdate: sync, onRefresh: sync });
+    sync();
   }
 
 
@@ -618,17 +827,41 @@
     var deck = document.querySelector('.svc__deck');
     if (!head || !deck) return;
     var cards = deck.querySelectorAll('.svc__card');
+    var catalogue = deck.closest('.svc--catalogue');
+    var titles = [];
+    if (catalogue) {
+      Array.prototype.forEach.call(cards, function (card, i) {
+        var title = card.querySelector('.svc__lead'), next = cards[i + 1];
+        if (title && next) titles.push({ card: card, el: title, slot: title.parentElement,
+          content: card.querySelector('.svc__card-aside'), next: next });
+      });
+    }
     function measure() {
-      var offset = parseFloat(getComputedStyle(head).top) || 96;   // resolved sticky top
-      deck.style.setProperty('--deck-top', Math.round(offset + head.offsetHeight + 18) + 'px');
+      if (catalogue) {
+        // copy/: only the cards pin; the section heading scrolls away normally.
+        deck.style.removeProperty('--deck-top');
+      } else {
+        var offset = parseFloat(getComputedStyle(head).top) || 96;   // resolved sticky top
+        deck.style.setProperty('--deck-top', Math.round(offset + head.offsetHeight + 18) + 'px');
+      }
       // Telefonā visas kārtis pinojas vienā augstumā (pilnīgs pārklājums, sk. CSS), tāpēc
       // garākās kārts apakša izlīstu zem nākamās. Nomērām dabiskos augstumus un izlīdzinām
       // visas uz garāko. Vispirms noņemam mainīgo, citādi mērītu iepriekšējo izlīdzinājumu.
       deck.style.removeProperty('--card-h');
-      if (window.innerWidth > 760) return;
-      var tallest = 0;
-      Array.prototype.forEach.call(cards, function (c) { tallest = Math.max(tallest, c.offsetHeight); });
-      if (tallest) deck.style.setProperty('--card-h', Math.ceil(tallest) + 'px');
+      var desktop = window.innerWidth > 760;
+      if (!desktop) {
+        var tallest = 0;
+        Array.prototype.forEach.call(cards, function (c) { tallest = Math.max(tallest, c.offsetHeight); });
+        if (tallest) deck.style.setProperty('--card-h', Math.ceil(tallest) + 'px');
+      }
+      titles.forEach(function (t) {
+        t.scale = Math.min(1, parseFloat(getComputedStyle(t.slot).fontSize) / parseFloat(getComputedStyle(t.el).fontSize));
+        t.peek = desktop ? parseFloat(getComputedStyle(t.next).top) - parseFloat(getComputedStyle(t.card).top) : 0;
+        var inset = t.slot.getBoundingClientRect().top - t.card.getBoundingClientRect().top;
+        t.shift = desktop ? (t.peek - t.el.offsetHeight * t.scale) / 2 - inset : 0;
+        t.progress = -1;
+      });
+      onScroll();
     }
     // Sadaļas beigās pēdējā kārts aizslīd pāri piestiprinātajam virsrakstam. Kārts to nosedz,
     // bet tās noapaļotie stūri ir caurspīdīgi, tāpēc stūrī pavīdēja virsraksta burts ("K"
@@ -639,7 +872,22 @@
     var queued = false;
     function syncCover() {
       queued = false;
-      if (!last) return;
+      // Start at the bottom of the body content, then ease the same heading into
+      // the visible strip. Stable layout boxes keep this reversible without jumps.
+      var progress = titles.map(function (t) {
+        var bottom = t.content.getBoundingClientRect().bottom;
+        var travel = bottom - t.card.getBoundingClientRect().top - t.peek;
+        var p = travel > 0 && !html.classList.contains('no-anim') ?
+          Math.max(0, Math.min(1, (bottom - t.next.getBoundingClientRect().top) / travel)) : 0;
+        return p * p * (3 - 2 * p);
+      });
+      titles.forEach(function (t, i) {
+        if (progress[i] === t.progress) return;
+        t.progress = progress[i];
+        t.el.style.setProperty('--title-scale', 1 + (t.scale - 1) * t.progress);
+        t.el.style.setProperty('--title-y', (t.shift * t.progress) + 'px');
+      });
+      if (!last || catalogue) return;
       var h = head.getBoundingClientRect(), c = last.getBoundingClientRect();
       var op = Math.max(0, Math.min(1, (c.top - h.top) / FADE));
       if (op === lastOp) return;
@@ -731,9 +979,27 @@
   var MORPH_CSS = 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700' +
                   '&family=Pacifico&family=Bebas+Neue&family=Archivo+Black&family=Caveat:wght@700' +
                   '&family=DM+Serif+Display:ital@0;1&display=swap';
+  // RU lapā morphojamais vārds ir kirilicā, bet puse latīņu komplekta (Bricolage,
+  // Bebas Neue, Archivo Black, DM Serif Display) kirilicu neatbalsta — burti kristu
+  // uz vienveidīgiem fallback fontiem un cikls izskatītos salauzts. Tāpēc RU savs
+  // saraksts ar līdzīgiem raksturiem, kuriem Google Fonts ir kirilicas apakškopa.
+  if (PAGE_LANG === 'ru') {
+    MORPH_FONTS = [
+      ["'Inter Tight', sans-serif",   ''],                              // jau ielādēts (RU display fonts)
+      ["'Playfair Display', serif",   '700 100px "Playfair Display"'],
+      ["'Pacifico', cursive",         '400 100px "Pacifico"'],
+      ["'Oswald', sans-serif",        '600 100px "Oswald"'],            // kondensēts ~ Bebas Neue
+      ["'Russo One', sans-serif",     '400 100px "Russo One"'],         // smags ~ Archivo Black
+      ["'Yeseva One', serif",         '400 100px "Yeseva One"'],        // dekoratīvs serifs ~ DM Serif
+      ["'Caveat', cursive",           '700 100px "Caveat"']
+    ];
+    MORPH_CSS = 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700' +
+                '&family=Pacifico&family=Oswald:wght@600&family=Russo+One' +
+                '&family=Yeseva+One&family=Caveat:wght@700&display=swap';
+  }
   var morphFontsReady = null;
 
-  function loadMorphFonts() {
+  function loadMorphFonts(word) {
     if (morphFontsReady) return morphFontsReady;
     morphFontsReady = new Promise(function (res) {
       var link = document.createElement('link');
@@ -748,7 +1014,7 @@
       if (!document.fonts || !document.fonts.load) return;
       var jobs = [];
       MORPH_FONTS.forEach(function (f) {
-        if (f[1]) jobs.push(document.fonts.load(f[1], 'rast'));
+        if (f[1]) jobs.push(document.fonts.load(f[1], word || 'rast'));
       });
       return Promise.all(jobs)['catch'](function () { });
     })['catch'](function () { });
@@ -780,7 +1046,7 @@
 
     function start() {
       if (timer || !near) return;
-      loadMorphFonts().then(function () {
+      loadMorphFonts(el.textContent).then(function () {
         if (!near || timer) return;                      // scrolled away while fonts loaded
         lockWidth();
         timer = setInterval(function () {
@@ -826,7 +1092,7 @@
     'uniform float uTime;uniform vec2 uMouse;uniform float uForce;uniform float uSize;uniform float uDpr;uniform vec3 uMouseW;',
     'uniform float uToText;uniform float uToSphere;uniform float uSpin;uniform float uSphereR;uniform vec3 uDotC;uniform float uGrow;',
     'attribute float aScale;attribute vec3 aText;attribute vec3 aSphere;attribute float aRand;attribute float aRelease;attribute float aIsDot;attribute float aSuck;',
-    'varying float vH;varying float vForm;varying float vSphere;varying float vIsDot;varying float vFade;',
+    'varying float vH;varying float vForm;varying float vSphere;varying float vIsDot;varying float vFade;varying float vNear;',
     SNOISE,
     'vec3 rotX(vec3 p,float a){float c=cos(a),s=sin(a);return vec3(p.x,c*p.y-s*p.z,s*p.y+c*p.z);}',
     'vec3 rotY(vec3 p,float a){float c=cos(a),s=sin(a);return vec3(c*p.x+s*p.z,p.y,-s*p.x+c*p.z);}',
@@ -844,15 +1110,16 @@
     '  vForm=tt;',
     '  float s=uToSphere;',
     '  float dNeck=length(vec2(position.x,position.y+9.0));',          // plane-space distance from the "neck" (projects to screen bottom-centre)
-    '  float ci=clamp((s*1.6-dNeck*0.038-aRand*0.12)/0.4,0.0,1.0);',   // starts immediately, and the tail keeps arriving almost until the grow — no dead wait
-    '  float t=ci*ci;',                                                // squared → gravity: hangs, then plunges; perfectly still at rest (s=0)
+    '  float ci=clamp((s*1.2-dNeck*0.022-aRand*0.2)/0.3,0.0,1.0);',   // a long, gradual stream: the nearest dots arrive quickly (the dot forms early), the far ones follow later and later
+    '  float t=ci;',                                                   // linear: the same speed all the way in (no hang-then-plunge)
     '  float r1=fract(aRand*13.7)-0.5;float r2=fract(aRand*7.31);float r3=fract(aRand*29.7)-0.5;',
     '  vec3 fp=wave;',
-    '  fp.y-=(2.5+4.5*r2)*t;',                                         // each dot has its OWN fall depth…
-    '  fp.x+=r1*7.0*t*(1.0-t);',                                       // …its own sideways arc…
-    '  fp.z+=r3*4.0*t*(1.0-t);',                                       // …and its own depth arc (zero at both ends)
     '  vec3 land=uDotC+aSphere*(0.12*fract(aRand*3.9));',              // landed dots pile into a tiny ROUND ball (Fibonacci directions, centre-dense) — the white dot itself
-    '  fp=mix(fp,land,smoothstep(0.20+0.25*r2,1.0,t));',               // own turn-in moment — EVERY dot lands in that cluster
+    '  fp=mix(fp,land,smoothstep(0.0,1.0,t));',                         // the WHOLE wave streams into the (itself falling) dot as one…
+    '  vec2 rel=fp.xy-land.xy;float sw=7.0*t*t*(1.0-t)*(0.7+0.6*r2);',   // …swirling in like a vortex once they are close (zero turn at both ends, so the wave at rest and the landed dot are untouched)
+    '  float cs=cos(sw),sn=sin(sw);fp.xy=land.xy+vec2(cs*rel.x-sn*rel.y,sn*rel.x+cs*rel.y);',
+    '  fp.x+=r1*5.0*t*(1.0-t);',                                       // each dot its own sideways arc…
+    '  fp.z+=r3*3.0*t*(1.0-t);',                                       // …and depth arc (zero at both ends)
     '  pos=mix(pos,fp,smoothstep(0.0,0.02,t));',
     '  float mf=smoothstep(0.02,0.15,t)*(1.0-smoothstep(0.75,0.95,t));',   // interactive the whole flight; lets go just before joining the ball
     '  vec3 rd=normalize(uMouseW-cameraPosition);',                    // repel measured from the cursor RAY, not a fixed plane —
@@ -860,29 +1127,30 @@
     '  float dRay=distance(pos,np);',
     '  pos+=(pos-np)/max(dRay,0.001)*smoothstep(1.2,0.0,dRay)*uForce*0.5*mf;',
     '  vSphere=0.0;',                                                  // in-flight dots keep their colour — ALL the orange is born from the white dot
-    '  vFade=1.0-smoothstep(0.0,0.08,uGrow);',                         // the instant the grow starts, the cluster dissolves INTO the forming orange
+    '  vFade=1.0-smoothstep(0.9,1.0,t)*smoothstep(0.0,0.08,uGrow);',   // once the white orb is there, each dot vanishes into it as it lands; dots still on their way stay visible
     '  vIsDot=aIsDot;',   // orange amount (dot → sphere)
+    '  vNear=smoothstep(0.6,1.0,t);',                                 // dots light up as they near the dot — it charges up
     '  float sm=mix(1.0,0.60,clamp(uToText,0.0,1.0));',
     '  sm=mix(sm,0.9,clamp(uToSphere,0.0,1.0));',
     '  vec4 mv=modelViewMatrix*vec4(pos,1.0);',
-    '  gl_PointSize=uSize*aScale*uDpr*(10.0/-mv.z)*sm;',
+    '  gl_PointSize=min(uSize*aScale*uDpr*(10.0/-mv.z)*sm*(1.0+0.12*vNear),mix(1000.0,6.0*uDpr,smoothstep(0.0,0.1,t)));',   // capped once moving: a dot swung close to the camera must never become a blob (the wave at rest is untouched)
     '  gl_Position=projectionMatrix*mv;}'
   ].join('\n');
 
   var FRAG = [
     'precision mediump float;',
-    'uniform vec3 uColorA;uniform vec3 uColorB;',
-    'varying float vH;varying float vForm;varying float vSphere;varying float vIsDot;varying float vFade;',
+    'uniform vec3 uColorA;uniform vec3 uColorB;uniform vec3 uGlow;',
+    'varying float vH;varying float vForm;varying float vSphere;varying float vIsDot;varying float vFade;varying float vNear;',
     'void main(){',
     '  vec2 c=gl_PointCoord-0.5;float dd=dot(c,c);if(dd>0.25)discard;',
     '  float a=smoothstep(0.25,0.0,dd);',
     '  float t=smoothstep(-0.6,1.3,vH);',
     '  vec3 waveCol=mix(uColorA,uColorB,t);',
     '  float waveA=0.30+0.62*t;',
-    '  vec3 formCol=mix(vec3(1.0),uColorA,vIsDot);',   // white letters, orange dot
-    '  vec3 col=mix(waveCol,formCol,vForm);',
+    '  vec3 formCol=mix(uGlow,uColorA,vIsDot);',   // white letters, orange dot (uGlow: palette's "white")
+    '  vec3 col=mix(mix(waveCol,formCol,vForm),uGlow,vNear*0.5);',
     '  col=mix(col,uColorA,vSphere);',   // orange as it enters the dot → sphere
-    '  gl_FragColor=vec4(col,a*mix(waveA,0.82,vForm)*(1.0-0.42*vSphere)*vFade);}'
+    '  gl_FragColor=vec4(col,min(1.0,a*mix(waveA,0.82,vForm)*(1.0+0.3*vNear))*(1.0-0.42*vSphere)*vFade);}'
   ].join('\n');
 
   // Sample "rast" (with the logo-style accent dot) into world-space target points.
@@ -972,11 +1240,33 @@
       uToSphere: { value: 0 },
       uSpin:     { value: 0 },
       uSphereR:  { value: small ? 2.7 : 3.4 },
-      uDotC:     { value: new THREE.Vector3(0, -3.2, 0) },   // the "black hole": centre-bottom of the front view
+      uDotC:     { value: new THREE.Vector3(0, -3.2, 0) },   // the dot the particles fall into (set by setLanding)
       uGrow:     { value: 0 },                               // grow progress — dissolves the landed cluster into the forming orange
       uColorA:   { value: new THREE.Color(0xff4a2e) },
-      uColorB:   { value: new THREE.Color(0xf4f0e9) }
+      uColorB:   { value: new THREE.Color(0xf4f0e9) },
+      uGlow:     { value: new THREE.Color(0xffffff) }
     };
+
+    // copy/: accent / ink / glow come from the palette (copy/js/palette.js); .intro is the first
+    // screen's set — the same as the page's, the page is dark throughout.
+    var palA = [new THREE.Color(), new THREE.Color(), new THREE.Color()], palB = [new THREE.Color(), new THREE.Color(), new THREE.Color()];
+    function recolorGL() {
+      if (!window.rastPalette) return;
+      var c = window.rastPalette.colors(), d = c.intro;
+      palA[0].set(d.accent); palA[1].set(d.ink); palA[2].set(d.glow);
+      palB[0].set(c.accent); palB[1].set(c.ink); palB[2].set(c.glow);
+      fadeGL();
+    }
+    function fadeGL() {
+      var hb = heroEl ? heroEl.getBoundingClientRect().bottom : 0, vh = window.innerHeight || 1;
+      var t = Math.min(1, Math.max(0, (vh * 0.9 - hb) / (vh * 0.5)));   // hero bottom 90% → 40% of the screen
+      uniforms.uColorA.value.copy(palA[0]).lerp(palB[0], t);
+      uniforms.uColorB.value.copy(palA[1]).lerp(palB[1], t);
+      uniforms.uGlow.value.copy(palA[2]).lerp(palB[2], t);
+    }
+    recolorGL();
+    window.addEventListener('rast:palette', recolorGL);
+    window.addEventListener('scroll', fadeGL, { passive: true });
 
     // Fill (and re-fill on webfont load / resize) the "rast" targets. rastW is the world
     // width of the word — shrunk on narrow (portrait) viewports so it always fits.
@@ -1016,7 +1306,10 @@
     var ndc = new THREE.Vector2(), hit = new THREE.Vector3();
     // camera-facing plane through the origin → gives a world cursor that drives the rast/sphere repel
     var camDir = new THREE.Vector3(), facePlane = new THREE.Plane(), hitW = new THREE.Vector3(), ORIGIN = new THREE.Vector3(0, 0, 0);
-    var orb = document.getElementById('fxOrb'), tmpV = new THREE.Vector3();   // orange circle that grows from the dot
+    var orb = document.getElementById('fxOrb');   // orange circle that grows from the dot
+    // Half the orb's CSS box (720px, styles.css). Big box scaled DOWN, never a small one scaled up:
+    // a 100px layer stretched to a ~650px sphere rendered blurry.
+    var ORB_R = 360;
     // Blend pair: #fxOrbInk (white, difference) + #fxOrb (gradient, multiply) — moved in
     // lockstep so white text under the sphere reads BLACK on orange (see styles.css).
     var orbInk = document.getElementById('fxOrbInk');
@@ -1027,7 +1320,159 @@
     }
     var targetForce = 0;
     var clock = new THREE.Clock();
-    var raf = null, running = false;
+    var raf = null, running = false, drewEmpty = false, lastLand = -1;
+
+    /* -------- Kling intro: the particles' landing dot IS the sequence's first frame ----------
+       A frame sequence (WebP, drawn to #fxSeq), not a <video>: scrubbing a video by setting
+       currentTime stutters — every seek waits on the decoder — while a decoded image draws at once.
+       Geometry contract, in the render's 1920×1080 "world": all of its content stays inside the
+       centre 9:16 strip x 656..1264 (wide empty margins), so the frames are just that strip
+       (1080×1920) and every screen shows the same composition. Every screen fits the box the
+       content actually fills over all frames (VID.box, a little margin around it) as big as it
+       goes, so the smoke and the logo fill the screen without a crop. Frame black is 0 and the canvas blends
+       with lighten, so the page colour shows everywhere except the smoke and the logo.
+       dot0 = the sphere in the first frame, dot1 = the logo's orange dot in the last one —
+       re-measure both after swapping the frames. */
+    var seqEl = document.getElementById('fxSeq'), seqCtx = seqEl && seqEl.getContext('2d');
+    var VID = { dot0: { x: 955, y: 279, d: 118 }, dot1: { x: 1197, y: 475, d: 55.5 }, stripX: 656, stripW: 608,
+      box: { x: 692, y: 195, w: 548, h: 700 } };   // all frames' content (x 706..1226, y 219..871) plus a margin
+    // The logo's dot over the last frames — [x, y, Ø] for frame END0, END0 + 1, … (it is still
+    // growing). The orb fades in on top of it frame by frame, so the swap can't be seen.
+    var END0 = 62, END = [[1195.8, 475.8, 43.5], [1196.5, 475.5, 45], [1196.8, 475.2, 47.5], [1197, 475.2, 49.5],
+      [1197.2, 475.2, 50.5], [1197.2, 475, 52], [1197.2, 475, 53], [1197.2, 475.2, 53.5], [1197.2, 475.2, 54.5],
+      [1197, 475, 55], [1197, 475.2, 55.5], [1197, 475.2, 55.5], [1197, 475.2, 55.5], [1196.8, 475.2, 55.5]];
+    var ORB_IN = 66, ORB_FULL = 70;   // orb fades in over these frames; from ORB_FULL the frame's own dot is masked
+    // Scroll → frame: the moving part (up to ORB_FULL) gets most of the scroll; the quiet tail (the
+    // last smoke clearing off the finished logo) gets just a short stretch, so it never reads as a
+    // pause — the whole section keeps one even pace.
+    var TAIL = 0.12;
+    function seqWarp(sp) {
+      var k = ORB_FULL / (seqFrames() - 1);
+      return sp < 1 - TAIL ? sp / (1 - TAIL) * k : k + (sp - (1 - TAIL)) / TAIL * (1 - k);
+    }
+    function dotAt(fi) {               // the logo dot at fractional frame fi, as a world point
+      var t = Math.min(END.length - 1, Math.max(0, fi - END0)), i = Math.min(END.length - 2, Math.floor(t)), f = t - i;
+      var A = END[i], B = END[i + 1];
+      return { x: lerp(A[0], B[0], f), y: lerp(A[1], B[1], f), d: lerp(A[2], B[2], f) };
+    }
+    var seqImgs = [], seqShown = -1, seqMasked = false, seqOp = -1;
+    // World → screen: scale + offset of the strip layout described above.
+    function layout() {
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      // Desktop gets a closer crop; the video and travelling dot share this geometry.
+      var B = VID.box, s = Math.min(w / B.w, h / B.h * (w > 880 ? 1.25 : 1));
+      return { s: s, ox: w / 2 - (B.x + B.w / 2) * s, oy: h / 2 - (B.y + B.h / 2) * s };
+    }
+    function vpt(p) { var L = layout(); return { x: L.ox + p.x * L.s, y: L.oy + p.y * L.s, d: p.d * L.s }; }
+    // The dot only ever moves DOWN the screen. Once the hero has had a moment, the whole wave
+    // streams into it as one while it falls, gathering speed; it grows into the sphere on the way and reaches PT_END just as the frames take over,
+    // falling exactly as fast as the sphere in them. The frames start that far down (seqLiftAt)
+    // and ease up into place more slowly than the sphere falls, so it keeps going down; the logo
+    // arrives centred as the frames end and then simply scrolls on with the page.
+    // The dot forms at the bottom of the wave, as if beneath it (PT_START) and keeps falling relative
+    // to the page — just slower than we scroll, so on screen we catch up with it (it rises at
+    // PT_V0 px per scrolled px, easing off). Once caught, it falls on screen too, reaching the frames'
+    // spot (PT_END) at the sphere's own falling speed (PT_V1) right at the hand-over. Cubic Hermite.
+    // It waits down there while the cluster gathers (until ptT0, when it becomes visible).
+    // copy/: no frames. The white dot gathers just above the screen centre and we FOLLOW it — it
+    // stays put on screen (only easing down a touch) while the page scrolls on. The orange dot
+    // comes up from below with the #studio stage (studio-burst.js) and runs into it: the white dot
+    // sits in the orange dot's top exactly as the stage pins (vidStartY = studio top) — the strike.
+    var PT_START = 0.4, PT_V0 = 0, PT_V1 = 0, ptT0 = 0;
+    // On the dot's top edge (where the splash starts, studio-burst.js level), not inside it: deeper in, the
+    // dot covered the drop ~30px before the strike and the scroll seemed to stall.
+    function pointEnd(h) { return h * 0.5 - Math.min(window.innerWidth, window.innerHeight) * 0.08 * 0.92; }
+    function pointY(y) {                                         // the dot's screen y, from the gather to the strike
+      var h = canvas.clientHeight, T = Math.max(1, vidStartY - ptT0), t = clamp01((y - ptT0) / T);
+      var t2 = t * t, t3 = t2 * t;
+      return (2 * t3 - 3 * t2 + 1) * h * PT_START + (t3 - 2 * t2 + t) * PT_V0 * T
+           + (-2 * t3 + 3 * t2) * pointEnd(h) + (t3 - t2) * PT_V1 * T;
+    }
+    function seqLiftAt(y) {                                      // how far below their place the frames are drawn
+      var L = pointEnd(canvas.clientHeight) - vpt(VID.dot0).y, vp = clamp01((y - vidStartY) / Math.max(1, vidLen));
+      // Linear and done by 30 % of the stretch: still slower than the sphere falls in the frames (so it keeps
+      // going down), but in place before the smoke spreads, so the sphere and smoke never leave the screen
+      return Math.max(0, L) * (1 - clamp01(vp / 0.3));
+    }
+    var zPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), landNdc = new THREE.Vector2(), landRay = new THREE.Raycaster();
+    function screenToWorld(sy, out) {                            // a screen y on the dot's column → the z = 0 plane
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      if (!w || !h) return;
+      camera.updateMatrixWorld();
+      landNdc.set(0, -(sy / h * 2 - 1));                         // the dot's column is the screen centre
+      landRay.setFromCamera(landNdc, camera);
+      landRay.ray.intersectPlane(zPlane, out);
+    }
+    function setLanding(sy) {
+      screenToWorld(sy == null ? pointY(window.pageYOffset || 0) : sy, uniforms.uDotC.value);
+    }
+    function frameOk(im) { return im && im.complete && im.naturalWidth > 0; }
+    function seqReady() { return frameOk(seqImgs[0]); }
+    function setSeqOp(v) {
+      if (!seqEl || v === seqOp) return;
+      seqOp = v;
+      seqEl.style.opacity = '' + v;
+      seqEl.style.visibility = v > 0 ? 'visible' : 'hidden';
+    }
+    var seqLift = -1, seqPadding = 0;
+    function setSeqLift(px) {                                    // moves the drawn frames up with the page
+      px = Math.round(px);
+      if (!seqEl || px === seqLift) return;
+      seqLift = px;
+      seqEl.style.transform = px ? 'translate3d(0,' + (-px) + 'px,0)' : '';
+    }
+    function sizeSeq() {
+      if (!seqEl) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var h = canvas.clientHeight, L = layout();
+      // Rasterize the full enlarged content BEFORE translating it onto the screen.
+      // A viewport-sized bitmap clips the first sphere's top permanently.
+      seqPadding = Math.ceil(Math.max(0, (VID.box.h * L.s - h) / 2));
+      seqEl.style.top = -seqPadding + 'px';
+      seqEl.style.bottom = 'auto';
+      seqEl.style.height = (h + seqPadding * 2) + 'px';
+      seqEl.width = Math.round(canvas.clientWidth * dpr);
+      seqEl.height = Math.round((h + seqPadding * 2) * dpr);
+      seqShown = -1;                                             // resizing clears the canvas — redraw
+    }
+    // Draw the frame at progress p (0..1); a frame still loading falls back to the nearest earlier one.
+    // mask: paint the logo's own dot out (black = page colour under lighten) once the orb has taken over.
+    function drawSeq(p, mask) {
+      if (!seqReady()) return;
+      var i = Math.round(Math.min(1, Math.max(0, p)) * (seqImgs.length - 1));
+      while (i > 0 && !frameOk(seqImgs[i])) i--;
+      mask = !!mask;
+      if (i === seqShown && mask === seqMasked) return;
+      seqShown = i; seqMasked = mask;
+      var L = layout(), k = seqEl.width / canvas.clientWidth;
+      seqCtx.clearRect(0, 0, seqEl.width, seqEl.height);
+      seqCtx.drawImage(seqImgs[i], (L.ox + VID.stripX * L.s) * k, (L.oy + seqPadding) * k, VID.stripW * L.s * k, 1080 * L.s * k);
+      if (mask) {
+        var dp = dotAt(i);
+        seqCtx.fillStyle = '#000';
+        seqCtx.beginPath();
+        seqCtx.arc((L.ox + dp.x * L.s) * k, (L.oy + seqPadding + dp.y * L.s) * k, (dp.d / 2 + 4) * L.s * k, 0, 7);
+        seqCtx.fill();
+      }
+    }
+    function seqFrames() { return seqImgs.length || (seqEl ? +seqEl.getAttribute('data-count') : 0) || 1; }
+    // After the page has loaded, so ~1 MB of frames never competes with the first paint.
+    function loadSeq() {
+      if (!seqEl || seqImgs.length) return;
+      var n = +seqEl.getAttribute('data-count') || 0, src = seqEl.getAttribute('data-src');
+      for (var i = 0; i < n; i++) {
+        var im = new Image();
+        im.decoding = 'async';
+        im.onload = function () { if (this.decode) this.decode().catch(function () { }); };   // decode ahead of the scrub
+        im.src = src.replace('%03d', ('00' + i).slice(-3));
+        seqImgs.push(im);
+      }
+    }
+    if (seqEl) {
+      sizeSeq();
+      if (document.readyState === 'complete') setTimeout(loadSeq, 300);
+      else window.addEventListener('load', function () { setTimeout(loadSeq, 300); });
+    }
 
     function resize() {
       var w = canvas.clientWidth, h = canvas.clientHeight;
@@ -1039,6 +1484,8 @@
       uniforms.uSphereR.value = Math.min(small ? 2.7 : 3.4, 0.42 * visW);
       var newW = Math.min(SX * 0.52, 0.86 * visW);
       if (Math.abs(newW - rastW) > 0.15) { rastW = newW; buildTargets(); }
+      sizeSeq();
+      setLanding();
       measure();
     }
     // Pointer (mouse or touch) drives the repel. NDC is vs the fixed canvas, so it works
@@ -1060,17 +1507,37 @@
       }
     }
     // Cache the assembly section's geometry — it drives the scroll timeline.
-    var aTop = 0, aH = 0, suckStart = 0, suckLen = 1, growSpan = 1, fadeA = 1, fadeB = 1, travelStartY = 1e9;
+    var aTop = 0, aH = 0, suckStart = 0, suckLen = 1, orbInY = 1e9, swellStart = 1e9, swellLen = 1, vidStartY = 1e9, vidLen = 1,
+        holdStartY = 1e9, fadeLen = 1, fadeA = 1, fadeB = 1, travelStartY = 1e9;
     function measure() {
       var a = document.getElementById('assembly'), vh = window.innerHeight;
       aTop = a ? a.offsetTop : vh;
       aH = a ? a.offsetHeight : vh;
-      // Fully scroll-driven so grow + travel compose cleanly: fall (from the very first
-      // scrolled pixel — the centre particles are already raining at rest), suck, grow.
-      suckStart = 0; suckLen = Math.max(1, aTop * 1.15); growSpan = Math.max(1, aH * 0.28);
-      travelStartY = suckStart + suckLen + growSpan;   // sphere fully grown → orb released to travel
-      var studioTop = aTop + aH - vh;
-      fadeA = studioTop; fadeB = studioTop + vh * 0.75;      // fade the particle canvas as #studio rises
+      // Fully scroll-driven and overlapping, always moving down the screen (see pointY): from the
+      // first scrolled pixel the particles fall into a low, falling dot; it swells into the first
+      // frame's sphere and the sequence starts playing right there, easing up into place while the
+      // sphere keeps falling (seqLiftAt) → it scrubs on (sphere falls, smoke, logo, smoke clears)
+      // → the orb takes over the logo's dot and sets
+      // off while "rast" scrolls away with the page, #studio rising right behind it (the
+      // .assembly height brings it in just as the logo is done). Lengths in screens.
+      // copy/: the gather runs almost up to the strike — the farthest dots land a quarter screen
+      // before the white drop meets the orange dot (#studio pins), so it flies the last bit alone.
+      var stEl = document.getElementById('studio');               // it overlaps the hero's foot (copy CSS), so read it directly
+      var strikeY = stEl ? stEl.offsetTop : aTop + aH;
+      var farNeck = Math.sqrt((SX / 2) * (SX / 2) + (SY / 2 + 9) * (SY / 2 + 9));
+      var farFrac = Math.min(1, (farNeck * 0.022 + 0.2 + 0.3) / 1.2);   // share of the gather when the farthest dot lands (ci = 1 in the shader)
+      suckStart = 0; suckLen = Math.max(1, (strikeY - vh * 0.25) / farFrac);
+      // A small white orb takes over the cluster once it has formed and falls on, still that small,
+      // while the rest of the dots stream in; only when the last is in does it grow (the swell).
+      orbInY = suckStart + suckLen * 0.33;
+      ptT0 = suckStart + suckLen * 0.25;                      // the cluster becomes visible — the catch-up starts
+      // The swell starts the moment the farthest dot lands — a little before the strike.
+      swellStart = suckStart + suckLen * farFrac; swellLen = Math.max(1, strikeY - swellStart);
+      // copy/ (no frames): the white drop keeps easing down to the screen centre and arrives
+      // exactly as #studio pins, where the traveller takes over — parked there for the burst.
+      travelStartY = holdStartY = vidStartY = strikeY;
+      vidLen = 1; fadeLen = vh * 0.3;
+      fadeA = swellStart + swellLen; fadeB = fadeA + vh * 0.1;   // the particles are all in the dot by now
       buildStops();
     }
     function lerp(a, b, t) { return a + (b - a) * t; }
@@ -1084,23 +1551,34 @@
     // and a semi-transparent orb reads GREY (the white ink layer stops inverting the backdrop
     // fully, so the multiply lands on a dim, desaturated base). The orb is opaque until the
     // traveller's own opacity keyframes take over.
-    function updateOrb(suckP, growP) {
-      var oA = growP > 0 ? 1 : 0;                                 // no fade-in: a half-transparent dot would read PALE over the white particle cluster — it appears already fully orange, at dot size, on top of that cluster
-      if (oA <= 0) { if (orb.style.opacity !== '0') orbCss('opacity', '0'); return; }
-      var t = ez(growP);                                          // tiny white dot → big centred sphere (scroll)
-      var vv = tmpV.copy(uniforms.uDotC.value).project(camera);
-      var w2 = canvas.clientWidth, h2 = canvas.clientHeight;
-      var dsx = (vv.x * 0.5 + 0.5) * w2, dsy = (-vv.y * 0.5 + 0.5) * h2;
-      var cx2 = lerp(dsx, w2 / 2, t), cy2 = lerp(dsy, h2 / 2, t);
-      var dia = lerp(14, Math.min(w2, h2) * 0.52, t);             // VERY small white dot → full sphere
-      gx = cx2; gy = cy2; gd = dia; go = oA;                      // remembered for the traveller handoff
-      // ONE colour from the first pixel to #studio: full brand orange, never a white/pale phase.
-      // Flat (no blend) while the particle cluster under it is still bright — blending there would
-      // invert it to black; the switch to the traveller's blend happens once the sphere covers the
-      // cluster, over the empty black section, where difference+multiply reproduces the same orange.
-      orbFlat(growP < 0.5);
+    function clamp01(v) { return Math.min(1, Math.max(0, v)); }
+    // On-screen diameter of the landed particle cluster (ball radius 0.12 world, centre-dense, plus
+    // the point size), so the orb can take over at exactly that size.
+    var cA = new THREE.Vector3(), cB = new THREE.Vector3();
+    var HAND = 0.015;   // share of the frames' stretch the first frame holds while the orb fades onto it — kept tiny, it's a stop
+    function clusterD() {
+      cA.copy(uniforms.uDotC.value).project(camera);
+      cB.copy(uniforms.uDotC.value); cB.x += 0.12; cB.project(camera);
+      return Math.abs(cB.x - cA.x) * canvas.clientWidth * 0.8 + 3;
+    }
+    function updateOrb(y) {
+      if (y < orbInY) {                                           // the cluster is still forming — no orb yet
+        if (orb.style.opacity !== '0') orbCss('opacity', '0');
+        return;
+      }
+      // copy/ (no frames). The cluster's white orb IS the drop: small and white, held on the
+      // screen's centre column (pointY) until the orange dot rises into it.
+      var cx2 = canvas.clientWidth / 2, cy2 = pointY(y), dia = clusterD(), ow = 1, halo = 1;
+      var oA = clamp01((y - orbInY) / (suckLen * 0.06));
+      gx = cx2; gy = cy2; gd = dia; go = 0;                       // the traveller starts hidden: the drop is spent in the strike
+      // Flat (no blend) the whole time: blending would invert the white cluster and the letters.
+      orbFlat(true);
+      orb.classList.add('is-white');                              // copy CSS: white overlay (--ow) over the orange
       orb.style.setProperty('--oj', '1');
-      orbCss('transform', 'translate(' + (cx2 - 50) + 'px,' + (cy2 - 50) + 'px) scale(' + (dia / 100) + ')');
+      orb.style.setProperty('--od', '0');
+      orb.style.setProperty('--ow', '' + ow);
+      orb.style.setProperty('--halo', '' + halo);
+      orbCss('transform', 'translate(' + (cx2 - ORB_R) + 'px,' + (cy2 - ORB_R) + 'px) scale(' + (dia / (2 * ORB_R)) + ')');
       orbCss('opacity', '' + oA);
     }
 
@@ -1125,68 +1603,22 @@
       svcZone = sv != null ? [sv - vh * 0.6, sv + svH * 0.68] : [1e9, 1e9];   // orb rides z-index:1 here — above bg, behind cards
       insZone = ins != null ? [ins - vh, ins + insH * 0.92] : [1e9, 1e9]; // …and BEHIND the article cards from the moment the section enters
       wkZone = wk != null ? [wk - vh * 0.2, wk + wkH] : [1e9, 1e9];       // …and BEHIND the work cards (photos would break the blend colours)
-      var K = [{ y: travelStartY, xf: 0.50, yf: 0.50, px: D(52), op: 1.0 }];   // grown sphere, centred (over empty space)
-      // MOBILE: the journey ends at the studio statement — the sphere docks beside
-      // "Internets ir pilns ar lapām…" and then rides up WITH the page (yf falls 1:1
-      // with scroll = document-anchored), gone for the rest of the page.
-      if (window.innerWidth <= 760) {
-        if (st != null) {
-          var dockY = st - vh * 0.30;                                              // statement ~1/3 down the viewport
-          K.push({ y: st - vh * 0.60, xf: 0.78, yf: 0.40, px: D(34), op: 1.0 });   // eases RIGHT as #studio rises
-          K.push({ y: dockY, xf: 0.80, yf: 0.34, px: D(26), op: 1.0 });            // docks beside the statement
-          K.push({ y: dockY + vh * 0.55, xf: 0.80, yf: -0.21, px: D(26), op: 1.0 }); // scrolls out the top with the section
-          K.push({ y: dockY + vh * 0.65, xf: 0.80, yf: -0.21, px: D(26), op: 0.0 }); // hidden from here on
-        }
-        stops = K;
-        faqZone = [1e9, 1e9];   // no FAQ follow — the journey is already over by then
-        return;
-      }
-      // Waypoints tuned for near-UNIFORM speed (screen-distance / scroll-distance kept in a
-      // narrow band; intentional exceptions: FAQ vertical ride, impact entry, fading exits).
-      // op stays 1.0 all the way through #studio: a partly transparent orb reads GREY, not
-      // orange (the ink layer's inversion goes with it), so any dip here shows up as a colour
-      // change. The journey only starts fading once it sweeps into #services to exit left.
+      // copy/: the traveller starts where the gather left the dot — centred, D(16), as #studio pins.
+      var K = [{ y: travelStartY, xf: 0.5, yf: 0.5, px: D(16), op: 0.0 }];   // the drop has struck — no orb from here
+      // #studio is a sticky burst stage (copy/js/studio-burst.js): the orb parks at the screen
+      // centre at the dot's size, D(16), and vanishes at data-burst-at, where the stage's own dot
+      // takes over and bursts open. Keep the size in step with R0 in studio-burst.js.
+      var burstY = null;
       if (st != null) {
-        K.push({ y: st - vh * 0.60, xf: 0.82, yf: 0.35, px: D(72), op: 1.0 });   // eases RIGHT as #studio rises — clear of the statement
-        K.push({ y: st, xf: 0.86, yf: 0.25, px: D(56), op: 1.0 });               // beside the statement, above the principles
-        K.push({ y: st + stH * 0.45, xf: 0.94, yf: 0.42, px: D(32), op: 1.0 });  // tucks into the right gutter while the principles pass
-        K.push({ y: st + stH * 0.95, xf: 0.64, yf: 0.46, px: D(48), op: 1.0 });  // then curves LEFT (into the behind-the-cards zone)
+        var stEl = document.getElementById('studio');
+        burstY = st + Math.max(0, stH - vh) * (parseFloat(stEl.getAttribute('data-burst-at')) || 0.06);
       }
-      if (sv != null) {
-        K.push({ y: sv + svH * 0.22, xf: 0.30, yf: 0.54, px: D(48), op: 0.80 });  // sweeps LEFT through the "Ko tu iegūsi." cards
-        K.push({ y: sv + svH * 0.62, xf: -0.42, yf: 0.60, px: D(44), op: 0.0 });  // exits off the LEFT edge, unhurried
+      // The journey ends in the studio burst — the orb only lives at the start of the page
+      // (hero → gather → burst) and is gone for the rest of it, on every screen size.
+      if (st != null) {
+        K.push({ y: Math.max(burstY, travelStartY + 1), xf: 0.5, yf: 0.5, px: D(16), op: 0.0 });   // stays gone through the burst
       }
-      if (wk != null) {
-        K.push({ y: wk + wkH * 0.08, xf: -0.25, yf: 0.44, px: D(44), op: 0.0 });  // waits just off LEFT, same size it left at
-        K.push({ y: wk + wkH * 0.45, xf: 0.14, yf: 0.40, px: D(44), op: 0.95 });  // glides back in, then one long arc to the FAQ
-      }
-      if (fq != null) {
-        K.push({ y: fq + fqH * 0.30, xf: 0.955, yf: 0.30, px: D(18), op: 0.95 }); // in the right margin by the questions
-        K.push({ y: fq + fqH * 0.65, xf: 0.955, yf: 0.74, px: D(18), op: 0.95 }); // rides down (FAQ = the speed exception)
-      }
-      if (pr != null) {
-        // NO climb over the top: out of the FAQ the orb keeps SINKING down the right edge
-        // and smoothly slides off the bottom (drifting a touch left, clear of the text) —
-        // fully gone before chapter "02" revolves in (the drum scrubs over prH − vh).
-        var scrub = Math.max(1, prH - vh);
-        K.push({ y: pr, xf: 0.93, yf: 0.80, px: D(22), op: 0.92 });                // still low on the right edge
-        K.push({ y: pr + scrub * 0.08, xf: 0.80, yf: 0.97, px: D(24), op: 0.75 }); // eases down toward the bottom edge
-        K.push({ y: pr + scrub * 0.15, xf: 0.66, yf: 1.22, px: D(24), op: 0.0 });  // slips below the screen — gone before "02"
-      }
-      if (im != null) {
-        K.push({ y: im - vh * 0.35, xf: 1.35, yf: 0.72, px: D(18), op: 0.0 });   // stays hidden, regrouping toward the RIGHT
-        K.push({ y: im - vh * 0.15, xf: 1.50, yf: 0.42, px: D(54), op: 0.0 });   // regroups off-screen as the letters begin
-        K.push({ y: im + imH * 0.22, xf: 0.82, yf: 0.40, px: D(54), op: 0.95 }); // sweeps in — 3× size, beside the title
-        K.push({ y: im + imH * 0.70, xf: 0.82, yf: 0.40, px: D(54), op: 0.95 }); // holds big, DEAD-STILL, until just past the section
-      }
-      if (ins != null) {
-        K.push({ y: ins + insH * 0.35, xf: 0.40, yf: 0.56, px: D(34), op: 0.92 });// one curved diagonal down-LEFT behind the articles
-      }
-      if (mf != null) {
-        K.push({ y: mf + vh * 0.10, xf: 0.32, yf: 0.80, px: D(32), op: 0.90 });  // rests low, left of centre, while the quote reads (close to the fall line — no zigzag)
-        K.push({ y: mf + vh * 0.26, xf: 0.60, yf: 1.02, px: D(14), op: 0.55 });  // the cite passes → FALLS at once AND shrinks fast, just right of centre…
-        K.push({ y: mf + vh * 0.42, xf: 0.66, yf: 1.48, px: D(5), op: 0.0 });    // …shrinks to a speck as it drops off the screen — gone before "Radīsim kaut ko neaizmirstamu."
-      }
+      faqZone = [1e9, 1e9];   // no FAQ follow — the journey is already over by then
       stops = K;
     }
     // Follow a hovered FAQ question (and grow when it's open).
@@ -1231,8 +1663,11 @@
       // First frame after taking over from the grow phase: continue from EXACTLY where the
       // grown sphere was rendered (no jump), then damp toward the travel path.
       if (dX === null) { dX = (gx != null ? gx : tx); dY = (gy != null ? gy : ty); dP = (gd != null ? gd : px); dO = (go != null ? go : op); }
-      dX = damp(dX, tx, 0.05, 1.6); dY = damp(dY, ty, 0.05, 1.6);   // speed ∝ distance, with a floor
-      dP = damp(dP, px, 0.06, 0);  dO = damp(dO, op, 0.08, 0);
+      // Damping eases in from none at the handoff: right after the logo the orb is locked to the
+      // scroll, so scrolling back up lands it exactly on the logo's dot — no lag, no snap.
+      var lock = 1 - clamp01((y - travelStartY) / (window.innerHeight * 0.6));
+      dX = damp(dX, tx, lerp(0.05, 1, lock), lock > 0 ? 0 : 1.6); dY = damp(dY, ty, lerp(0.05, 1, lock), lock > 0 ? 0 : 1.6);   // speed ∝ distance, with a floor
+      dP = damp(dP, px, lerp(0.06, 1, lock), 0);  dO = damp(dO, op, lerp(0.08, 1, lock), 0);
       var zi = '800';
       // z-index 1 = ABOVE every section background (bodies/panels paint at z:auto/0, incl. the OPAQUE
       // #studio panel) but BEHIND the cards (svc__card is z-index 2). So the sphere is always visible
@@ -1241,9 +1676,10 @@
       else if (y > wkZone[0] && y < wkZone[1]) zi = '-1';     // behind the work cards — never over the photos
       else if (y > insZone[0] && y < insZone[1]) zi = '1';    // behind the article cards (z-index 2) but OVER the plain section text
       orbCss('zIndex', zi);
-      orbFlat(false);                                         // travel phase: blending back on (sphere passes over text)
+      orbFlat(seqOp > 0);                                     // flat while the logo fades out under it, then blending back on (sphere passes over text)
+      orb.classList.remove('is-white');
       orb.style.setProperty('--oj', '1');                     // travelling orb is always fully orange (even after an instant jump mid-collect)
-      orbCss('transform', 'translate(' + (dX - 50) + 'px,' + (dY - 50) + 'px) scale(' + (dP / 100) + ')');
+      orbCss('transform', 'translate(' + (dX - ORB_R) + 'px,' + (dY - ORB_R) + 'px) scale(' + (dP / (2 * ORB_R)) + ')');
       orbCss('opacity', '' + dO);
     }
     // SINGLE writer for the orb, both phases (grow + travel) — two competing writers at the
@@ -1251,17 +1687,30 @@
     (function orbLoop() {
       if (orb) {
         var y = window.pageYOffset || 0;
-        if (y >= travelStartY) travelOrb(y);
+        if (y >= travelStartY) {
+          orb.style.setProperty('--od', '0');                    // copy/: already the shaded brand dot
+          travelOrb(y);
+        }
         else {
           dX = null;                                             // next takeover re-syncs from the grow output
           if (orb.style.zIndex !== '800') orbCss('zIndex', '800');   // an instant jump up (Ctrl+F, scrollbar flick) must not keep a card-zone z-index
-          var suckP = Math.min(1, Math.max(0, (y - suckStart) / suckLen));
-          var growP = Math.min(1, Math.max(0, (y - suckStart - suckLen) / growSpan));
-          updateOrb(suckP, growP);
+          updateOrb(y);
         }
       }
       requestAnimationFrame(orbLoop);
     })();
+
+    // Visibility must follow scroll even while offscreen rendering is paused.
+    // History restoration can jump past both observed intro sections in one frame.
+    function syncCanvasVisibility() {
+      var y = window.pageYOffset || 0;
+      canvas.style.opacity = '' + (1 - Math.min(1, Math.max(0, (y - fadeA) / Math.max(1, fadeB - fadeA))));
+    }
+    window.addEventListener('scroll', syncCanvasVisibility, { passive: true });
+    window.addEventListener('pageshow', function () {
+      requestAnimationFrame(function () { measure(); syncCanvasVisibility(); });
+    });
+    if (hasST) ScrollTrigger.addEventListener('refresh', syncCanvasVisibility);
 
     function frame() {
       var dt = Math.min(clock.getDelta(), 0.05);
@@ -1274,19 +1723,27 @@
       // "rast" stage DROPPED (uToText stays 0): the wave drains down, then funnels into the dot
       var suckP = Math.min(1, Math.max(0, (y - suckStart) / suckLen));
       uniforms.uToSphere.value = suckP;
-      uniforms.uGrow.value = Math.min(1, Math.max(0, (y - suckStart - suckLen) / growSpan));
+      var ly = pointY(y);                                        // the dot falls the whole time
+      if (ly !== lastLand) { lastLand = ly; setLanding(ly); }    // the dot scrolls up with #assembly
+      // uGrow = the swell: the cluster dissolves into the white sphere over the whole swell (the
+      // shader fades the particles out across uGrow 0..0.08)
+      uniforms.uGrow.value = 0.08 * Math.min(1, Math.max(0, (y - orbInY) / (suckLen * 0.06)));   // "orb is there" — from now on landed dots vanish into it
       // camera stays FIXED on the hero landscape view — the platform never changes perspective
 
       // fade the particle canvas as #studio rises (the orb itself is driven solely by orbLoop)
-      canvas.style.opacity = '' + (1 - Math.min(1, Math.max(0, (y - fadeA) / Math.max(1, fadeB - fadeA))));
+      syncCanvasVisibility();
 
-      renderer.render(scene, camera);
+      // Through the long video stretch every particle is faded out — draw that empty frame once,
+      // then stop re-rendering it every frame.
+      var empty = y >= swellStart + swellLen;                     // particles fully faded into the sphere
+      if (!empty || !drewEmpty) renderer.render(scene, camera);
+      drewEmpty = empty;
       raf = requestAnimationFrame(frame);
     }
     function start() { if (!running) { running = true; clock.start(); frame(); } }
     function stop() { if (running) { running = false; cancelAnimationFrame(raf); } }
 
-    resize(); measure();
+    resize(); measure(); syncCanvasVisibility();
     window.addEventListener('resize', resize);
     if (hasST && ScrollTrigger.addEventListener) ScrollTrigger.addEventListener('refresh', measure);
     window.addEventListener('mousemove', function (e) { pointer(e.clientX, e.clientY); });
@@ -1308,7 +1765,11 @@
 
   function setupHero3D() {
     var canvas = document.getElementById('heroCanvas');
-    if (!setupWave3D(canvas, heroEl)) setupCanvas(canvas, heroEl);
+    if (!setupWave3D(canvas, heroEl)) {
+      // No WebGL sequence → no orb or intro video either: collapse their empty scroll stretch.
+      document.documentElement.classList.add('no-fx');
+      setupCanvas(canvas, heroEl);
+    }
   }
 
   /* ---------------- Preloader ---------------- */
@@ -1320,7 +1781,7 @@
     loaderDone = true;
     if (loader) loader.classList.add('is-done');
     body.style.overflow = '';
-    if (lenis) lenis.start();
+    syncScrollLock();
     // Reveal the hero title only once webfonts are ready, so it can't reflow
     // (fallback → Bricolage swap) mid slide-in — that swap is the "glitch".
     if (document.fonts && document.fonts.ready) {
@@ -1333,7 +1794,7 @@
   }
 
   function runLoader() {
-    if (!loader || reduce) { finishLoader(); return; }
+    if (!loader || reduce || savedPosition()) { finishLoader(); return; }
     body.style.overflow = 'hidden';
     if (lenis) lenis.stop();
     var countEl = document.getElementById('loaderCount');
@@ -1367,6 +1828,7 @@
     setupServices();
     setupServicesHeader();
     if (hasST) ScrollTrigger.refresh();
+    restoreInitialPosition();
   }
 
   function init() {
@@ -1384,60 +1846,105 @@
       html.classList.add('no-anim');
       if (loader) loader.classList.add('is-done');
       body.style.overflow = '';
+      syncScrollLock();
+      scenesBuilt = true;
+      restoreInitialPosition();
       if (window.console) console.warn('rast init:', err);
     }
   }
 
   // Hard safety: drop loader no matter what
   window.addEventListener('load', finishLoader);
-  // Recompute all pin/scrub positions once everything (video, fonts, images) has
-  // fully loaded — prevents pinned sections (impact) from using stale positions.
-  // Force the top first (a reload must never start mid-page, or the pins miscalculate).
-  if (hasST) window.addEventListener('load', function () {
-    // If we arrived with a hash (e.g. from a case-study/article via "Citi darbi"/"Citi ieskati"),
-    // honour it: refresh first, THEN jump to that section. Otherwise start at the top
-    // (a plain reload must not start mid-page, or the pinned sections miscalculate).
-    // __rastDropHash is set by the boot script in index.html when this load is a manual
-    // refresh — then the hash is ignored and we start at the top like any other reload.
-    var hash = window.__rastDropHash ? '' : location.hash;
-    var target = (hash && hash.length > 1) ? document.querySelector(hash) : null;
-    if (!target) { window.scrollTo(0, 0); if (lenis) lenis.scrollTo(0, { immediate: true }); }
-    setTimeout(function () {
-      ScrollTrigger.refresh();
-      if (target) {
-        if (lenis) lenis.scrollTo(target, { immediate: true, offset: 0 });
-        else target.scrollIntoView();
-      }
-    }, 350);
-  });
-  setTimeout(finishLoader, 4500);
-
-  // Don't let the browser restore a stale mid-page scroll position on reload/back —
-  // ScrollTrigger pins miscalculate if the page starts anywhere but the top.
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-
-  // Pages reached by "back" — e.g. returning to the homepage from an article/case-study —
-  // may be restored from the browser's back/forward cache (bfcache) without re-running
-  // init. The rAF-driven GSAP ticker that also powers Lenis never resumes, so scrolling
-  // and every scroll-linked animation freeze and the page looks broken. Force a clean
-  // reload so everything re-initialises from scratch (the preloader masks the rebuild).
-  // `e.persisted` catches true bfcache restores; the navigation-type check also catches
-  // back/forward loads served from the HTTP cache where the same stale state can appear.
-  function isBackForward() {
-    try {
-      var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-      return !!(nav && nav.type === 'back_forward');
-    } catch (err) { return false; }
+  // Positions belong to individual history entries, so different visits never
+  // overwrite one another. No persistent storage or personal form data is needed.
+  var restorationDone = false;
+  var saveTimer = 0;
+  var pageLoaded = document.readyState === 'complete';
+  function savedPosition() {
+    var pos = history.state && history.state.rastScroll;
+    return pos && pos.path === location.pathname + location.search && pos.hash === location.hash &&
+      Number.isFinite(pos.y) && pos.y >= 0 ? pos : null;
   }
-  window.addEventListener('pageshow', function (e) {
-    if (e.persisted || isBackForward()) {
-      // Mark the reload as ours. The boot script in index.html strips the hash on a *user*
-      // refresh; without this mark our own back/forward reload would look the same to it and
-      // returning from an article would land at the top instead of at #insights.
-      // The mark rides on history.state (kept across the reload, no storage permission needed).
-      try { history.replaceState({ rastBfReload: 1 }, ''); } catch (err) { }
-      window.location.reload();
+  function positionState(y, hash) {
+    return Object.assign({}, history.state, {
+      rastScroll: { path: location.pathname + location.search, hash: hash, y: y }
+    });
+  }
+  function savePosition() {
+    clearTimeout(saveTimer);
+    if (!restorationDone) return;
+    try {
+      history.replaceState(positionState(window.scrollY, location.hash), '');
+    } catch (err) { /* Native navigation still works if history is restricted. */ }
+  }
+  function restorePosition() {
+    var pos = savedPosition(), target = hashTarget(location.hash);
+    if (hasST) ScrollTrigger.refresh();
+    scrollToPosition(pos ? pos.y : target ? anchorY(target) : 0);
+    // Incoming links still accept #work etc.; consume the destination, then clean the URL.
+    if (target) {
+      try { history.replaceState(positionState(window.scrollY, ''), '', location.pathname + location.search); } catch (err) { }
     }
+    if (hasST) ScrollTrigger.update();
+  }
+  function restoreInitialPosition() {
+    if (restorationDone || !scenesBuilt || !pageLoaded) return;
+    requestAnimationFrame(function () {
+      if (restorationDone) return;
+      finishLoader();
+      restorePosition();
+      restorationDone = true;
+      savePosition();
+    });
+  }
+  window.addEventListener('load', function () {
+    pageLoaded = true;
+    restoreInitialPosition();
+  });
+  setTimeout(function () { pageLoaded = true; finishLoader(); restoreInitialPosition(); }, 4500);
+  // A slow resource must never drag a visitor back after they start interacting.
+  function cancelInitialRestore(e) {
+    if (e.type === 'keydown' && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].indexOf(e.key) < 0) return;
+    if (loaderDone) restorationDone = true;
+  }
+  ['wheel', 'touchstart', 'keydown'].forEach(function (event) {
+    window.addEventListener(event, cancelInitialRestore, { passive: true });
+  });
+  window.addEventListener('scroll', function () {
+    clearTimeout(saveTimer);
+    if (restorationDone) saveTimer = setTimeout(savePosition, 150);
+  }, { passive: true });
+  window.addEventListener('pagehide', savePosition);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) savePosition();
+    else if (hasGSAP) gsap.ticker.wake();
+  });
+  window.addEventListener('popstate', function () {
+    clearTimeout(saveTimer);
+    if (!restorationDone) return;
+    restorePosition();
+  });
+  window.addEventListener('hashchange', function () {
+    if (restorationDone) { restorePosition(); savePosition(); }
+  });
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted) return;
+    if (hasGSAP) gsap.ticker.wake();
+    syncScrollLock();
+    restorePosition();
+    restorationDone = true;
+  });
+  // Expanding FAQ answers changes every later scene's geometry.
+  var layoutTimer;
+  Array.prototype.forEach.call(document.querySelectorAll('.faq__item'), function (item) {
+    item.addEventListener('toggle', function () {
+      clearTimeout(layoutTimer);
+      layoutTimer = setTimeout(function () {
+        if (lenis) lenis.resize();
+        if (hasST) ScrollTrigger.refresh();
+        onScroll(window.scrollY);
+      }, reduce ? 0 : 400);
+    });
   });
 
   /* ---------------- White text goes black ONLY where the sphere's circle covers it ----------
@@ -1460,7 +1967,7 @@
               ' .section-note, .faq__a, .svc__lead, .step__desc';
     var els = [].slice.call(document.querySelectorAll(SEL));
     if (!els.length) return;
-    var ORB_ABOVE_ONLY = '.svc__card, .insight, .work__card--cta, .studio';
+    var ORB_ABOVE_ONLY = '.svc__card, .insight, .work__card, .studio';   // work names sit ON the photos now
     var COPY = ['fontFamily','fontSize','fontWeight','fontStyle','fontStretch','letterSpacing',
                 'lineHeight','textTransform','textAlign','textIndent','wordSpacing','whiteSpace','direction'];
     var targets = [];

@@ -4,10 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0A0A0C" />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
   <title>Mājaslapu izstrāde Latvijā - process, termiņi un cena | rast studija</title>
   <meta name="description" content="Mājaslapu izstrāde no idejas līdz gatavai lapai: pielāgots dizains, ātra ielāde, ērta lietošana telefonā un SEO pamati. Uzzini, kā notiek mājaslapas izveide un cik tā maksā." />
-  <link rel="canonical" href="https://www.raststudio.lv/majaslapu-izstrade" />
+  <link rel="alternate" hreflang="lv" href="https://www.raststudio.lv/majaslapu-izstrade" />
+  <link rel="alternate" hreflang="en" href="https://www.raststudio.lv/en/web-development" />
+  <link rel="alternate" hreflang="ru" href="https://www.raststudio.lv/ru/sozdanie-saitov" />
+  <link rel="alternate" hreflang="x-default" href="https://www.raststudio.lv/majaslapu-izstrade" />
 
   <!-- Open Graph / social -->
   <meta property="og:type" content="website" />
@@ -21,11 +24,11 @@
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400..800&family=Karla:wght@400..800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
 
   <script type="application/ld+json">
   {
@@ -87,11 +90,21 @@
     .art-cta h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px,4vw,48px); letter-spacing: -.03em; }
     .art-cta .row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
   </style>
+<link rel="stylesheet" href="/css/fonts.css" />
+<link rel="stylesheet" href="/css/palette.css" />
+<script src="/js/palette.js"></script>
+<link rel="canonical" href="https://www.raststudio.lv/majaslapu-izstrade" />
 </head>
 <body>
   <nav class="art-nav">
-    <a href="/" class="brand">rast<span class="accent" style="font-weight:800">.</span></a>
-    <a href="/" class="art-back">← Uz sākumu</a>
+    <a href="/" class="brand"><span class="brand__word">rast</span><span class="brand__dot" aria-hidden="true"></span></a>
+    <div style="display:flex;align-items:center;gap:18px">
+      <div class="lang" aria-label="Valoda">
+        <span aria-current="true">LV</span>
+        <a href="/en/web-development" hreflang="en" lang="en">EN</a>
+      </div>
+      <a href="/" class="art-back">← Uz sākumu</a>
+    </div>
   </nav>
 
   <article class="art">
@@ -147,13 +160,13 @@
   <section class="art-cta">
     <div class="container">
       <h2>Sāksim ar sarunu<span class="accent">.</span></h2>
-      <p style="margin-top:10px">Pastāsti par savu ideju - atbildēsim vienas darba dienas laikā. Bez saistībām un bez maksas.</p>
+      <p style="margin-top:10px">Pastāsti par savu ideju - atbildēsim vienas darba dienas laikā.</p>
       <div class="row">
-        <a href="/#contact" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+        <a href="/?project=1" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
         <a href="mailto:hello@raststudio.lv" class="btn btn--ghost"><span>hello@raststudio.lv</span></a>
       </div>
     </div>
   </section>
-  <script src="js/tab-title.js"></script>
-</body>
+  <script src="/js/tab-title.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script><script src="/js/smooth-scroll.js"></script></body>
 </html>

@@ -1,0 +1,33 @@
+{
+  "reference": "https://www.awwwards.com/inspiration/services-layout-wkndhrs",
+  "generator": "Kling",
+  "model": "kling-video-v3_0_omni",
+  "duration": 5,
+  "credits": 120,
+  "clips": [
+    {
+      "file": "together",
+      "title": "Dizains un izstrāde kopā",
+      "prompt": "A refined abstract 3D motion design film for a contemporary design studio website. Landscape 16:9 composition, fixed camera, one continuous shot. Near-black charcoal background, warm off-white and vermilion orange (#FF4A2E) sculptural objects only. Tactile satin material, subtle studio lighting, crisp geometry, restrained elegant movement. The sculpture fills the central two thirds of the frame and remains completely in frame. No people, no letters, no words, no logos, no watermark-like graphics, no UI, no cuts, no camera travel. Five second calm loop, start and end on the same balanced composition. Two complementary architectural pieces, one smooth off-white curved arch and one finely ribbed orange geometric arch, slowly slide toward each other and interlock precisely into a single complete sculptural ring. Their surfaces and seams align perfectly, showing creative form and engineered structure working together. They gently separate and return, a smooth rhythmic mechanical loop.",
+      "source": "https://v15-kling.klingai.com/bs2/upload-ylab-stunt-sgp/9bdc60f4-f24c-42b5-ba4e-1b90dc05a2c2-DBqEyL8qmcVXPNsDc8FxUg-output.mp4?x-kcdn-pid=112372"
+    },
+    {
+      "file": "character",
+      "title": "Tava uzņēmuma raksturs",
+      "prompt": "A refined abstract 3D motion design film for a contemporary design studio website. Landscape 16:9 composition, fixed camera, one continuous shot. Near-black charcoal background, warm off-white and vermilion orange (#FF4A2E) sculptural objects only. Tactile satin material, subtle studio lighting, crisp geometry, restrained elegant movement. The sculpture fills the central two thirds of the frame and remains completely in frame. No people, no letters, no words, no logos, no watermark-like graphics, no UI, no cuts, no camera travel. Five second calm loop, start and end on the same balanced composition. An array of small identical matte off-white spheres in perfectly straight rows on a charcoal surface. At the center stands one distinct vermilion orange softly sculpted star with rounded lobes. The orange sculpture slowly turns on its axis, revealing its distinctive silhouette, while all the uniform spheres remain still. Art direction about a brand having its own unmistakable character, sophisticated physical material study.",
+      "source": "https://v15-kling.klingai.com/bs2/upload-ylab-stunt-sgp/05eebbe2-9b6f-46d8-a633-f7a60eb192d2-EzM3PvoKVYu8luNlpxhagQ-output.mp4?x-kcdn-pid=112372"
+    },
+    {
+      "file": "clarity",
+      "title": "Skaidrība detaļās",
+      "prompt": "A refined abstract 3D motion design film for a contemporary design studio website. Landscape 16:9 composition, fixed camera, one continuous shot. Near-black charcoal background, warm off-white and vermilion orange (#FF4A2E) sculptural objects only. Tactile satin material, subtle studio lighting, crisp geometry, restrained elegant movement. The sculpture fills the central two thirds of the frame and remains completely in frame. No people, no letters, no words, no logos, no watermark-like graphics, no UI, no cuts, no camera travel. Five second calm loop, start and end on the same balanced composition. Macro view of an elegant geometric composition: six off-white rectangular tiles suspended just above a charcoal plane, and a single small vermilion orange cube. The slightly misaligned tiles slide gently into an exact orderly grid; the orange cube slots precisely into the one remaining opening. Beautiful exact alignment, tiny tactile shadows and clean spacing. A subtle breath of separation then a return to alignment.",
+      "source": "https://v15-kling.klingai.com/bs2/upload-ylab-stunt-sgp/0e607cc4-0119-4b7d-8957-13bc8acaedb0-O0WPP0O7LZys-e7kUYcBmA-output.mp4?x-kcdn-pid=112372"
+    },
+    {
+      "file": "dialogue",
+      "title": "Saruna visa projekta laikā",
+      "prompt": "A refined abstract 3D motion design film for a contemporary design studio website. Landscape 16:9 composition, fixed camera, one continuous shot. Near-black charcoal background, warm off-white and vermilion orange (#FF4A2E) sculptural objects only. Tactile satin material, subtle studio lighting, crisp geometry, restrained elegant movement. The sculpture fills the central two thirds of the frame and remains completely in frame. No people, no letters, no words, no logos, no watermark-like graphics, no UI, no cuts, no camera travel. Five second calm loop, start and end on the same balanced composition. Two sculptural curved ribbon loops face one another across a small gap, one off-white and one vermilion orange, isolated on charcoal. A small orange sphere glides gently from one ribbon to the other, is received, then returns on a graceful curved path. The ribbons lean gently toward each other in response, like an attentive conversation. Simple readable composition, balanced exchange and continuous collaboration.",
+      "source": "https://v15-kling.klingai.com/bs2/upload-ylab-stunt-sgp/9a9bb696-84b3-4ff6-80c4-9d72c1901a10-NqegdTgyCQwS4fCfxtW8WQ-output.mp4?x-kcdn-pid=112372"
+    }
+  ]
+}

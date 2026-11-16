@@ -1,0 +1,67 @@
+/* copy/: a soft shadow on the bg behind the hero copy, so the text stands clear of the wave.
+   Each word and each small text block gets a dark cloud in the page colour — a plain radial
+   gradient, densest under the text and thinning out to nothing at its edge, so it reads as a
+   shadow, never as a box or an outline. Gradients cost nothing to paint, unlike big blurs.
+   The clouds arrive with their text: a word's cloud rides on the word as it slides in, the note's
+   fades in with the note, and the lead's fades in as its lines slide up (main.js tweens --scrim). */
+.hero--solutions .hero__word > span,
+.hero--solutions .hero__lead,
+.hero__note { position: relative; }
+
+/* As wide as the word, not the grid row, so the shadow sits behind the letters. */
+.hero--solutions .hero__word > span { width: fit-content; }
+.hero--solutions .hero__word--1 > span { margin-left: auto; }
+
+.hero--solutions .hero__word > span::before,
+.hero--solutions .hero__lead::before,
+.hero__note::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side,
+    rgba(var(--bg-rgb, 10, 10, 12), .85) 0%,
+    rgba(var(--bg-rgb, 10, 10, 12), .78) 40%,
+    rgba(var(--bg-rgb, 10, 10, 12), .5) 65%,
+    rgba(var(--bg-rgb, 10, 10, 12), .2) 85%,
+    rgba(var(--bg-rgb, 10, 10, 12), 0) 100%);
+}
+.hero--solutions .hero__word > span::before { inset: -.3em -.55em; }
+.hero--solutions .hero__lead::before { inset: -2.6em -3.2em; }
+.hero__note::before { inset: -3.2em -3.8em; }
+
+/* The lead lines and the note get a darker, wider cloud than the big words — they are small and sit right on the wave. */
+.hero--solutions .hero__lead::before {
+  background: radial-gradient(closest-side,
+    rgba(var(--bg-rgb, 10, 10, 12), .97) 0%,
+    rgba(var(--bg-rgb, 10, 10, 12), .94) 45%,
+    rgba(var(--bg-rgb, 10, 10, 12), .76) 68%,
+    rgba(var(--bg-rgb, 10, 10, 12), .38) 86%,
+    rgba(var(--bg-rgb, 10, 10, 12), 0) 100%);
+}
+.hero__note::before {
+  background: radial-gradient(closest-side,
+    rgba(var(--bg-rgb, 10, 10, 12), .97) 0%,
+    rgba(var(--bg-rgb, 10, 10, 12), .94) 45%,
+    rgba(var(--bg-rgb, 10, 10, 12), .75) 68%,
+    rgba(var(--bg-rgb, 10, 10, 12), .38) 86%,
+    rgba(var(--bg-rgb, 10, 10, 12), 0) 100%);
+}
+
+.hero--solutions .hero__lead::before { opacity: var(--scrim, 1); }
+
+/* The big words slide in on `top`, not transform, behind a clip that leaves room for their cloud:
+   neither makes a stacking context, so every word's cloud stays under every word's letters even
+   mid-slide (a transform would put the next word's cloud over the descenders above it). The words
+   start low enough (top 2.2em, main.js) that neither letters nor cloud peek out before they move. */
+.hero--solutions .hero__title .hero__word { overflow: clip; overflow-clip-margin: .6em; }
+.js .hero--solutions .hero__word > span { transform: none; top: 2.2em; }
+.no-anim .hero--solutions .hero__word > span,
+.hero.is-intro-done .hero__word > span { top: 0; }
+@media (prefers-reduced-motion: reduce) { .js .hero--solutions .hero__word > span { top: 0; } }
+
+/* After the intro: the lines no longer clip (or the shadows would be cut off in straight lines),
+   and the pre-hide transform stays off once GSAP has cleared its own. */
+.hero.is-intro-done .hero__title .line,
+.no-anim .hero__title .line { overflow: visible; }
+.hero.is-intro-done .hero__title .line > span { transform: none; }

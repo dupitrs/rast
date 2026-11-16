@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0A0A0C" />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
   <title>Kā sagatavoties mājaslapas izstrādei? | rast studija</title>
   <meta name="description" content="Ko sagatavot iepriekš, lai mājaslapas izstrāde norit ātri un bez pārpratumiem: mērķis, teksti, attēli un piemēri. Praktisks ceļvedis no rast studijas." />
-  <link rel="canonical" href="https://www.raststudio.lv/raksti/ka-sagatavoties-izstradei" />
 
   <!-- Open Graph / social -->
   <meta property="og:type" content="article" />
@@ -21,11 +20,11 @@
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400..800&family=Karla:wght@400..800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org", "@type": "Article",
@@ -68,17 +67,21 @@
     .art-cta h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px,4vw,48px); letter-spacing: -.03em; }
     .art-cta .row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
   </style>
+<link rel="stylesheet" href="/css/fonts.css" />
+<link rel="stylesheet" href="/css/palette.css" />
+<script src="/js/palette.js"></script>
+<link rel="canonical" href="https://www.raststudio.lv/raksti/ka-sagatavoties-izstradei" />
 </head>
 <body>
   <nav class="art-nav">
-    <a href="/" class="brand">rast<span class="accent" style="font-weight:800">.</span></a>
-    <a href="/#insights" class="art-back">← Raksti</a>
+    <a href="/" class="brand"><span class="brand__word">rast</span><span class="brand__dot" aria-hidden="true"></span></a>
+    <a href="/en/raksti/ka-sagatavoties-izstradei" lang="en" hreflang="en">EN</a>
+    <a href="/blogs" class="art-back">← Raksti</a>
   </nav>
 
   <article class="art">
     <header class="art-head">
-      <p class="eyebrow"><span class="dot"></span> Ceļvedis</p>
-      <h1 class="art-h1">Kā sagatavoties mājaslapas izstrādei?</h1>
+      <h1 class="art-h1">Kā sagatavoties mājaslapas izstrādei<span class="q-split">?</span></h1>
     </header>
 
     <div class="art-body">
@@ -117,11 +120,13 @@
     <div class="container">
       <h2>Parunāsim par tavu projektu?<span class="accent">.</span></h2>
       <div class="row">
-        <a href="/#contact" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
-        <a href="/#insights" class="btn btn--ghost"><span>Citi raksti</span></a>
+        <a href="/?project=1" class="btn btn--solid"><span>Sākt projektu</span> <i class="btn__arrow">→</i></a>
+        <a href="/blogs" class="btn btn--ghost"><span>Citi raksti</span></a>
       </div>
     </div>
   </section>
-  <script src="../js/tab-title.js"></script>
+  <script src="/js/tab-title.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script src="/js/smooth-scroll.js"></script>
 </body>
 </html>

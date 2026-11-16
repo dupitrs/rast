@@ -1,0 +1,137 @@
+/* copy/: service names lead each card, followed by the description and prominent
+   suitability examples. All copy, surfaces and typography belong to the RAST page.
+   The shared styles and setupServicesHeader retain the original sticky cascade,
+   title-bar peeks, mobile height matching and reduced-motion fallback. */
+.svc--catalogue > .container {
+  max-width: none;
+  padding-inline: 0;
+}
+
+#services.svc--catalogue .section-head {
+  position: static;
+  width: min(1600px, calc(100% - clamp(24px, 5vw, 112px)));
+  max-width: none;
+  container-type: inline-size;
+}
+
+#services.svc--catalogue .section-title {
+  max-width: none;
+  margin: 0;
+  font-size: 10.95cqw;
+  line-height: 1.06;
+  white-space: nowrap;
+}
+
+.svc--catalogue .svc__deck { --deck-top: clamp(20px, 3vh, 40px); }
+
+.svc--catalogue .svc__extra {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.svc--catalogue .svc__card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.svc--catalogue .svc__heading {
+  /* Compact size measured by the scroll animation; the heading keeps its layout. */
+  font-size: clamp(22px, 1.9vw, 28px);
+}
+
+.svc--catalogue .svc__card-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  align-content: stretch;
+  gap: clamp(36px, 3.6vw, 56px);
+  padding-top: clamp(24px, 2.5vw, 36px);
+}
+
+.svc--catalogue .svc__lead {
+  color: var(--accent);
+  max-width: none;
+  font-size: clamp(46px, 6.4vw, 96px);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -.04em;
+  text-wrap: balance;
+  transform-origin: top left;
+  transform: translateY(var(--title-y, 0px)) scale(var(--title-scale, 1));
+}
+
+.svc--catalogue .svc__card-aside {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-self: center;
+  align-items: start;
+  gap: clamp(32px, 6vw, 96px);
+}
+
+.svc--catalogue .svc__desc {
+  max-width: 44ch;
+  margin-top: 0;
+  font-size: clamp(20px, 1.8vw, 27px);
+  line-height: 1.55;
+}
+
+.svc--catalogue .svc__fit {
+  width: 100%;
+  max-width: none;
+  font-size: clamp(22px, 2.1vw, 31px);
+  line-height: 1.4;
+}
+
+.svc--catalogue .svc__fit-tag {
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.svc--catalogue .svc__fit-list {
+  gap: 0;
+  margin-top: 24px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+
+.svc--catalogue .svc__fit-list li { padding-left: 0; }
+.svc--catalogue .svc__fit-list li::before { content: none; }
+.svc--catalogue .svc__fit-list li + li {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 761px) {
+  .svc--catalogue .svc__card { min-height: clamp(520px, 74vh, 820px); }
+  .svc--catalogue .svc__card-main { padding: clamp(36px, 4.5vw, 76px) clamp(56px, 7vw, 136px); }
+}
+
+@media (max-width: 1100px) {
+  .svc--catalogue .svc__desc { max-width: none; }
+}
+
+@media (max-width: 760px) {
+  .svc--catalogue .svc__card { border-radius: 10px; }
+  /* Let tall cards scroll into full view before the next card covers them. */
+  .svc--catalogue .svc__card:nth-child(n) { top: min(var(--deck-top), calc(100svh - var(--card-h, 0px) - 20px)); }
+  .svc--catalogue .svc__heading { font-size: 20px; }
+  .svc--catalogue .svc__card-main { grid-template-rows: auto auto; align-content: start; gap: 28px; padding: 28px clamp(32px, 9vw, 48px) 38px; }
+  .svc--catalogue .svc__card-aside { grid-template-columns: 1fr; align-self: start; gap: 28px; }
+  .svc--catalogue .svc__lead { max-width: 22ch; font-size: clamp(32px, 8.5vw, 42px); line-height: 1.12; }
+  .svc--catalogue .svc__desc { font-size: 18px; line-height: 1.6; }
+  .svc--catalogue .svc__fit { padding-top: 24px; border-top: 1px solid var(--line); font-size: 19px; line-height: 1.45; }
+  .svc--catalogue .svc__fit-list { margin-top: 16px; }
+  .svc--catalogue .svc__fit-list li + li { margin-top: 16px; padding-top: 16px; }
+}
+
+.no-anim .svc--catalogue .svc__lead { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .svc--catalogue .svc__lead { transform: none; }
+}
